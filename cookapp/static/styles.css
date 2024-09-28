@@ -1,22 +1,128 @@
+/* When we import fonts we'll put them here, @import */
+
+/* static colors */
+:root {
+  --color-white: #fff;
+  --color-black: #000;
+  --color-primary-peach: #c96868;
+  --color-secondary-yellow: #fadfa1;
+  --color-beige: #fff4ea;
+  --color-light-blue: #7eacb5;
+  --color-dark: #333;
+}
+
+/* fill viewport  */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+html,
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
-    margin: 0;
-    padding: 20px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
 }
-header {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 0;
-    text-align: center;
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--color-beige);
+  color: var(--color-dark);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
+/* Header classes */
+header.main-header {
+  background: linear-gradient(
+    45deg,
+    var(--color-secondary-yellow),
+    var(--color-primary-peach)
+  );
+  color: var(--color-dark);
+  padding: 2px 20px;
+  text-align: left;
+  word-spacing: -6px;
+}
+
+/* Navbar classes */
+nav.navbar {
+  background-color: var(--color-dark);
+  color: var(--color-beige);
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+nav.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+nav.navbar ul li {
+  margin: 0;
+}
+
+nav.navbar ul li a {
+  color: var(--color-beige);
+  text-decoration: none;
+  padding: 5px 10px;
+}
+
+nav.navbar ul li a:hover {
+    color: var(--color-primary-peach);
+}
+
+
+/* Main content classes */
 main {
-    margin: 20px 0;
-    text-align: center;
+  flex: 1;
+  margin: 0;
+  padding: 20px 0;
+  text-align: center;
+  background-color: transparent;
+  color: var(--color-dark);
 }
+
+/* wanted to test sticky navbar */
+.remove-later {
+    padding-top: 100vh;
+}
+/* Footer classes  */
 footer {
-    text-align: center;
-    font-size: 0.8em;
-    color: #777;
+  text-align: center;
+  font-size: 0.8em;
+  background-color: var(--color-dark);
+  color: var(--color-beige);
+  padding: 10px 0;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: auto;
+  align-items: center;
+  justify-content: center;
+}
+
+footer .navbar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+footer .navbar-text {
+  padding: 0 20px;
+}
+
+.github-icon i {
+  color: var(--color-beige);
+}
+
+.github-icon i:hover {
+  color: var(--color-primary-peach);
 }

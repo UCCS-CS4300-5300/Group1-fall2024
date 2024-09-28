@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--0v=p1ycobs(ia)7p*=j0e306&f#rz_msx1)x%^*)t=19xyvel
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["app-ganders4-5.devedu.io", "app-kbarcrof-5.devedu.io", "app-rlustig-5.devedu.io","app-kcall2-5.devedu.io"]
+ALLOWED_HOSTS = ["app-ganders4-5.devedu.io", "app-kbarcrof-5.devedu.io", "app-rlustig-5.devedu.io","app-kcall2-5.devedu.io", "app-tjenkin5-5.devedu.io","advsoftware.prox"]
 
 
 # Application definition

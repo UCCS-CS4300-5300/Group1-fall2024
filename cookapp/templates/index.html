@@ -2,21 +2,53 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <title>We Need To Cook</title>
-</head>
-<body>
-    <header>
-        <h1>We Need To Cook!</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+    <title>{% block title %}We Need To Cook{% endblock %}</title>
+  </head>
+  <body class="page-container">
+    <header class="main-header">
+      <h1>We Need To Cook!</h1>
     </header>
+    <nav class="navbar">
+      <ul>
+        <li><a href="#">We</a></li>
+        <li><a href="#">Need</a></li>
+        <li><a href="#">To</a></li>
+        <li><a href="#">Cook</a></li>
+      </ul>
+    </nav>
     <main>
-        <p>This is a beautiful landing page.</p>
+      {% block content %}
+    <section class="intro">
+        <h2>Welcome to We Need To Cook!</h2>
+        <p>
+            You give ingredients, we give recipes!
+        </p>
+        <p class='mt-4 remove-later'>
+            <strong>This is a <u>beautiful</u> landing page.</strong>
+        </p>
+    </section>
+      {% endblock %}
     </main>
     <footer>
-        <p>Created by Group 1 - 9/25/2024</p>
+      <div class="navbar navbar-inverse navbar-static-bottom" role="navigation">
+        <div class="navbar-text pull-left">Created by Group 1 - Oct 2024</div>
+        <div class="navbar-text pull-right">
+          <a
+            href="https://github.com/UCCS-CS4300-5300/Group1-fall2024"
+            class="github-icon"
+          >
+            <i class="fa fa-github-square fa-2x"></i>
+          </a>
+        </div>
+      </div>
     </footer>
-</body>
+  </body>
 </html>
