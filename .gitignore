@@ -54,3 +54,6 @@ docs/_build/
 env/
 ENV/
 .env
+
+# db
+db.sqlite3
