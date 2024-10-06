@@ -43,6 +43,10 @@ pip install -r requirements.txt || { echo "Error: Failed to install requirements
 echo "Applying migrations..."
 python manage.py migrate || { echo "Error: Failed to apply migrations."; exit 1; }
 
+# Clear existing content types to avoid conflicts
+echo "Clearing existing content types..."
+python manage.py shell -c "from django.contrib.contenttypes.models import ContentType; ContentType.objects.all().delete()" || { echo "Error: Failed to clear content types."; exit 1; }
+
 # Load the new data
 echo "Loading initial data..."
 python manage.py loaddata init_data.json || { echo "Error: Failed to load initial data."; exit 1; }
