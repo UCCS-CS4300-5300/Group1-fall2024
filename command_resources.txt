@@ -2,7 +2,7 @@ This is where useful documentation will be stored.  :)
 
 -----------------------------Setting up the database from TheMealDB-----------------------------
 
-1. Make sure your git is up to date with my stuff on the sprint 1 branch, so e 
+1. Make sure your git is up to date with my stuff on the sprint 1 branch, so 
     git pull origin sprint1
 
 2.1 The script relys on 'requests' to be downloaded. I added the 'requests' stuff into the requirements.txt now, 
