@@ -9,6 +9,10 @@
       href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
       rel="stylesheet"
     />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="{% static 'styles.css' %}" />
     <title>{% block title %}We Need To Cook{% endblock %}</title>
   </head>
@@ -16,23 +20,44 @@
     <header class="main-header">
         <h1 class="main-header">We Need To Cook!</h1>
     </header>
-    <nav class="navbar">
-      <ul>
-        <li><a href="#">We</a></li>
-        <li><a href="#">Need</a></li>
-        <li><a href="#">To</a></li>
-        <li><a href="#">Cook</a></li>
-      </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="#">We</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Need</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">To</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Cook</a></li>
+        </ul>
+      </div>
     </nav>
     <main>
       {% block content %}
-    <section class="intro">
-      <img class="index-image" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">       
+      <section class="search-section">
+        <div class="container d-flex flex-column align-items-center">
+          <div class="row justify-content-center w-100">
+            <div class="col-md-8">
+              <form id="search-form" class="form-inline justify-content-center">
+                <div class="input-group mb-3 w-100">
+                  <input type="text" id="search-input" class="form-control" placeholder="What are you looking for?">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="clear-search">&times;</button>
+                  </div>
+                </div>
+              </form>
+              <ul id="results-list" class="list-group w-100">
+                <!-- Search results will be displayed here -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="intro">
+        <img class="index-image" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">       
       <h2>Welcome to We Need To Cook!</h2>
         <p>
             You give ingredients, we give recipes!
         </p>
-        </p>
+        <p>
             With a list of ingredients that you already have, we will provide you with amazing recipes! <br>
             You will also have the option to give us a blacklist of ingredients which you want to avoid or are allergic to. <br>
             You can save your favorite recipe and navigate to the favorites page.
@@ -41,6 +66,53 @@
             <strong>This is a <u>beautiful</u> landing page.</strong>
         </p>
     </section>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function() {
+          $('#search-input').on('keyup', function() {
+              var query = $(this).val();
+  
+              if (query.length < 3) {
+                  $('#results-list').empty();
+                  return;
+              }
+  
+              // AJAX request
+              $.ajax({
+                  url: '{% url "recipe_search" %}',
+                  data: {
+                      'term': query
+                  },
+                  dataType: 'json',
+                  success: function(data) {
+                      $('#results-list').empty();  // Clear previous results
+  
+                      // Add recipes
+                      if (data.recipes.length > 0) {
+                        for (var i = 0; i < data.recipes.length; i++) {
+                            var title = data.recipes[i].title;
+                            var highlightedTitle = title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+                            $('#results-list').append('<li class="list-group-item"><i class="fa fa-book"></i> ' + highlightedTitle + '</li>');
+                        }
+                      }
+                      
+                      // If no results, show a message
+                      if (data.recipes.length === 0) {
+                        $('#results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
+                      }
+                  }
+              });
+          });
+  
+          // Clear search input and results
+          $('#clear-search').on('click', function() {
+              $('#search-input').val('');
+              $('#results-list').empty();
+          });
+      });
+      </script>
       {% endblock %}
     </main>
     <footer>
