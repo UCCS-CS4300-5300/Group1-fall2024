@@ -1,0 +1,20 @@
+This is where useful documentation will be stored.  :)
+
+-----------------------------Setting up the database from TheMealDB-----------------------------
+
+1. Make sure your git is up to date with my stuff on the sprint 1 branch, so 
+    git pull origin sprint1
+
+2.1 The script relys on 'requests' to be downloaded. I added the 'requests' stuff into the requirements.txt now, 
+but you can check in your terminal with:
+    pip show requests
+
+
+2.1 If it turns out you do not have it installed, run:
+    pip install requests
+
+
+
+3. You should be good to try running the custom script to populate the database. The script I made 
+is in cookapp/management/commands/fetch_meals. Run the following:
+    python manage.py fetch_meals

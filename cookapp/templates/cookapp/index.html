@@ -1,0 +1,20 @@
+{% extends 'cookapp/base.html' %}
+{% load static %}
+
+      {% block content %}
+    <section class="intro">
+      <img class="index-image" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">       
+      <h2>Welcome to We Need To Cook!</h2>
+        <p>
+            You give ingredients, we give recipes!
+        </p>
+        </p>
+            With a list of ingredients that you already have, we will provide you with amazing recipes! <br>
+            You will also have the option to give us a blacklist of ingredients which you want to avoid or are allergic to. <br>
+            You can save your favorite recipe and navigate to the favorites page.
+        </p>
+        <p class='mt-4 remove-later'>
+            <strong>This is a <u>beautiful</u> landing page.</strong>
+        </p>
+    </section>
+      {% endblock %}

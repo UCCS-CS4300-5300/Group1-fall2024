@@ -18,29 +18,25 @@
     </header>
     <nav class="navbar">
       <ul>
-        <li><a href="#">We</a></li>
+        <li><a href="{% url 'index' %}">Home</a></li>
         <li><a href="#">Need</a></li>
         <li><a href="#">To</a></li>
         <li><a href="#">Cook</a></li>
+        {% if user.is_authenticated %}
+          <li><a href="#">Favorites</a></li>
+          <li>
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" style="background: none; border: none; color: inherit; padding: 0; font: inherit; cursor: pointer;">Logout {{ user }}</button>
+            </form>
+        </li>
+        {% else %}
+          <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li> 
+        {% endif %}
       </ul>
     </nav>
     <main>
       {% block content %}
-    <section class="intro">
-      <img class="index-image" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">       
-      <h2>Welcome to We Need To Cook!</h2>
-        <p>
-            You give ingredients, we give recipes!
-        </p>
-        </p>
-            With a list of ingredients that you already have, we will provide you with amazing recipes! <br>
-            You will also have the option to give us a blacklist of ingredients which you want to avoid or are allergic to. <br>
-            You can save your favorite recipe and navigate to the favorites page.
-        </p>
-        <p class='mt-4 remove-later'>
-            <strong>This is a <u>beautiful</u> landing page.</strong>
-        </p>
-    </section>
       {% endblock %}
     </main>
     <footer>

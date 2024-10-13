@@ -1,0 +1,14 @@
+{% extends 'cookapp/base.html' %}
+
+{% block content %}
+<div style="text-align: left; max-width: 800px; margin: 0 auto"></div>
+  <h2>Customer Account Registration</h2>
+
+  <form method="POST" action="" style="text-align: left; max-width: 800px; margin: 0 auto">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" name="Create User">
+  </form>
+  {{form.errors}}
+</div>
+{% endblock %}
