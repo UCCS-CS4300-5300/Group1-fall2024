@@ -9,20 +9,27 @@
       href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
       rel="stylesheet"
     />
+
     <link rel="stylesheet" href="{% static 'styles.css' %}" />
     <title>{% block title %}We Need To Cook{% endblock %}</title>
-</head>
-<body class="page-container">
-    <header class="main-header d-flex align-items-center"> <!-- Flexbox for alignment -->
-        <img src="{% static 'images/logo_transparent.png' %}" alt="Logo" width="70" height="70" class="mr-2"> <!-- Logo image -->
-      <h1 class="main-header">We Need To Cook!</h1>
+  </head>
+  <body class="page-container">
+    <header class="main-header">
+      <div class="header-content">
+        <a href="{% url 'index' %}"><img
+          src="{% static 'images/logo_transparent.png' %}"
+          alt="Logo"
+          width="70"
+          height="70"
+          class="logo"
+        /></a>
+        <h1 class="main-header-title">We Need To Cook!</h1>
+      </div>
     </header>
     <nav class="navbar">
       <ul>
         <li><a href="{% url 'index' %}">Home</a></li>
-        <li><a href="#">Need</a></li>
-        <li><a href="#">To</a></li>
-        <li><a href="#">Cook</a></li>
+        <li><a href="#">Recipes</a></li>
         {% if user.is_authenticated %}
         <li><a href="#">Favorites</a></li>
         <li>
@@ -47,27 +54,8 @@
         <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
         {% endif %}
       </ul>
-    
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Recipes</a></li>
-                {% if user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="#">Favorites</a></li>
-                    <li class="nav-item">
-                        <form method="POST" action="{% url 'logout' %}" class="form-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-link nav-link" style="padding: 0;">Logout {{ user }}</button>
-                        </form>
-                    </li>
-                {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
-                {% endif %}
-            </ul>
-        </div>
     </nav>
-    <main>{% block content %} {% endblock %}</main>
+    <main>{% block content %}{% endblock %}</main>
     <footer>
       <div class="navbar navbar-inverse navbar-static-bottom" role="navigation">
         <div class="navbar-text pull-left">Created by Group 1 - Oct 2024</div>
@@ -82,8 +70,7 @@
         </div>
       </div>
     </footer>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

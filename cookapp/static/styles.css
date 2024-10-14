@@ -33,10 +33,11 @@ body {
   min-height: 100vh;
 }
 
-
 /* Message styles */
 .messages {
-  margin: 20px 0;
+  margin: 20px auto; /* Center the messages horizontally */
+  width: 80%; /* Set the width of the messages container */
+  max-width: 600px; /* Set a maximum width for the messages container */
 }
 
 .alert {
@@ -74,9 +75,30 @@ header.main-header {
     var(--color-primary-peach)
   );
   color: var(--color-dark);
-  padding: 2px 20px;
-  text-align: left;
-  word-spacing: -6px;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+}
+
+.header-content .logo {
+  margin-right: 10px;
+}
+
+.main-header-title {
+  margin: 0;
+  font-size: 2.5em;
+  word-spacing: -0.6rem; 
+  color: var(--color-dark);
+}
+
+.main-header-title a {
+  text-decoration: none; /* Remove underline from the link */
 }
 
 /* Navbar classes */
@@ -85,7 +107,6 @@ nav.navbar {
   color: var(--color-beige);
   padding: 10px 20px;
   position: sticky;
-  flex-direction: row;
   top: 0;
   z-index: 1000;
 }
@@ -95,9 +116,7 @@ nav.navbar ul {
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: row;
   justify-content: space-around;
-  width: 100%;
   width: 100%;
 }
 
@@ -112,35 +131,9 @@ nav.navbar ul li a {
 }
 
 nav.navbar ul li a:hover {
-    color: var(--color-primary-peach);
+  color: var(--color-primary-peach);
 }
 
-/* Media query for navbar on small screens */
-@media (max-width: 768px) {
-  nav.navbar ul {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  /* Media query for navbar on small screens */
-@media (max-width: 576px) {
-  nav.navbar ul {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  nav.navbar ul li {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-
-  nav.navbar ul li {
-    width: 100%;
-    text-align: center;
-  }
-}
 /* Media query for navbar on small screens */
 @media (max-width: 768px) {
   nav.navbar ul {
@@ -173,8 +166,9 @@ main {
 
 /* wanted to test sticky navbar */
 .remove-later {
-    padding-top: 100vh;
+  padding-top: 100vh;
 }
+
 /* Footer classes  */
 footer {
   text-align: center;
@@ -214,11 +208,66 @@ footer .navbar-text {
   color: var(--color-dark);
 }
 
+/* Recipe Search Result classes */
+#results-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 20px; /* Added margin-bottom to create space below the results */
+  width: 100%; /* Ensure the results list takes up the full width of its container */
+}
+
+#results-list::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+#results-list::-webkit-scrollbar-track {
+  background: var(--color-beige); /* Background of the scrollbar track */
+}
+
+#results-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary-peach); /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Roundness of the scrollbar thumb */
+  border: 2px solid var(--color-beige); /* Padding around the scrollbar thumb */
+}
+
+#results-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-dark); /* Color of the scrollbar thumb on hover */
+}
+
+#results-list li {
+  padding: 10px;
+  background-color: var(--color-white);
+  margin-bottom: 5px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  border: var(--color-black) 1px solid;
+  align-items: left;
+}
+
+#results-list li:hover {
+  background-color: var(--color-light-blue);
+  color: var(--color-beige);
+}
+
+#results-list li:active {
+  background-color: var(--color-dark);
+  color: var(--color-beige);
+}
+
+#results-list li i {
+  margin-right: 10px;
+}
+
 .list-group-item.active {
   background-color: var(--color-secondary-yellow);
   color: var(--color-dark);
 }
 
+/* Blacklist classes */
 .blacklist-tag {
   display: inline-block;
   margin-right: 10px;
@@ -251,63 +300,11 @@ footer .navbar-text {
   border-color: var(--color-primary-peach); /* Change border color on focus */
 }
 
-#results-list {
-  list-style-type: none;
-  padding: 0;
-  margin-top: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  margin-bottom: 20px; /* Added margin-bottom to create space below the results */
-  width: 100%; /* Ensure the results list takes up the full width of its container */
-}
-
-#results-list::-webkit-scrollbar {
-  width: 8px; /* Width of the scrollbar */
-}
-
-#results-list::-webkit-scrollbar-track {
-  background: var(--color-beige); /* Background of the scrollbar track */
-}
-
-#results-list::-webkit-scrollbar-thumb {
-  background-color: var(--color-primary-peach); /* Color of the scrollbar thumb */
-  border-radius: 10px; /* Roundness of the scrollbar thumb */
-  border: 2px solid var(--color-beige); /* Padding around the scrollbar thumb */
-}
-
-#results-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-dark); /* Color of the scrollbar thumb on hover */
-}
-
-#results-list li {
-  padding: 10px;
-  background-color: var(--color-white);
-  margin-bottom: 5px;
-  cursor: pointer;
-  width: 100%; /* Ensure the list items take up the full width of the results list */
-  display: flex;
-  border: var(--color-black) 1px solid;
-  align-items: left;
-}
-
-#results-list li:hover {
-  background-color: var(--color-light-blue);
-  color: var(--color-beige);
-}
-
-#results-list li:active {
-  background-color: var(--color-dark);
-  color: var (--color-beige);
-}
-
-#results-list li i {
-  margin-right: 10px;
-}
-
 /* Custom styles for the clear search button */
 #clear-search {
   color: var(--color-primary-peach);
   border-color: var(--color-primary-peach);
+
 }
 
 #clear-search:hover {
@@ -331,7 +328,7 @@ footer .navbar-text {
   background-color: var(--color-secondary-yellow);
   color: var(--color-dark);
   font-weight: bold;
-  display: inline-block; /* Ensure the highlighted text maintains its spacing */
+  display: inline-block;
 }
 
 /* Remove hover and active styles for no-hover and no-active classes */
@@ -361,214 +358,9 @@ footer .navbar-text {
     font-size: 14px;
   }
 }
-
-/* Recipe Search classes */
-.list-group-item {
-  display: flex;
-  align-items: left;
-  color: var(--color-dark);
-}
-
-.list-group-item.active {
-  background-color: var(--color-secondary-yellow);
-  color: var (--color-dark);
-}
-
-#search-form {
-  width: 100%; /* Ensure the form takes up the full width of its container */
-}
-
-#search-input {
-  width: 40%; /* Ensure the input takes up the full width of the form */
-  padding: 10px;
-  font-size: 16px;
-}
-
-#search-input:focus {
-  outline: none; /* Remove the default outline */
-  box-shadow: 0 0 0 2px var(--color-primary-peach); /* Custom focus outline */
-  border-color: var(--color-primary-peach); /* Change border color on focus */
-}
-
-#results-list {
-  list-style-type: none;
-  padding: 0;
-  margin-top: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  margin-bottom: 20px; /* Added margin-bottom to create space below the results */
-  width: 100%; /* Ensure the results list takes up the full width of its container */
-}
-
-#results-list::-webkit-scrollbar {
-  width: 8px; /* Width of the scrollbar */
-}
-
-#results-list::-webkit-scrollbar-track {
-  background: var(--color-beige); /* Background of the scrollbar track */
-}
-
-#results-list::-webkit-scrollbar-thumb {
-  background-color: var(--color-primary-peach); /* Color of the scrollbar thumb */
-  border-radius: 10px; /* Roundness of the scrollbar thumb */
-  border: 2px solid var(--color-beige); /* Padding around the scrollbar thumb */
-}
-
-#results-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-dark); /* Color of the scrollbar thumb on hover */
-}
-
-#results-list li {
-  padding: 10px;
-  background-color: var(--color-white);
-  margin-bottom: 5px;
-  cursor: pointer;
-  width: 100%; /* Ensure the list items take up the full width of the results list */
-  display: flex;
-  border: var(--color-black) 1px solid;
-  align-items: left;
-}
-
-#results-list li:hover {
-  background-color: var(--color-light-blue);
-  color: var(--color-beige);
-}
-
-#results-list li:active {
-  background-color: var(--color-dark);
-  color: var(--color-beige);
-}
-
-#results-list li i {
-  margin-right: 10px;
-}
-
-/* Custom styles for the clear search button */
-#clear-search {
-  color: var(--color-primary-peach);
-  border-color: var(--color-primary-peach);
-}
-
-#clear-search:hover {
-  background-color: var(--color-primary-peach);
-  color: var(--color-white);
-}
-
-#clear-search:active {
-  background-color: var(--color-dark);
-  color: var(--color-white);
-}
-
-/* Highlighted text for search matches */
-.highlight {
-  background-color: var(--color-secondary-yellow);
-  color: var(--color-dark);
-  font-weight: bold;
-  display: inline-block; /* Ensure the highlighted text maintains its spacing */
-}
-
-/* Remove hover and active styles for no-hover and no-active classes */
-.no-hover:hover {
-  background-color: var(--color-white) !important; /* Override hover background color */
-  color: var(--color-dark) !important; /* Override hover text color */
-}
-
-.no-active:active {
-  background-color: var(--color-white) !important;/* Override active background color */
-  color: var(--color-dark) !important; /* Override active text color */
-}
-
-/* Media query for responsive design */
-@media (max-width: 768px) {
-  #search-form {
-    margin: 10px;
-  }
-
-  #search-input {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  #results-list li {
-    padding: 8px;
-    font-size: 14px;
-  }
-}
-/* Bootstrap card recipes */
-.card {
-  border: 3px solid var(--color-light-blue);
-  border-radius: 5%;
-  overflow: hidden; /* Ensure the image respects the rounded corners */
-  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-}
-
-.card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  border-color: var(--color-primary-peach);
-}
-
-.card-img-top {
-  border-top-left-radius: 5%;
-  border-top-right-radius: 5%;
-}
-
-.card-title {
-  color: var(--color-dark);
-}
-
-.card-text {
-  color: var(--color-dark);
-}
-
-.card-footer {
-  background-color: var(--color-beige);
-  border-top: 2px solid var(--color-light-blue);
-  border-bottom-left-radius: 5%;
-  text-align: left;
-  border-bottom-right-radius: 5%;
-}
-
-/* Tag button styles */
-.tag-button {
-  margin: 2px;
-  background-color: var(--color-light-blue);
-  border: none;
-  color: var(--color-white);
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.tag-button:hover {
-  background-color: var(--color-primary-peach);
-  transform: scale(1.1);
-}
-
-.tag-button:focus {
-  background-color: var(--color-primary-peach) !important;
-  outline: none;
-}
-
-/* media query for the recipe cards */
-@media (max-width: 768px) {
-  .card {
-    margin: 10px;
-  }
-}
-
-/* media query for the recipe cards */
-@media (max-width: 576px) {
-  .card {
-    margin: 10px;
-  }
-}
-
-
 
 /* Login page styles */
 .login-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh; /* Full viewport height */
   background-color: var(--color-beige);
 }
@@ -580,9 +372,6 @@ footer .navbar-text {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 300px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 .login-block h1 {
   font-size: 1.5em;
@@ -592,6 +381,15 @@ footer .navbar-text {
 
 .form-group {
   margin-bottom: 15px;
+}
+
+.txt-password-reset {
+  color: var(--color-primary-peach);
+  font-size: small;
+}
+
+.txt-brand {
+  color: var(--color-primary-peach);
 }
 
 .input-group {
