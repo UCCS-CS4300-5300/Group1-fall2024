@@ -1,44 +1,67 @@
 {% extends 'cookapp/base.html' %}
 
 {% block content %}
-<div style="text-align: left; max-width: 300px; margin: 0 auto">
+<div class="login-page center-content">
+  <main>
+    <div class="login-block">
+      <h1>Log into your account</h1>
 
-  <!-- doesn't work correctly - do not want to do all messages-->
-  {% for message in messages %}
-    <p id="messages">{{message}}</p>
-  {% endfor %}
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
+      <form id="login-form" method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-user ti-user"></i></span>
+            <input type="text" class="form-control" placeholder="Your name" name="username">
+          </div>
+        </div>
+        
+        <hr class="hr-xs">
 
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
-    {% endif %}
-  {% endif %}
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-lock ti-unlock"></i></span>
+            <input type="password" class="form-control" placeholder="Choose a password" name="password">
+          </div>
+        </div>
+        
+        <p class="text-center">
+          <a class="txt-brand" href="{% url 'password_reset' %}">Forgot your password?</a>
+        </p>
+        <button class="btn btn-primary btn-block" type="submit">Login</button>
+      </form>
 
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
-      <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-      </tr>
-      <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-      </tr>
-    </table>
-    <input type="submit" name="submit" value="login">
-    <input type="hidden" name="next" value="{{ next }}">
-  </form>
-
-  {# Assumes you setup the password_reset view in your URLconf #}
-  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-  <p><a href="{% url 'register_page' %}">Register</a></p>
+      <div class="login-links">
+        <p class="text-center">Don't have an account?
+        <hr class="hr-xs">
+        <a class="txt-brand" href="{% url 'register_page' %}">Register</a></p>
+      </div>
+    </div>
+  </main>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var loginForm = document.getElementById('login-form');
+    loginForm.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        loginForm.submit();
+      }
+    });
+  });
+</script>
 {% endblock %}

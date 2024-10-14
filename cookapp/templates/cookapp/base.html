@@ -2,19 +2,51 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link
+      href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="{% static 'styles.css' %}" />
     <title>{% block title %}We Need To Cook{% endblock %}</title>
 </head>
 <body class="page-container">
     <header class="main-header d-flex align-items-center"> <!-- Flexbox for alignment -->
         <img src="{% static 'images/logo_transparent.png' %}" alt="Logo" width="70" height="70" class="mr-2"> <!-- Logo image -->
-        <h1 class="main-header">We Need To Cook!</h1>
+      <h1 class="main-header">We Need To Cook!</h1>
     </header>
+    <nav class="navbar">
+      <ul>
+        <li><a href="{% url 'index' %}">Home</a></li>
+        <li><a href="#">Need</a></li>
+        <li><a href="#">To</a></li>
+        <li><a href="#">Cook</a></li>
+        {% if user.is_authenticated %}
+        <li><a href="#">Favorites</a></li>
+        <li>
+          <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button
+              type="submit"
+              style="
+                background: none;
+                border: none;
+                color: inherit;
+                padding: 0;
+                font: inherit;
+                cursor: pointer;
+              "
+            >
+              Logout {{ user }}
+            </button>
+          </form>
+        </li>
+        {% else %}
+        <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+        {% endif %}
+      </ul>
     
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -35,24 +67,23 @@
             </ul>
         </div>
     </nav>
-
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-
+    <main>{% block content %} {% endblock %}</main>
     <footer>
-        <div class="navbar navbar-inverse navbar-static-bottom" role="navigation">
-            <div class="navbar-text pull-left">Created by Group 1 - Oct 2024</div>
-            <div class="navbar-text pull-right">
-                <a href="https://github.com/UCCS-CS4300-5300/Group1-fall2024" class="github-icon">
-                    <i class="fa fa-github-square fa-2x"></i>
-                </a>
-            </div>
+      <div class="navbar navbar-inverse navbar-static-bottom" role="navigation">
+        <div class="navbar-text pull-left">Created by Group 1 - Oct 2024</div>
+        <div class="navbar-text pull-right">
+          <a
+            href="https://github.com/UCCS-CS4300-5300/Group1-fall2024"
+            class="github-icon"
+            target="_blank"
+          >
+            <i class="fa fa-github-square fa-2x"></i>
+          </a>
         </div>
+      </div>
     </footer>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
 </html>
