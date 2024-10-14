@@ -1,20 +1,123 @@
-{% extends 'cookapp/base.html' %}
+{% extends "cookapp/base.html" %}
 {% load static %}
 
-      {% block content %}
-    <section class="intro">
-      <img class="index-image" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">       
-      <h2>Welcome to We Need To Cook!</h2>
+{% block content %}
+<main>
+    <section class="search-section">
+        <div class="container d-flex flex-column align-items-center">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8">
+                    <form id="search-form" class="justify-content-center">
+                        <div class="input-group mb-3 w-100">
+                            <input type="text" id="search-input" class="form-control" placeholder="What are you looking for?">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" type="button" id="search-button">Search</button>
+                            </div>
+                        </div>
+                        <div id="blacklist-container" class="w-100">
+                            <!-- Blacklist tags will be added here -->
+                        </div>
+                        <div class="input-group mb-3 w-100">
+                            <input type="text" id="new-blacklist-input" class="form-control" placeholder="Add blacklisted ingredient">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="add-blacklist">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                    <ul id="results-list" class="list-group w-100 mt-3">
+                        <!-- Search results will be displayed here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="intro text-center">
+        <img class="index-image img-fluid" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">
+        <h2>Welcome to We Need To Cook!</h2>
+        <p>You give ingredients, we give recipes!</p>
         <p>
-            You give ingredients, we give recipes!
-        </p>
-        </p>
-            With a list of ingredients that you already have, we will provide you with amazing recipes! <br>
-            You will also have the option to give us a blacklist of ingredients which you want to avoid or are allergic to. <br>
+            With a list of ingredients that you already have, we will provide you with amazing recipes!<br>
+            You will also have the option to give us a blacklist of ingredients which you want to avoid or are allergic to.<br>
             You can save your favorite recipe and navigate to the favorites page.
         </p>
         <p class='mt-4 remove-later'>
             <strong>This is a <u>beautiful</u> landing page.</strong>
         </p>
     </section>
-      {% endblock %}
+</main>
+
+<footer>
+    <div class="navbar navbar-inverse navbar-static-bottom" role="navigation">
+        <div class="navbar-text pull-left">Created by Group 1 - Oct 2024</div>
+        <div class="navbar-text pull-right">
+            <a href="https://github.com/UCCS-CS4300-5300/Group1-fall2024" class="github-icon">
+                <i class="fa fa-github-square fa-2x"></i>
+            </a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        function fetchRecipes(query) {
+            var blacklist = [];
+            $('.blacklist-tag').each(function() {
+                blacklist.push($(this).data('ingredient'));
+            });
+
+            $.ajax({
+                url: '{% url "recipe_search" %}',
+                data: {
+                    'term': query,
+                    'blacklist': JSON.stringify(blacklist)
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('#results-list').empty();
+
+                    if (data.recipes.length > 0) {
+                        for (var i = 0; i < data.recipes.length; i++) {
+                            var title = data.recipes[i].title;
+                            var highlightedTitle = title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+                            $('#results-list').append('<li class="list-group-item"><i class="fa fa-book"></i> ' + highlightedTitle + '</li>');
+                        }
+                    } else {
+                        $('#results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
+                    }
+                }
+            });
+        }
+
+        $('#search-button').on('click', function() {
+            var query = $('#search-input').val();
+            if (query.length >= 3) {
+                fetchRecipes(query);
+            }
+        });
+
+        $('#search-input').on('keyup', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                var query = $(this).val();
+                if (query.length >= 3) {
+                    fetchRecipes(query);
+                }
+            }
+        });
+
+        $('#add-blacklist').on('click', function() {
+            var ingredient = $('#new-blacklist-input').val().trim();
+            if (ingredient) {
+                var tag = $('<span class="badge badge-danger blacklist-tag" data-ingredient="' + ingredient + '">' + ingredient + ' <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></span>');
+                $('#blacklist-container').append(tag);
+                $('#new-blacklist-input').val('');
+            }
+        });
+
+        $(document).on('click', '.blacklist-tag .close', function() {
+            $(this).closest('.blacklist-tag').remove();
+        });
+    });
+</script>
+{% endblock %}

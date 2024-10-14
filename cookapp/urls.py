@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('search/', views.RecipeSearch.as_view(), name='recipe_search'),
 
     # user auth
     path('accounts/', include('django.contrib.auth.urls')),
