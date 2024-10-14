@@ -8,11 +8,18 @@ from django.contrib import messages
 import json
 from django.http import JsonResponse
 from django.views import View
-from django.db.models import Q
-
+from django.db.models import Q, Count
 
 def index(request):
-    return render(request, 'cookapp/index.html')
+    # Get the most common ingredients
+    # works by counting the number of recipes that use each ingredient and ordering by that count
+    # annotate adds a new field to each ingredient object with the count
+    common_ingredients = Ingredient.objects.annotate(recipe_count=Count('recipe')).order_by('-recipe_count')[:10]
+
+    context = {
+        'common_ingredients': common_ingredients,
+    }
+    return render(request, 'cookapp/index.html', context)
 
 def logout_message(request):
     return render(request, 'registration/logout.html')
@@ -27,7 +34,7 @@ def registerPage(request):
             username = form.cleaned_data.get('username')
             user.save()
 
-            messages.success(request, 'Account was created for ' + username)
+            messages.success(request, f'Account was created for {username}')
             return redirect('login')
     
     context = {'form':form}

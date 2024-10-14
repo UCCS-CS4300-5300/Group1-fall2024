@@ -11,22 +11,29 @@
                         <div class="input-group mb-3 w-100">
                             <input type="text" id="search-input" class="form-control" placeholder="What are you looking for?">
                             <div class="input-group-append">
-                                <button class="btn btn-outline-primary" type="button" id="search-button">Search</button>
+                                <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+                                <button class="btn btn-outline-secondary" type="button" id="clear-search">X</button>
                             </div>
                         </div>
-                        <div id="blacklist-container" class="w-100">
+                        <ul id="results-list" class="list-group w-100 mt-3">
+                            <!-- Search results will be displayed here -->
+                        </ul>
+                        <div id="blacklist-container" class="w-100 mb-3">
                             <!-- Blacklist tags will be added here -->
                         </div>
                         <div class="input-group mb-3 w-100">
-                            <input type="text" id="new-blacklist-input" class="form-control" placeholder="Add blacklisted ingredient">
+                            <input type="text" id="new-blacklist-input" class="form-control" placeholder="Add an ingredient to blacklist">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" id="add-blacklist">Add</button>
                             </div>
                         </div>
+                        <div id="common-ingredients" class="w-100 mb-3">
+                            <p class="text-left">Quick Add:</p>
+                            {% for ingredient in common_ingredients %}
+                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn" data-ingredient="{{ ingredient.name }}">{{ ingredient.name }}</button>
+                            {% endfor %}
+                        </div>
                     </form>
-                    <ul id="results-list" class="list-group w-100 mt-3">
-                        <!-- Search results will be displayed here -->
-                    </ul>
                 </div>
             </div>
         </div>
@@ -46,17 +53,6 @@
         </p>
     </section>
 </main>
-
-<footer>
-    <div class="navbar navbar-inverse navbar-static-bottom" role="navigation">
-        <div class="navbar-text pull-left">Created by Group 1 - Oct 2024</div>
-        <div class="navbar-text pull-right">
-            <a href="https://github.com/UCCS-CS4300-5300/Group1-fall2024" class="github-icon">
-                <i class="fa fa-github-square fa-2x"></i>
-            </a>
-        </div>
-    </div>
-</footer>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -90,6 +86,17 @@
             });
         }
 
+        function addBlacklistIngredient(ingredient) {
+            if (ingredient && !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length) {
+                var tag = $('<span class="badge badge-danger blacklist-tag" data-ingredient="' + ingredient + '">' + ingredient + '</span>');
+                tag.on('click', function() {
+                    $(this).remove();
+                });
+                $('#blacklist-container').append(tag);
+                $('#new-blacklist-input').val('');
+            }
+        }
+
         $('#search-button').on('click', function() {
             var query = $('#search-input').val();
             if (query.length >= 3) {
@@ -106,17 +113,57 @@
             }
         });
 
+        $('#clear-search').on('click', function() {
+            $('#search-input').val('');
+            $('#results-list').empty();
+        });
+
         $('#add-blacklist').on('click', function() {
             var ingredient = $('#new-blacklist-input').val().trim();
-            if (ingredient) {
-                var tag = $('<span class="badge badge-danger blacklist-tag" data-ingredient="' + ingredient + '">' + ingredient + ' <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></span>');
-                $('#blacklist-container').append(tag);
-                $('#new-blacklist-input').val('');
+            addBlacklistIngredient(ingredient);
+        });
+
+        $('#new-blacklist-input').on('keyup', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                var ingredient = $(this).val().trim();
+                addBlacklistIngredient(ingredient);
             }
         });
 
-        $(document).on('click', '.blacklist-tag .close', function() {
-            $(this).closest('.blacklist-tag').remove();
+        $(document).on('click', '.blacklist-tag', function() {
+            $(this).remove();
+        });
+
+        // Add event listener for common ingredients buttons
+        $(document).on('click', '.common-ingredient-btn', function(event) {
+            event.preventDefault();  // Prevent the default form submission behavior
+            var ingredient = $(this).data('ingredient');
+            addBlacklistIngredient(ingredient);
+        });
+
+        // Prevent Enter key from triggering both actions
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+        });
+
+        // Ensure Enter key in search input only triggers search
+        $('#search-input').on('keypress', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                e.preventDefault();
+                var query = $(this).val();
+                if (query.length >= 3) {
+                    fetchRecipes(query);
+                }
+            }
+        });
+
+        // Ensure Enter key in blacklist input only triggers add blacklist
+        $('#new-blacklist-input').on('keypress', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                e.preventDefault();
+                var ingredient = $(this).val().trim();
+                addBlacklistIngredient(ingredient);
+            }
         });
     });
 </script>

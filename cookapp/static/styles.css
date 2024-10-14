@@ -235,7 +235,7 @@ footer .navbar-text {
 
 #results-list li:active {
   background-color: var(--color-dark);
-  color: var(--color-beige);
+  color: var (--color-beige);
 }
 
 #results-list li i {
@@ -256,6 +256,12 @@ footer .navbar-text {
 #clear-search:active {
   background-color: var(--color-dark);
   color: var(--color-white);
+}
+
+#new-blacklist-input:focus {
+  outline: none; /* Remove the default outline */
+  box-shadow: 0 0 0 2px var(--color-primary-peach); /* Custom focus outline */
+  border-color: var(--color-primary-peach); /* Change border color on focus */
 }
 
 /* Highlighted text for search matches */
