@@ -1,5 +1,3 @@
-/* When we import fonts we'll put them here, @import */
-
 /* static colors */
 :root {
   --color-white: #fff;
@@ -35,6 +33,39 @@ body {
   min-height: 100vh;
 }
 
+
+/* Message styles */
+.messages {
+  margin: 20px 0;
+}
+
+.alert {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Center block content of any children */
+.center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
 /* Header classes */
 header.main-header {
   background: linear-gradient(
@@ -54,6 +85,7 @@ nav.navbar {
   color: var(--color-beige);
   padding: 10px 20px;
   position: sticky;
+  flex-direction: row;
   top: 0;
   z-index: 1000;
 }
@@ -63,7 +95,9 @@ nav.navbar ul {
   margin: 0;
   padding: 0;
   display: flex;
+  flex-direction: row;
   justify-content: space-around;
+  width: 100%;
 }
 
 nav.navbar ul li {
@@ -80,6 +114,32 @@ nav.navbar ul li a:hover {
     color: var(--color-primary-peach);
 }
 
+/* Media query for navbar on small screens */
+@media (max-width: 768px) {
+  nav.navbar ul {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Media query for navbar on small screens */
+@media (max-width: 576px) {
+  nav.navbar ul {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  nav.navbar ul li {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+
+  nav.navbar ul li {
+    width: 100%;
+    text-align: center;
+  }
+}
 
 /* Main content classes */
 main {
@@ -132,4 +192,290 @@ footer .navbar-text {
 
 .github-icon i:hover {
   color: var(--color-primary-peach);
+}
+
+/* Recipe Search classes */
+.list-group-item {
+  display: flex;
+  align-items: left;
+  color: var(--color-dark);
+}
+
+.list-group-item.active {
+  background-color: var(--color-secondary-yellow);
+  color: var (--color-dark);
+}
+
+#search-form {
+  width: 100%; /* Ensure the form takes up the full width of its container */
+}
+
+#search-input {
+  width: 40%; /* Ensure the input takes up the full width of the form */
+  padding: 10px;
+  font-size: 16px;
+}
+
+#search-input:focus {
+  outline: none; /* Remove the default outline */
+  box-shadow: 0 0 0 2px var(--color-primary-peach); /* Custom focus outline */
+  border-color: var(--color-primary-peach); /* Change border color on focus */
+}
+
+#results-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 20px; /* Added margin-bottom to create space below the results */
+  width: 100%; /* Ensure the results list takes up the full width of its container */
+}
+
+#results-list::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+#results-list::-webkit-scrollbar-track {
+  background: var(--color-beige); /* Background of the scrollbar track */
+}
+
+#results-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary-peach); /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Roundness of the scrollbar thumb */
+  border: 2px solid var(--color-beige); /* Padding around the scrollbar thumb */
+}
+
+#results-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-dark); /* Color of the scrollbar thumb on hover */
+}
+
+#results-list li {
+  padding: 10px;
+  background-color: var(--color-white);
+  margin-bottom: 5px;
+  cursor: pointer;
+  width: 100%; /* Ensure the list items take up the full width of the results list */
+  display: flex;
+  border: var(--color-black) 1px solid;
+  align-items: left;
+}
+
+#results-list li:hover {
+  background-color: var(--color-light-blue);
+  color: var(--color-beige);
+}
+
+#results-list li:active {
+  background-color: var(--color-dark);
+  color: var(--color-beige);
+}
+
+#results-list li i {
+  margin-right: 10px;
+}
+
+/* Custom styles for the clear search button */
+#clear-search {
+  color: var(--color-primary-peach);
+  border-color: var(--color-primary-peach);
+}
+
+#clear-search:hover {
+  background-color: var(--color-primary-peach);
+  color: var(--color-white);
+}
+
+#clear-search:active {
+  background-color: var(--color-dark);
+  color: var(--color-white);
+}
+
+/* Highlighted text for search matches */
+.highlight {
+  background-color: var(--color-secondary-yellow);
+  color: var(--color-dark);
+  font-weight: bold;
+  display: inline-block; /* Ensure the highlighted text maintains its spacing */
+}
+
+/* Remove hover and active styles for no-hover and no-active classes */
+.no-hover:hover {
+  background-color: var(--color-white) !important; /* Override hover background color */
+  color: var(--color-dark) !important; /* Override hover text color */
+}
+
+.no-active:active {
+  background-color: var(--color-white) !important;/* Override active background color */
+  color: var(--color-dark) !important; /* Override active text color */
+}
+
+/* Media query for responsive design */
+@media (max-width: 768px) {
+  #search-form {
+    margin: 10px;
+  }
+
+  #search-input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  #results-list li {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+/* Bootstrap card recipes */
+.card {
+  border: 3px solid var(--color-light-blue);
+  border-radius: 5%;
+  overflow: hidden; /* Ensure the image respects the rounded corners */
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-color: var(--color-primary-peach);
+}
+
+.card-img-top {
+  border-top-left-radius: 5%;
+  border-top-right-radius: 5%;
+}
+
+.card-title {
+  color: var(--color-dark);
+}
+
+.card-text {
+  color: var(--color-dark);
+}
+
+.card-footer {
+  background-color: var(--color-beige);
+  border-top: 2px solid var(--color-light-blue);
+  border-bottom-left-radius: 5%;
+  text-align: left;
+  border-bottom-right-radius: 5%;
+}
+
+/* Tag button styles */
+.tag-button {
+  margin: 2px;
+  background-color: var(--color-light-blue);
+  border: none;
+  color: var(--color-white);
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.tag-button:hover {
+  background-color: var(--color-primary-peach);
+  transform: scale(1.1);
+}
+
+.tag-button:focus {
+  background-color: var(--color-primary-peach) !important;
+  outline: none;
+}
+
+/* media query for the recipe cards */
+@media (max-width: 768px) {
+  .card {
+    margin: 10px;
+  }
+}
+
+/* media query for the recipe cards */
+@media (max-width: 576px) {
+  .card {
+    margin: 10px;
+  }
+}
+
+
+
+/* Login page styles */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  background-color: var(--color-beige);
+}
+
+.login-block {
+  background-color: var(--color-white);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.login-block h1 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  color: var(--color-dark);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-dark);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.input-group-addon {
+  background-color: var(--color-light-blue);
+  color: var(--color-white);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-control {
+  border: none;
+  padding: 10px;
+  flex: 1;
+}
+
+.btn-primary {
+  background-color: var(--color-primary-peach);
+  border: none;
+  padding: 10px;
+  color: var(--color-white);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-dark);
+}
+
+.login-links {
+  margin-top: 20px;
+}
+
+.login-links p {
+  color: var(--color-dark);
+}
+
+.login-links a {
+  color: var(--color-primary-peach);
+  text-decoration: none;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
 }

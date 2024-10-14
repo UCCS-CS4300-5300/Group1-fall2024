@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     # user auth
+    path('accounts/login/', views.CustomLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', views.registerPage, name='register_page'),
     path('logout/', views.logout_message, name='logout_message'),
