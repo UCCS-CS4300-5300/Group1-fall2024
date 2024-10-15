@@ -31,6 +31,9 @@ ALLOWED_HOSTS = ["app-ganders4-5.devedu.io", "app-kbarcrof-5.devedu.io", "app-rl
 CSRF_TRUSTED_ORIGINS = [
     'https://app-kcall2-5.devedu.io',
     'https://app-ganders4-5.devedu.io',
+    'https://app-kbarcrof-5.devedu.io',
+    'https://app-rlustig-5.devedu.io',
+    'https://app-tjenkin5-5.devedu.io',
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -56,6 +59,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Message storage
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 ROOT_URLCONF = 'needtocook.urls'
 
@@ -107,6 +113,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/logout/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

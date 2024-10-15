@@ -1,0 +1,91 @@
+{% extends 'cookapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="login-page center-content">
+  <main>
+    <div class="login-block">
+      <img
+      src="{% static 'images/logo_transparent.png' %}"
+      alt="Logo"
+      width="70"
+      height="70"
+      class="logo"
+    />
+      <h1>Create an Account</h1>
+
+      <form method="post" action="{% url 'register_page' %}">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+        
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-user ti-user"></i></span>
+            <input type="text" class="form-control" placeholder="Your name" name="username" value="{{ form.username.value|default_if_none:'' }}">
+          </div>
+          {% if form.username.errors %}
+            <div class="alert alert-danger">
+              {{ form.username.errors }}
+            </div>
+          {% endif %}
+        </div>
+        
+        <hr class="hr-xs">
+
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-envelope ti-email"></i></span>
+            <input type="email" class="form-control" placeholder="Your email address" name="email" value="{{ form.email.value|default_if_none:'' }}">
+          </div>
+          {% if form.email.errors %}
+            <div class="alert alert-danger">
+              {{ form.email.errors }}
+            </div>
+          {% endif %}
+        </div>
+        
+        <hr class="hr-xs">
+
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-lock ti-unlock"></i></span>
+            <input type="password" class="form-control" placeholder="Choose a password" name="password1">
+          </div>
+          {% if form.password1.errors %}
+            <div class="alert alert-danger">
+              {{ form.password1.errors }}
+            </div>
+          {% endif %}
+        </div>
+        
+        <hr class="hr-xs">
+
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-lock ti-unlock"></i></span>
+            <input type="password" class="form-control" placeholder="Confirm your password" name="password2">
+          </div>
+          {% if form.password2.errors %}
+            <div class="alert alert-danger">
+              {{ form.password2.errors }}
+            </div>
+          {% endif %}
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">Sign Up</button>
+      </form>
+
+      <div class="login-links">
+        <p class="text-center">Already have an account?
+        <hr class="hr-xs">
+        <a class="txt-brand" href="{% url 'login' %}">Login</a></p>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

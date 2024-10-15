@@ -1,0 +1,186 @@
+{% extends "cookapp/base.html" %}
+{% load static %}
+
+{% block content %}
+<link
+href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+rel="stylesheet"
+/>
+<main>
+    <section class="search-section">
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+        <div class="container d-flex flex-column align-items-center">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8">
+                    <form id="search-form" class="justify-content-center">
+                        <div class="input-group mb-3 w-100">
+                            <input type="text" id="search-input" class="form-control" placeholder="What are you looking for?">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+                                <button class="btn btn-outline-secondary" type="button" id="clear-search">X</button>
+                            </div>
+                        </div>
+                        <ul id="results-list" class="list-group w-100 mt-3">
+                            <!-- Search results will be displayed here -->
+                        </ul>
+                        <div id="blacklist-container" class="w-100 mb-3">
+                            <!-- Blacklist tags will be added here -->
+                        </div>
+                        <div class="input-group mb-3 w-100">
+                            <input type="text" id="new-blacklist-input" class="form-control" placeholder="Add an ingredient to blacklist">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="add-blacklist">Add</button>
+                            </div>
+                        </div>
+                        <div id="common-ingredients" class="w-100 mb-3">
+                            <p class="text-left">Quick Add:</p>
+                            {% for ingredient in common_ingredients %}
+                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn" data-ingredient="{{ ingredient.name }}">{{ ingredient.name }}</button>
+                            {% endfor %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="intro text-center">
+        <img class="index-image img-fluid" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">
+        <h2>Welcome to We Need To Cook!</h2>
+        <p>You give ingredients, we give recipes!</p>
+        <p>
+            With a list of ingredients that you already have, we will provide you with amazing recipes!<br>
+            You will also have the option to give us a blacklist of ingredients which you want to avoid or are allergic to.<br>
+            You can save your favorite recipe and navigate to the favorites page.
+        </p>
+        <p class='mt-4 remove-later'>
+            <strong>This is a <u>beautiful</u> landing page.</strong>
+        </p>
+    </section>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        function fetchRecipes(query) {
+            var blacklist = [];
+            $('.blacklist-tag').each(function() {
+                blacklist.push($(this).data('ingredient'));
+            });
+
+            $.ajax({
+                url: '{% url "recipe_search" %}',
+                data: {
+                    'term': query,
+                    'blacklist': JSON.stringify(blacklist)
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('#results-list').empty();
+
+                    if (data.recipes.length > 0) {
+                        for (var i = 0; i < data.recipes.length; i++) {
+                            var title = data.recipes[i].title;
+                            var highlightedTitle = title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+                            $('#results-list').append('<li class="list-group-item"><i class="fa fa-book"></i> ' + highlightedTitle + '</li>');
+                        }
+                    } else {
+                        $('#results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
+                    }
+                }
+            });
+        }
+
+        function addBlacklistIngredient(ingredient) {
+            if (ingredient && !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length) {
+                var tag = $('<span class="badge badge-danger blacklist-tag" data-ingredient="' + ingredient + '">' + ingredient + '</span>');
+                tag.on('click', function() {
+                    $(this).remove();
+                });
+                $('#blacklist-container').append(tag);
+                $('#new-blacklist-input').val('');
+            }
+        }
+
+        $('#search-button').on('click', function() {
+            var query = $('#search-input').val();
+            if (query.length >= 3) {
+                fetchRecipes(query);
+            }
+        });
+
+        $('#search-input').on('keyup', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                var query = $(this).val();
+                if (query.length >= 3) {
+                    fetchRecipes(query);
+                }
+            }
+        });
+
+        $('#clear-search').on('click', function() {
+            $('#search-input').val('');
+            $('#results-list').empty();
+        });
+
+        $('#add-blacklist').on('click', function() {
+            var ingredient = $('#new-blacklist-input').val().trim();
+            addBlacklistIngredient(ingredient);
+        });
+
+        $('#new-blacklist-input').on('keyup', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                var ingredient = $(this).val().trim();
+                addBlacklistIngredient(ingredient);
+            }
+        });
+
+        $(document).on('click', '.blacklist-tag', function() {
+            $(this).remove();
+        });
+
+        // Add event listener for common ingredients buttons
+        $(document).on('click', '.common-ingredient-btn', function(event) {
+            event.preventDefault();  // Prevent the default form submission behavior
+            var ingredient = $(this).data('ingredient');
+            addBlacklistIngredient(ingredient);
+        });
+
+        // Prevent Enter key from triggering both actions
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+        });
+
+        // Ensure Enter key in search input only triggers search
+        $('#search-input').on('keypress', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                e.preventDefault();
+                var query = $(this).val();
+                if (query.length >= 3) {
+                    fetchRecipes(query);
+                }
+            }
+        });
+
+        // Ensure Enter key in blacklist input only triggers add blacklist
+        $('#new-blacklist-input').on('keypress', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                e.preventDefault();
+                var ingredient = $(this).val().trim();
+                addBlacklistIngredient(ingredient);
+            }
+        });
+    });
+</script>
+{% endblock %}

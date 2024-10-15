@@ -1,0 +1,75 @@
+{% extends 'cookapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="login-page center-content">
+  <main>
+    <div class="login-block">
+      <img
+      src="{% static 'images/logo_transparent.png' %}"
+      alt="Logo"
+      width="70"
+      height="70"
+      class="logo"
+    />
+      <h1>Log into your account</h1>
+
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form id="login-form" method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-user ti-user"></i></span>
+            <input type="text" class="form-control" placeholder="Your name" name="username">
+          </div>
+        </div>
+        
+        <hr class="hr-xs">
+
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-lock ti-unlock"></i></span>
+            <input type="password" class="form-control" placeholder="Choose a password" name="password">
+          </div>
+        </div>
+        <p class="text-left">
+          <a class="txt-password-reset" href="{% url 'password_reset' %}"><em>Forgot your password?</em></a>
+        </p>
+        
+        <button class="btn btn-primary btn-block" type="submit">Login</button>
+      </form>
+
+      <div class="login-links">
+        <p class="text-center">Don't have an account?
+        <hr class="hr-xs">
+        <a class="txt-brand" href="{% url 'register_page' %}">Register</a></p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var loginForm = document.getElementById('login-form');
+    loginForm.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        loginForm.submit();
+      }
+    });
+  });
+</script>
+{% endblock %}
