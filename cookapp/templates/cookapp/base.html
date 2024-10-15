@@ -9,19 +9,27 @@
       href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
       rel="stylesheet"
     />
+
     <link rel="stylesheet" href="{% static 'styles.css' %}" />
     <title>{% block title %}We Need To Cook{% endblock %}</title>
   </head>
   <body class="page-container">
     <header class="main-header">
-      <h1 class="main-header">We Need To Cook!</h1>
+      <div class="header-content">
+        <a href="{% url 'index' %}"><img
+          src="{% static 'images/logo_transparent.png' %}"
+          alt="Logo"
+          width="70"
+          height="70"
+          class="logo"
+        /></a>
+        <h1 class="main-header-title">We Need To Cook!</h1>
+      </div>
     </header>
     <nav class="navbar">
       <ul>
         <li><a href="{% url 'index' %}">Home</a></li>
-        <li><a href="#">Need</a></li>
-        <li><a href="#">To</a></li>
-        <li><a href="#">Cook</a></li>
+        <li><a href="#">Recipes</a></li>
         {% if user.is_authenticated %}
         <li><a href="#">Favorites</a></li>
         <li>
@@ -47,7 +55,8 @@
         {% endif %}
       </ul>
     </nav>
-    <main>{% block content %} {% endblock %}</main>
+    <main>{% block content %}{% endblock %}</main>
+
     <footer>
       <div class="navbar navbar-inverse navbar-static-bottom" role="navigation">
         <div class="navbar-text pull-left">Created by Group 1 - Oct 2024</div>

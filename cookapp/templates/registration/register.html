@@ -1,10 +1,19 @@
 {% extends 'cookapp/base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="login-page center-content">
   <main>
     <div class="login-block">
-      <h1>Customer Account Registration</h1>
+      <img
+      src="{% static 'images/logo_transparent.png' %}"
+      alt="Logo"
+      width="70"
+      height="70"
+      class="logo"
+    />
+      <h1>Create an Account</h1>
+
 
       <form method="post" action="{% url 'register_page' %}">
         {% csrf_token %}
@@ -68,8 +77,8 @@
             </div>
           {% endif %}
         </div>
+        <button class="btn btn-primary btn-block" type="submit">Sign Up</button>
 
-        <button class="btn btn-primary btn-block" type="submit">Create User</button>
       </form>
 
       <div class="login-links">

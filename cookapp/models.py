@@ -1,3 +1,4 @@
+from email.mime import image
 from tabnanny import verbose
 from django.db import models
 from django.contrib.auth.models import User
@@ -35,6 +36,7 @@ class Recipe(models.Model):
         instructions: TextField representing the instructions to make the recipe
         calories: IntegerField representing the total calories in the recipe
         macros: JSONField representing the macronutrients in the recipe
+        image: url to the image of the recipe
         tags: JSONField representing the tags associated with the recipe ex. ['quick', 'easy', 'low-carb', etc.]
 
     Note: 
@@ -45,6 +47,7 @@ class Recipe(models.Model):
     api_id = models.CharField(max_length=100, unique=True)  # Reference to the API ID
     ingredients = models.ManyToManyField(Ingredient) # Many-to-many relationship with Ingredient model
     instructions = models.TextField(null=True, blank=True)
+    image = models.URLField(null=True, blank=True)
     calories = models.IntegerField(null=True, blank=True)
     macros = models.JSONField(null=True, blank=True)  # Store macros as JSON
     tags = models.JSONField(null=True, blank=True)  # Store tags as JSON

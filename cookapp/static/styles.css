@@ -33,10 +33,12 @@ body {
   min-height: 100vh;
 }
 
-
 /* Message styles */
 .messages {
-  margin: 20px 0;
+  margin: 20px auto; /* Center the messages horizontally */
+  width: 80%; /* Set the width of the messages container */
+  max-width: 600px; /* Set a maximum width for the messages container */
+
 }
 
 .alert {
@@ -74,9 +76,30 @@ header.main-header {
     var(--color-primary-peach)
   );
   color: var(--color-dark);
-  padding: 2px 20px;
-  text-align: left;
-  word-spacing: -6px;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+}
+
+.header-content .logo {
+  margin-right: 10px;
+}
+
+.main-header-title {
+  margin: 0;
+  font-size: 2.5em;
+  word-spacing: -0.6rem; 
+  color: var(--color-dark);
+}
+
+.main-header-title a {
+  text-decoration: none; /* Remove underline from the link */
 }
 
 /* Navbar classes */
@@ -111,12 +134,13 @@ nav.navbar ul li a {
 }
 
 nav.navbar ul li a:hover {
-    color: var(--color-primary-peach);
+  color: var(--color-primary-peach);
 }
 
 /* Media query for navbar on small screens */
 @media (max-width: 768px) {
   nav.navbar ul {
+
     flex-direction: row;
     align-items: center;
   }
@@ -133,7 +157,6 @@ nav.navbar ul li a:hover {
     text-align: center;
   }
 }
-
 
   nav.navbar ul li {
     width: 100%;
@@ -160,8 +183,9 @@ main {
 
 /* wanted to test sticky navbar */
 .remove-later {
-    padding-top: 100vh;
+  padding-top: 100vh;
 }
+
 /* Footer classes  */
 footer {
   text-align: center;
@@ -200,6 +224,7 @@ footer .navbar-text {
   align-items: left;
   color: var(--color-dark);
 }
+
 
 .list-group-item.active {
   background-color: var(--color-secondary-yellow);
@@ -275,6 +300,44 @@ footer .navbar-text {
   margin-right: 10px;
 }
 
+.list-group-item.active {
+  background-color: var(--color-secondary-yellow);
+  color: var(--color-dark);
+}
+
+/* Blacklist classes */
+.blacklist-tag {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+#blacklist-container {
+  margin-bottom: 15px;
+}
+.badge-danger .close {
+  color: white;
+  opacity: 1;
+  font-size: 16px;
+  font-weight: normal;
+  padding-left: 5px;
+}
+
+#search-form {
+  width: 100%; /* Ensure the form takes up the full width of its container */
+}
+
+#search-input {
+  width: 40%; /* Ensure the input takes up the full width of the form */
+  padding: 10px;
+  font-size: 16px;
+}
+
+#search-input:focus {
+  outline: none; /* Remove the default outline */
+  box-shadow: 0 0 0 2px var(--color-primary-peach); /* Custom focus outline */
+  border-color: var(--color-primary-peach); /* Change border color on focus */
+}
+
 /* Custom styles for the clear search button */
 #clear-search {
   color: var(--color-primary-peach);
@@ -289,6 +352,12 @@ footer .navbar-text {
 #clear-search:active {
   background-color: var(--color-dark);
   color: var(--color-white);
+}
+
+#new-blacklist-input:focus {
+  outline: none; /* Remove the default outline */
+  box-shadow: 0 0 0 2px var(--color-primary-peach); /* Custom focus outline */
+  border-color: var(--color-primary-peach); /* Change border color on focus */
 }
 
 /* Highlighted text for search matches */
@@ -326,6 +395,7 @@ footer .navbar-text {
     font-size: 14px;
   }
 }
+
 /* Bootstrap card recipes */
 .card {
   border: 3px solid var(--color-light-blue);
@@ -416,6 +486,7 @@ footer .navbar-text {
   flex-direction: column;
   align-items: center;
 }
+
 .login-block h1 {
   font-size: 1.5em;
   margin-bottom: 20px;
@@ -425,6 +496,16 @@ footer .navbar-text {
 .form-group {
   margin-bottom: 15px;
 }
+
+.txt-password-reset {
+  color: var(--color-primary-peach);
+  font-size: small;
+}
+
+.txt-brand {
+  color: var(--color-primary-peach);
+}
+
 
 .input-group {
   display: flex;

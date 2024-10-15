@@ -1,9 +1,18 @@
 {% extends 'cookapp/base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="login-page center-content">
   <main>
     <div class="login-block">
+      <img
+      src="{% static 'images/logo_transparent.png' %}"
+      alt="Logo"
+      width="70"
+      height="70"
+      class="logo"
+    />
+
       <h1>Log into your account</h1>
 
       {% if messages %}
@@ -37,9 +46,8 @@
             <input type="password" class="form-control" placeholder="Choose a password" name="password">
           </div>
         </div>
-        
-        <p class="text-center">
-          <a class="txt-brand" href="{% url 'password_reset' %}">Forgot your password?</a>
+        <p class="text-left">
+          <a class="txt-password-reset" href="{% url 'password_reset' %}"><em>Forgot your password?</em></a>
         </p>
         <button class="btn btn-primary btn-block" type="submit">Login</button>
       </form>

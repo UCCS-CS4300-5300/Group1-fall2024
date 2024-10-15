@@ -1,0 +1,29 @@
+<!-- recipe_detail.html -->
+
+{% extends "cookapp/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ recipe.title }}</h1>
+    {% if recipe.image %}
+        <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="img-fluid mb-4">
+    {% endif %}
+    <h3>Ingredients:</h3>
+    <ul>
+        {% for ingredient in recipe.ingredients.all %}
+            <li>{{ ingredient.name }}</li>
+        {% endfor %}
+    </ul>
+    <h3>Instructions:</h3>
+    <p>{{ recipe.instructions }}</p>
+    {% if recipe.tags %}
+        <h4>Tags:</h4>
+        <p>
+            {% for tag in recipe.tags %}
+                <span class="badge badge-primary">{{ tag }}</span>
+            {% endfor %}
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

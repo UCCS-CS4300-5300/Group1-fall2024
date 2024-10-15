@@ -1,4 +1,5 @@
 # cookapp/management/commands/fetch_meals.py
+from email.mime import image
 import requests
 from django.core.management.base import BaseCommand
 from cookapp.models import Ingredient, Recipe
@@ -29,7 +30,8 @@ class Command(BaseCommand):
                 title = meal_data['strMeal']
                 instructions = meal_data['strInstructions']
                 meal_id = meal_data['idMeal']
-                tags = meal_data.get('strTags', '').split(',') if meal_data.get('strTags') else []
+                tags = meal_data.get('strCategory', '').split(',') if meal_data.get('strCategory') else []
+                image_url = meal_data.get('strMealThumb').replace('\\/', '/')
 
                 # Extract ingredients and measurements
                 ingredients = []
@@ -47,6 +49,7 @@ class Command(BaseCommand):
                     defaults={
                         'title': title,
                         'instructions': instructions,
+                        'image': image_url,
                         'tags': tags,
                         'macros': {},  # TheMealDB doesn't provide nutritional info, leave empty for now
                     }
