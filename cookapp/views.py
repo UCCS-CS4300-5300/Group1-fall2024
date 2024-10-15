@@ -1,15 +1,20 @@
+import json
+
 from django.shortcuts import render, redirect
-from .models import Ingredient, Recipe, UserPreference
-from .decorators import unauthenticated_user
-from .forms import CreateUserForm
+from django.shortcuts import render, get_object_or_404
+
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-import json
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
+
+from .models import Ingredient, Recipe, UserPreference
+
+from .forms import CreateUserForm
+from .decorators import unauthenticated_user
 
 def index(request):
     # Get the most common ingredients
@@ -52,6 +57,7 @@ def registerPage(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
+
 class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '')
@@ -79,4 +85,13 @@ class RecipeSearch(View):
 
         return JsonResponse({
             'recipes': recipe_list,
-        }, safe=False)
+        })
+
+
+class RecipeDetailView(View):
+    def get(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
+        context = {
+            'recipe': recipe
+        }
+        return render(request, 'cookapp/recipe_detail.html', context)

@@ -90,17 +90,27 @@ rel="stylesheet"
                     $('#results-list').empty();
 
                     if (data.recipes.length > 0) {
+                        var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
+                        recipeDetailUrl = recipeDetailUrl.replace('0/', ''); // Remove '0/' to eliminate the extra slash
+
+
                         for (var i = 0; i < data.recipes.length; i++) {
                             var title = data.recipes[i].title;
+                            var id = data.recipes[i].id;
                             var highlightedTitle = title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
-                            $('#results-list').append('<li class="list-group-item"><i class="fa fa-book"></i> ' + highlightedTitle + '</li>');
+                            var listItem = `<li class="list-group-item">
+                                <a href="${recipeDetailUrl}${id}/" class="recipe-link">
+                                    <i class="fa fa-book"></i> ${highlightedTitle}
+                                </a>
+                            </li>`;
+                            $('#results-list').append(listItem);
                         }
                     } else {
                         $('#results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
                     }
                 }
             });
-        }
+        }       
 
         function addBlacklistIngredient(ingredient) {
             if (ingredient && !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length) {
