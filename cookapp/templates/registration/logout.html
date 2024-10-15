@@ -1,6 +1,11 @@
 {% extends 'cookapp/base.html' %}
 
 {% block content %}
-  <p>Logged out!</p>
-  <a href="{% url 'login'%}">Click here to login again.</a>
+  <div class="container mt-5">
+    <div class="alert alert-info" role="alert">
+      You have been successfully logged out.
+    </div>
+    <p>If you wish to log in again, click the button below:</p>
+    <a href="{% url 'login' %}" class="btn btn-primary">Login Again</a>
+  </div>
 {% endblock %}
