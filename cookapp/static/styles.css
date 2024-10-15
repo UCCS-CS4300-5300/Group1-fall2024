@@ -38,6 +38,7 @@ body {
   margin: 20px auto; /* Center the messages horizontally */
   width: 80%; /* Set the width of the messages container */
   max-width: 600px; /* Set a maximum width for the messages container */
+
 }
 
 .alert {
@@ -107,6 +108,7 @@ nav.navbar {
   color: var(--color-beige);
   padding: 10px 20px;
   position: sticky;
+  flex-direction: row;
   top: 0;
   z-index: 1000;
 }
@@ -116,6 +118,7 @@ nav.navbar ul {
   margin: 0;
   padding: 0;
   display: flex;
+  flex-direction: row;
   justify-content: space-around;
   width: 100%;
 }
@@ -137,9 +140,23 @@ nav.navbar ul li a:hover {
 /* Media query for navbar on small screens */
 @media (max-width: 768px) {
   nav.navbar ul {
-    flex-direction: column;
+
+    flex-direction: row;
     align-items: center;
   }
+
+  /* Media query for navbar on small screens */
+@media (max-width: 576px) {
+  nav.navbar ul {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  nav.navbar ul li {
+    width: 100%;
+    text-align: center;
+  }
+}
 
   nav.navbar ul li {
     width: 100%;
@@ -208,7 +225,28 @@ footer .navbar-text {
   color: var(--color-dark);
 }
 
-/* Recipe Search Result classes */
+
+.list-group-item.active {
+  background-color: var(--color-secondary-yellow);
+  color: var (--color-dark);
+}
+
+#search-form {
+  width: 100%; /* Ensure the form takes up the full width of its container */
+}
+
+#search-input {
+  width: 40%; /* Ensure the input takes up the full width of the form */
+  padding: 10px;
+  font-size: 16px;
+}
+
+#search-input:focus {
+  outline: none; /* Remove the default outline */
+  box-shadow: 0 0 0 2px var(--color-primary-peach); /* Custom focus outline */
+  border-color: var(--color-primary-peach); /* Change border color on focus */
+}
+
 #results-list {
   list-style-type: none;
   padding: 0;
@@ -242,7 +280,7 @@ footer .navbar-text {
   background-color: var(--color-white);
   margin-bottom: 5px;
   cursor: pointer;
-  width: 100%;
+  width: 100%; /* Ensure the list items take up the full width of the results list */
   display: flex;
   border: var(--color-black) 1px solid;
   align-items: left;
@@ -304,7 +342,6 @@ footer .navbar-text {
 #clear-search {
   color: var(--color-primary-peach);
   border-color: var(--color-primary-peach);
-
 }
 
 #clear-search:hover {
@@ -328,7 +365,7 @@ footer .navbar-text {
   background-color: var(--color-secondary-yellow);
   color: var(--color-dark);
   font-weight: bold;
-  display: inline-block;
+  display: inline-block; /* Ensure the highlighted text maintains its spacing */
 }
 
 /* Remove hover and active styles for no-hover and no-active classes */
@@ -359,8 +396,81 @@ footer .navbar-text {
   }
 }
 
+/* Bootstrap card recipes */
+.card {
+  border: 3px solid var(--color-light-blue);
+  border-radius: 5%;
+  overflow: hidden; /* Ensure the image respects the rounded corners */
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-color: var(--color-primary-peach);
+}
+
+.card-img-top {
+  border-top-left-radius: 5%;
+  border-top-right-radius: 5%;
+}
+
+.card-title {
+  color: var(--color-dark);
+}
+
+.card-text {
+  color: var(--color-dark);
+}
+
+.card-footer {
+  background-color: var(--color-beige);
+  border-top: 2px solid var(--color-light-blue);
+  border-bottom-left-radius: 5%;
+  text-align: left;
+  border-bottom-right-radius: 5%;
+}
+
+/* Tag button styles */
+.tag-button {
+  margin: 2px;
+  background-color: var(--color-light-blue);
+  border: none;
+  color: var(--color-white);
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.tag-button:hover {
+  background-color: var(--color-primary-peach);
+  transform: scale(1.1);
+}
+
+.tag-button:focus {
+  background-color: var(--color-primary-peach) !important;
+  outline: none;
+}
+
+/* media query for the recipe cards */
+@media (max-width: 768px) {
+  .card {
+    margin: 10px;
+  }
+}
+
+/* media query for the recipe cards */
+@media (max-width: 576px) {
+  .card {
+    margin: 10px;
+  }
+}
+
+
+
 /* Login page styles */
 .login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100vh; /* Full viewport height */
   background-color: var(--color-beige);
 }
@@ -372,7 +482,11 @@ footer .navbar-text {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 .login-block h1 {
   font-size: 1.5em;
   margin-bottom: 20px;
@@ -391,6 +505,7 @@ footer .navbar-text {
 .txt-brand {
   color: var(--color-primary-peach);
 }
+
 
 .input-group {
   display: flex;

@@ -1,8 +1,6 @@
 import json
 
-from django.shortcuts import render, redirect
-from django.shortcuts import render, get_object_or_404
-
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -12,7 +10,6 @@ from django.views import View
 from django.db.models import Q, Count
 
 from .models import Ingredient, Recipe, UserPreference
-
 from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
