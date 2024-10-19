@@ -46,7 +46,7 @@ rel="stylesheet"
                 <tbody>
                     {% for day in days %}
                         <tr>
-                            <td>{{ day }}</td>
+                            <td class="rotate"><div>{{ day }}</div></td>
                             {% for meal in meals %}
                                 <td class="dropzone" data-day="{{ day }}" data-meal="{{ meal }}">
                                     <!-- Dropped recipes will appear here -->
@@ -136,12 +136,12 @@ rel="stylesheet"
             var droppedRecipe = $(`li[data-recipe-id="${recipeId}"]`).html(); // Get recipe HTML
 
             // Append dropped recipe to the cell with a remove button
-            $(this).html(droppedRecipe + '<button class="remove-recipe">X</button>');
+            $(this).html(`<div class="card meal-card d-flex align-items-center"><span>${droppedRecipe}<i class="fa fa-times" aria-hidden="true"></i></span><button class="remove-recipe ml-2"></button></div>`);
         });
 
         // Remove recipe from cell
         $(document).on('click', '.remove-recipe', function() {
-            $(this).parent().empty();
+            $(this).closest('.meal-card').remove();
         });
 
         // Save to local storage
@@ -173,7 +173,15 @@ rel="stylesheet"
 
         // PDF Export
         $('#export-to-pdf').on('click', function() {
-            html2pdf(document.querySelector('.meal-plan-table-wrapper'));
+            const element = document.querySelector('.meal-plan-table-wrapper');
+            const opt = {
+                margin: 1,
+                filename: 'meal-plan.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save();
         });
     });
 </script>

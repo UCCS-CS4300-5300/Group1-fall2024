@@ -638,6 +638,7 @@ footer .navbar-text {
   text-decoration: underline;
 }
 
+
 /* Meal Planner Table */
 .meal-plan-table-wrapper {
   margin-bottom: 20px; /* Add margin to the bottom of the table */
@@ -684,6 +685,17 @@ footer .navbar-text {
   align-items: center;
   justify-content: center;
   height: 100px; /* Adjust height as needed */
+}
+
+.meal-card {
+  background-color: var(--cardBgColor);
+  border: 1px solid var(--eventBorderColor);
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .remove-recipe {
