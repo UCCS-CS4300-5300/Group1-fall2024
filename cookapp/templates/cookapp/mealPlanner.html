@@ -1,0 +1,180 @@
+{% extends "cookapp/base.html" %}
+{% load static %}
+
+{% block content %}
+<link
+href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+rel="stylesheet"
+/>
+<div class="container">
+    <!-- Recipe Search Section -->
+    <section class="search-section">
+        <div class="container d-flex flex-column align-items-center">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8">
+                    <form id="search-form" class="justify-content-center">
+                        <div class="input-group mb-3 w-100">
+                            <input type="text" id="search-input" class="form-control" placeholder="Search for a recipe">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+                                <button class="btn btn-outline-secondary" type="button" id="clear-search">X</button>
+                            </div>
+                        </div>
+                        <ul id="results-list" class="list-group w-100 mt-3">
+                            <!-- Search results will be displayed here -->
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Meal Planner Section -->
+    <section class="meal-plan-section">
+        <h2 class="text-center">Meal Planner</h2>
+        <div class="meal-plan-table-wrapper">
+            <table class="meal-plan-table table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Breakfast</th>
+                        <th>Lunch</th>
+                        <th>Snack</th>
+                        <th>Dinner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for day in days %}
+                        <tr>
+                            <td>{{ day }}</td>
+                            {% for meal in meals %}
+                                <td class="dropzone" data-day="{{ day }}" data-meal="{{ meal }}">
+                                    <!-- Dropped recipes will appear here -->
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button id="save-meal-plan" class="btn-plan">Save Meal Plan</button>
+        <button id="export-to-pdf" class="btn-plan">Export as PDF</button>
+    </section>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<script>
+    $(document).ready(function() {
+        // Function to fetch recipes based on the search input
+        function fetchRecipes(query) {
+            $.ajax({
+                url: '{% url "recipe_search" %}',
+                data: {
+                    'term': query
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('#results-list').empty();
+                    if (data.recipes.length > 0) {
+                        var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
+                        recipeDetailUrl = recipeDetailUrl.replace('0/', '');
+
+                        data.recipes.forEach(function(recipe) {
+                            var listItem = `
+                                <li class="list-group-item draggable" draggable="true" data-recipe-id="${recipe.id}">
+                                    <a href="${recipeDetailUrl}${recipe.id}/" class="recipe-link" target="_blank">
+                                        ${recipe.title}
+                                    </a>
+                                </li>`;
+                            $('#results-list').append(listItem);
+                        });
+                    } else {
+                        $('#results-list').append('<li class="list-group-item no-hover">No results found</li>');
+                    }
+                }
+            });
+        }
+
+        // Search button click
+        $('#search-button').on('click', function() {
+            var query = $('#search-input').val();
+            if (query.length >= 3) {
+                fetchRecipes(query);
+            }
+        });
+
+        // Clear search input
+        $('#clear-search').on('click', function() {
+            $('#search-input').val('');
+            $('#results-list').empty();
+        });
+
+        // Ensure Enter key in search input only triggers search
+        $('#search-input').on('keypress', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                e.preventDefault();
+                var query = $(this).val();
+                if (query.length >= 3) {
+                    fetchRecipes(query);
+                }
+            }
+        });
+
+        // Drag & Drop functionality
+        $(document).on('dragstart', '.draggable', function(e) {
+            e.originalEvent.dataTransfer.setData('text/plain', $(this).data('recipe-id'));
+        });
+
+        $('.dropzone').on('dragover', function(e) {
+            e.preventDefault();
+        });
+
+        $('.dropzone').on('drop', function(e) {
+            e.preventDefault();
+            var recipeId = e.originalEvent.dataTransfer.getData('text/plain');
+            var droppedRecipe = $(`li[data-recipe-id="${recipeId}"]`).html(); // Get recipe HTML
+
+            // Append dropped recipe to the cell with a remove button
+            $(this).html(droppedRecipe + '<button class="remove-recipe">X</button>');
+        });
+
+        // Remove recipe from cell
+        $(document).on('click', '.remove-recipe', function() {
+            $(this).parent().empty();
+        });
+
+        // Save to local storage
+        $('#save-meal-plan').on('click', function() {
+            let mealPlan = {};
+            $('.dropzone').each(function() {
+                let day = $(this).data('day');
+                let meal = $(this).data('meal');
+                let content = $(this).html();
+                if (!mealPlan[day]) mealPlan[day] = {};
+                mealPlan[day][meal] = content;
+            });
+            localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+            alert('Meal plan saved!');
+        });
+
+        // Load from local storage
+        let savedMealPlan = localStorage.getItem('mealPlan');
+        if (savedMealPlan) {
+            savedMealPlan = JSON.parse(savedMealPlan);
+            $('.dropzone').each(function() {
+                let day = $(this).data('day');
+                let meal = $(this).data('meal');
+                if (savedMealPlan[day] && savedMealPlan[day][meal]) {
+                    $(this).html(savedMealPlan[day][meal]);
+                }
+            });
+        }
+
+        // PDF Export
+        $('#export-to-pdf').on('click', function() {
+            html2pdf(document.querySelector('.meal-plan-table-wrapper'));
+        });
+    });
+</script>
+{% endblock %}

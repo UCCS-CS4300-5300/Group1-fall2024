@@ -13,6 +13,8 @@ urlpatterns = [
     # Recipe detail page
     path('recipe/<int:id>/', views.RecipeDetailView.as_view(), name='recipe_detail'),
     
+    # Meal plan
+    path('mealplan/', views.MealPlanView.as_view(), name='meal_plan'),
     # User authentication
     path('accounts/login/', views.CustomLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),

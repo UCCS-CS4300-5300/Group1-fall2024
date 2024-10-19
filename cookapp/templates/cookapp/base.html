@@ -11,6 +11,7 @@
     />
 
     <link rel="stylesheet" href="{% static 'styles.css' %}" />
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon" />
     <title>{% block title %}We Need To Cook{% endblock %}</title>
   </head>
   <body class="page-container">
@@ -31,24 +32,16 @@
         <li><a href="{% url 'index' %}">Home</a></li>
         <li><a href="#">Recipes</a></li>
         {% if user.is_authenticated %}
-        <li><a href="#">Favorites</a></li>
-        <li>
-          <form method="POST" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button
-              type="submit"
-              style="
-                background: none;
-                border: none;
-                color: inherit;
-                padding: 0;
-                font: inherit;
-                cursor: pointer;
-              "
-            >
-              Logout {{ user }}
-            </button>
-          </form>
+        <li class="dropdown">
+          <a href="#" class="dropbtn">Profile</a>
+          <div class="dropdown-content">
+            <a href="#">Favorites</a>
+            <a href="{% url 'meal_plan' %}">Meal Planner</a>
+            <form method="POST" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="dropdown-logout">Logout {{ user }}</button>
+            </form>
+          </div>
         </li>
         {% else %}
         <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
