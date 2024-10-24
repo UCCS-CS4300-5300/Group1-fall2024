@@ -6,24 +6,81 @@
 href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
 rel="stylesheet"
 />
+
 <main>
     <section class="search-section">
-      {% if messages %}
-      <div class="messages">
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <div class="container d-flex flex-column align-items-center">
             <div class="row justify-content-center w-100">
                 <div class="col-md-8">
+                    <!-- Changed header -->
+                    <h3 class="text-center mb-4">Recipe Finder</h3>
                     <form id="search-form" class="justify-content-center">
+
+                        <!-- Quick Add Section -->
+                        <div class="ingredients-section mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="text-left mb-0">Quick Add:</h5>
+                                <div class="mode-toggle d-flex align-items-center">
+                                    <span class="toggle-label me-2">Include</span>
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="quick-add-mode" checked>
+                                        <label class="custom-control-label" for="quick-add-mode"></label>
+                                    </div>
+                                    <span class="toggle-label ms-2">Exclude</span>
+                                </div>
+                            </div>
+                            <div id="common-ingredients" class="w-100">
+                                {% for ingredient in common_ingredients %}
+                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn" 
+                                        data-ingredient="{{ ingredient.name }}">
+                                    {{ ingredient.name }}
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Whitelist Section -->
+                        <div class="ingredients-section mb-4">
+                            <h5 class="text-left">Included Ingredients:</h5>
+                            <div id="whitelist-container" class="w-100 mb-3">
+                                <!-- Whitelist tags will be added here -->
+                            </div>
+                            <div class="input-group mb-3 w-100">
+                                <input type="text" id="new-whitelist-input" class="form-control" placeholder="Include an ingredient">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-success" type="button" id="add-whitelist">Add</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Blacklist Section -->
+                        <div class="ingredients-section mb-4">
+                            <h5 class="text-left">Excluded Ingredients:</h5>
+                            <div id="blacklist-container" class="w-100 mb-3">
+                                <!-- Blacklist tags will be added here -->
+                            </div>
+                            <div class="input-group mb-3 w-100">
+                                <input type="text" id="new-blacklist-input" class="form-control" placeholder="Exclude an ingredient">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-danger" type="button" id="add-blacklist">Add</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Added header for search bar -->
+                        <h5 class="text-left mt-4">Recipe Search</h5>
                         <div class="input-group mb-3 w-100">
                             <input type="text" id="search-input" class="form-control" placeholder="What are you looking for?">
                             <div class="input-group-append">
@@ -31,24 +88,19 @@ rel="stylesheet"
                                 <button class="btn btn-outline-secondary" type="button" id="clear-search">X</button>
                             </div>
                         </div>
-                        <ul id="results-list" class="list-group w-100 mt-3">
+
+                        <!-- Search Results -->
+                        <ul id="search-results-list" class="list-group w-100">
                             <!-- Search results will be displayed here -->
                         </ul>
-                        <div id="blacklist-container" class="w-100 mb-3">
-                            <!-- Blacklist tags will be added here -->
-                        </div>
-                        <div class="input-group mb-3 w-100">
-                            <input type="text" id="new-blacklist-input" class="form-control" placeholder="Add an ingredient to blacklist">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" id="add-blacklist">Add</button>
-                            </div>
-                        </div>
-                        <div id="common-ingredients" class="w-100 mb-3">
-                            <p class="text-left">Quick Add:</p>
-                            {% for ingredient in common_ingredients %}
-                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn" data-ingredient="{{ ingredient.name }}">{{ ingredient.name }}</button>
-                            {% endfor %}
-                        </div>
+
+                        <!-- Find Recipes Button -->
+                        <button type="button" id="find-recipes-button" class="btn btn-primary mb-3">Find Recipes</button>
+                        
+                        <!-- Search Results from Find Recipes -->
+                        <ul id="find-results-list" class="list-group w-100 mb-3">
+                            <!-- Results from Find Recipes will be displayed here -->
+                        </ul>
                     </form>
                 </div>
             </div>
@@ -56,16 +108,13 @@ rel="stylesheet"
     </section>
 
     <section class="intro text-center">
-        <img class="index-image img-fluid" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients">
+        <img class="index-image img-fluid" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients" style="margin-top: 40px;">
         <h2>Welcome to We Need To Cook!</h2>
         <p>You give ingredients, we give recipes!</p>
         <p>
             With a list of ingredients that you already have, we will provide you with amazing recipes!<br>
-            You will also have the option to give us a blacklist of ingredients which you want to avoid or are allergic to.<br>
-            You can save your favorite recipe and navigate to the favorites page.
-        </p>
-        <p class='mt-4 remove-later'>
-            <strong>This is a <u>beautiful</u> landing page.</strong>
+            You can specify ingredients you must include and those you want to avoid.<br>
+            Save your favorite recipes and navigate to the favorites page.
         </p>
     </section>
 </main>
@@ -79,20 +128,25 @@ rel="stylesheet"
                 blacklist.push($(this).data('ingredient'));
             });
 
+            var whitelist = [];
+            $('.whitelist-tag').each(function() {
+                whitelist.push($(this).data('ingredient'));
+            });
+
             $.ajax({
                 url: '{% url "recipe_search" %}',
                 data: {
                     'term': query,
-                    'blacklist': JSON.stringify(blacklist)
+                    'blacklist': JSON.stringify(blacklist),
+                    'whitelist': JSON.stringify(whitelist)
                 },
                 dataType: 'json',
                 success: function(data) {
-                    $('#results-list').empty();
+                    $('#search-results-list').empty(); // Change to search-results-list
 
                     if (data.recipes.length > 0) {
                         var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
-                        recipeDetailUrl = recipeDetailUrl.replace('0/', ''); // Remove '0/' to eliminate the extra slash
-
+                        recipeDetailUrl = recipeDetailUrl.replace('0/', '');
 
                         for (var i = 0; i < data.recipes.length; i++) {
                             var title = data.recipes[i].title;
@@ -103,18 +157,31 @@ rel="stylesheet"
                                     <i class="fa fa-book"></i> ${highlightedTitle}
                                 </a>
                             </li>`;
-                            $('#results-list').append(listItem);
+                            $('#search-results-list').append(listItem); // Change to search-results-list
                         }
                     } else {
-                        $('#results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
+                        $('#search-results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
                     }
                 }
             });
-        }       
+        }
+
+        function addWhitelistIngredient(ingredient) {
+            if (ingredient && !$('.whitelist-tag[data-ingredient="' + ingredient + '"]').length) {
+                var tag = $('<span class="badge badge-success whitelist-tag mr-2" data-ingredient="' + ingredient + '">' + 
+                          ingredient + '</span>');
+                tag.on('click', function() {
+                    $(this).remove();
+                });
+                $('#whitelist-container').append(tag);
+                $('#new-whitelist-input').val('');
+            }
+        }
 
         function addBlacklistIngredient(ingredient) {
             if (ingredient && !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length) {
-                var tag = $('<span class="badge badge-danger blacklist-tag" data-ingredient="' + ingredient + '">' + ingredient + '</span>');
+                var tag = $('<span class="badge badge-danger blacklist-tag mr-2" data-ingredient="' + ingredient + '">' + 
+                          ingredient + '</span>');
                 tag.on('click', function() {
                     $(this).remove();
                 });
@@ -131,7 +198,7 @@ rel="stylesheet"
         });
 
         $('#search-input').on('keyup', function(e) {
-            if (e.keyCode === 13) {  // Enter key
+            if (e.keyCode === 13) {
                 var query = $(this).val();
                 if (query.length >= 3) {
                     fetchRecipes(query);
@@ -141,7 +208,12 @@ rel="stylesheet"
 
         $('#clear-search').on('click', function() {
             $('#search-input').val('');
-            $('#results-list').empty();
+            $('#search-results-list').empty(); // Change to search-results-list
+        });
+
+        $('#add-whitelist').on('click', function() {
+            var ingredient = $('#new-whitelist-input').val().trim();
+            addWhitelistIngredient(ingredient);
         });
 
         $('#add-blacklist').on('click', function() {
@@ -149,46 +221,25 @@ rel="stylesheet"
             addBlacklistIngredient(ingredient);
         });
 
-        $('#new-blacklist-input').on('keyup', function(e) {
-            if (e.keyCode === 13) {  // Enter key
+        $('#new-whitelist-input, #new-blacklist-input').on('keyup', function(e) {
+            if (e.keyCode === 13) {
                 var ingredient = $(this).val().trim();
-                addBlacklistIngredient(ingredient);
-            }
-        });
-
-        $(document).on('click', '.blacklist-tag', function() {
-            $(this).remove();
-        });
-
-        // Add event listener for common ingredients buttons
-        $(document).on('click', '.common-ingredient-btn', function(event) {
-            event.preventDefault();  // Prevent the default form submission behavior
-            var ingredient = $(this).data('ingredient');
-            addBlacklistIngredient(ingredient);
-        });
-
-        // Prevent Enter key from triggering both actions
-        $('#search-form').on('submit', function(e) {
-            e.preventDefault();
-        });
-
-        // Ensure Enter key in search input only triggers search
-        $('#search-input').on('keypress', function(e) {
-            if (e.keyCode === 13) {  // Enter key
-                e.preventDefault();
-                var query = $(this).val();
-                if (query.length >= 3) {
-                    fetchRecipes(query);
+                if ($(this).is('#new-whitelist-input')) {
+                    addWhitelistIngredient(ingredient);
+                } else {
+                    addBlacklistIngredient(ingredient);
                 }
             }
         });
 
-        // Ensure Enter key in blacklist input only triggers add blacklist
-        $('#new-blacklist-input').on('keypress', function(e) {
-            if (e.keyCode === 13) {  // Enter key
-                e.preventDefault();
-                var ingredient = $(this).val().trim();
-                addBlacklistIngredient(ingredient);
+        // Toggle mode between include/exclude
+        $('#quick-add-mode').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#add-whitelist').show();
+                $('#add-blacklist').hide();
+            } else {
+                $('#add-whitelist').hide();
+                $('#add-blacklist').show();
             }
         });
     });

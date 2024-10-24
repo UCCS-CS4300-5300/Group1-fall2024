@@ -305,21 +305,191 @@ footer .navbar-text {
   color: var(--color-dark);
 }
 
-/* Blacklist classes */
-.blacklist-tag {
-  display: inline-block;
-  margin-right: 10px;
-  margin-bottom: 10px;
+/* Updated Recipe Search specific styles */
+.ingredients-section {
+  background-color: var(--color-white);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
 }
+
+.ingredients-section h5 {
+  color: var(--color-dark);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Tag Containers */
+#whitelist-container,
 #blacklist-container {
-  margin-bottom: 15px;
+  min-height: 40px;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.05);
 }
-.badge-danger .close {
-  color: white;
-  opacity: 1;
-  font-size: 16px;
-  font-weight: normal;
-  padding-left: 5px;
+
+/* Tag Styles */
+.whitelist-tag,
+.blacklist-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  margin: 4px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.whitelist-tag {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.blacklist-tag {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.whitelist-tag:hover,
+.blacklist-tag:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.whitelist-tag .fa-times,
+.blacklist-tag .fa-times {
+  margin-left: 6px;
+  font-size: 0.8rem;
+}
+
+/* Include/Exclude Toggle */
+.mode-toggle {
+  font-size: 0.9rem;
+}
+
+.toggle-label {
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+/* Custom Switch Colors */
+.custom-control-input:focus~.custom-control-label::before {
+  border-color: green !important;
+}
+
+.custom-control-input:active~.custom-control-label::before {
+  background-color: green !important;
+  border-color: green !important;
+}
+
+.custom-control-input:checked~.custom-control-label::before {
+  border-color: green !important;
+  background-color: green !important;
+}
+
+.custom-control-input:not(:checked) ~ .custom-control-label::before {
+  background-color: red !important;
+  border-color: red !important;
+}
+
+.custom-switch .custom-control-label::after {
+  background-color: var(--color-white);
+}
+
+.custom-control-input:not(:checked) ~ .custom-control-label::after {
+  background-color: var(--color-white) !important;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+/* Input Groups */
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-group input {
+  border-right: none;
+}
+
+.input-group input:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+/* Quick Add Section */
+.custom-control-input:checked ~ .custom-control-label::before {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.common-ingredient-btn {
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  border-radius: 15px;
+}
+
+.common-ingredient-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Search Results */
+#results-list {
+  background-color: var(--color-white);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item {
+  border-left: none;
+  border-right: none;
+  transition: all 0.2s ease;
+}
+
+.list-group-item:first-child {
+  border-top: none;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+.list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.recipe-link {
+  color: var(--color-dark);
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+.recipe-link:hover {
+  color: var(--color-primary-peach);
+  text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ingredients-section {
+    padding: 10px;
+  }
+
+  .whitelist-tag,
+  .blacklist-tag {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+
+  .common-ingredient-btn {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
 }
 
 #search-form {

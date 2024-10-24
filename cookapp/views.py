@@ -59,26 +59,39 @@ class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '')
         blacklist_query = request.GET.get('blacklist', '[]')
+        whitelist_query = request.GET.get('whitelist', '[]')
 
-        # Parse the blacklist JSON string into a list
         try:
             blacklist = json.loads(blacklist_query)
+            whitelist = json.loads(whitelist_query)
         except json.JSONDecodeError:
             blacklist = []
+            whitelist = []
 
-        # Search by Recipe title or tags
+        # Start with base query
         recipe_results = Recipe.objects.filter(Q(title__icontains=query) | Q(tags__icontains=query))
 
-        # Exclude recipes with blacklisted ingredients
+        # Apply whitelist filter if any ingredients are specified
+        if whitelist:
+            whitelist_filter = Q()
+            for ingredient in whitelist:
+                try:
+                    whitelisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
+                    whitelist_filter |= Q(ingredients=whitelisted_ingredient)
+                except Ingredient.DoesNotExist:
+                    continue
+            if whitelist_filter:
+                recipe_results = recipe_results.filter(whitelist_filter)
+
+        # Apply blacklist filter
         for ingredient in blacklist:
             try:
                 blacklisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
                 recipe_results = recipe_results.exclude(ingredients=blacklisted_ingredient)
             except Ingredient.DoesNotExist:
-                pass  # If the ingredient doesn't exist, just skip filtering for it
+                continue
 
-        # Limit results to 10 and prepare response data
-        recipe_list = list(recipe_results.values('title', 'id')[:10])
+        recipe_list = list(recipe_results.distinct().values('title', 'id')[:10])
 
         return JsonResponse({
             'recipes': recipe_list,
