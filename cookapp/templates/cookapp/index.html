@@ -122,126 +122,153 @@ rel="stylesheet"
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        function fetchRecipes(query) {
-            var blacklist = [];
-            $('.blacklist-tag').each(function() {
-                blacklist.push($(this).data('ingredient'));
-            });
+    function fetchRecipes(query, useWhitelist = false) {
+        var blacklist = [];
+        $('.blacklist-tag').each(function() {
+            blacklist.push($(this).data('ingredient'));
+        });
 
-            var whitelist = [];
-            $('.whitelist-tag').each(function() {
-                whitelist.push($(this).data('ingredient'));
-            });
+        var whitelist = [];
+        $('.whitelist-tag').each(function() {
+            whitelist.push($(this).data('ingredient'));
+        });
 
-            $.ajax({
-                url: '{% url "recipe_search" %}',
-                data: {
-                    'term': query,
-                    'blacklist': JSON.stringify(blacklist),
-                    'whitelist': JSON.stringify(whitelist)
-                },
-                dataType: 'json',
-                success: function(data) {
-                    $('#search-results-list').empty(); // Change to search-results-list
+        // If the query is empty and useWhitelist is true, use whitelist ingredients as the search query
+        if (!query && useWhitelist && whitelist.length > 0) {
+            query = whitelist.join(', ');  // Use whitelisted ingredients as query
+        }
 
-                    if (data.recipes.length > 0) {
-                        var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
-                        recipeDetailUrl = recipeDetailUrl.replace('0/', '');
+        $.ajax({
+            url: '{% url "recipe_search" %}',
+            data: {
+                'term': query,
+                'blacklist': JSON.stringify(blacklist),
+                'whitelist': JSON.stringify(whitelist)
+            },
+            dataType: 'json',
+            success: function(data) {
+                $('#search-results-list').empty(); // Clear the previous results
 
-                        for (var i = 0; i < data.recipes.length; i++) {
-                            var title = data.recipes[i].title;
-                            var id = data.recipes[i].id;
-                            var highlightedTitle = title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
-                            var listItem = `<li class="list-group-item">
-                                <a href="${recipeDetailUrl}${id}/" class="recipe-link">
-                                    <i class="fa fa-book"></i> ${highlightedTitle}
-                                </a>
-                            </li>`;
-                            $('#search-results-list').append(listItem); // Change to search-results-list
-                        }
-                    } else {
-                        $('#search-results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
+                if (data.recipes.length > 0) {
+                    var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
+                    recipeDetailUrl = recipeDetailUrl.replace('0/', '');
+
+                    for (var i = 0; i < data.recipes.length; i++) {
+                        var title = data.recipes[i].title;
+                        var id = data.recipes[i].id;
+                        var highlightedTitle = title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+                        var listItem = `<li class="list-group-item">
+                            <a href="${recipeDetailUrl}${id}/" class="recipe-link">
+                                <i class="fa fa-book"></i> ${highlightedTitle}
+                            </a>
+                        </li>`;
+                        $('#search-results-list').append(listItem); // Append the result
                     }
+                } else {
+                    $('#search-results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
                 }
+            }
+        });
+    }
+
+    function addWhitelistIngredient(ingredient) {
+        if (ingredient && !$('.whitelist-tag[data-ingredient="' + ingredient + '"]').length) {
+            var tag = $('<span class="badge badge-success whitelist-tag mr-2" data-ingredient="' + ingredient + '">' + 
+                        ingredient + '</span>');
+            tag.on('click', function() {
+                $(this).remove();
             });
+            $('#whitelist-container').append(tag);
+            $('#new-whitelist-input').val('');  // Clear the input field
         }
+    }
 
-        function addWhitelistIngredient(ingredient) {
-            if (ingredient && !$('.whitelist-tag[data-ingredient="' + ingredient + '"]').length) {
-                var tag = $('<span class="badge badge-success whitelist-tag mr-2" data-ingredient="' + ingredient + '">' + 
-                          ingredient + '</span>');
-                tag.on('click', function() {
-                    $(this).remove();
-                });
-                $('#whitelist-container').append(tag);
-                $('#new-whitelist-input').val('');
-            }
+    function addBlacklistIngredient(ingredient) {
+        if (ingredient && !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length) {
+            var tag = $('<span class="badge badge-danger blacklist-tag mr-2" data-ingredient="' + ingredient + '">' + 
+                        ingredient + '</span>');
+            tag.on('click', function() {
+                $(this).remove();
+            });
+            $('#blacklist-container').append(tag);
+            $('#new-blacklist-input').val('');  // Clear the input field
         }
+    }
 
-        function addBlacklistIngredient(ingredient) {
-            if (ingredient && !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length) {
-                var tag = $('<span class="badge badge-danger blacklist-tag mr-2" data-ingredient="' + ingredient + '">' + 
-                          ingredient + '</span>');
-                tag.on('click', function() {
-                    $(this).remove();
-                });
-                $('#blacklist-container').append(tag);
-                $('#new-blacklist-input').val('');
-            }
+    // Handle Quick Add buttons
+    $('.common-ingredient-btn').on('click', function() {
+        var ingredient = $(this).data('ingredient');
+        if ($('#quick-add-mode').is(':checked')) {
+            addWhitelistIngredient(ingredient);  // Add to whitelist if Include mode is selected
+        } else {
+            addBlacklistIngredient(ingredient);  // Add to blacklist if Exclude mode is selected
         }
+    });
 
-        $('#search-button').on('click', function() {
-            var query = $('#search-input').val();
+    $('#search-button').on('click', function() {
+        var query = $('#search-input').val();
+        if (query.length >= 3) {
+            fetchRecipes(query);
+        }
+    });
+
+    $('#search-input').on('keyup', function(e) {
+        if (e.keyCode === 13) {
+            var query = $(this).val();
             if (query.length >= 3) {
                 fetchRecipes(query);
             }
-        });
-
-        $('#search-input').on('keyup', function(e) {
-            if (e.keyCode === 13) {
-                var query = $(this).val();
-                if (query.length >= 3) {
-                    fetchRecipes(query);
-                }
-            }
-        });
-
-        $('#clear-search').on('click', function() {
-            $('#search-input').val('');
-            $('#search-results-list').empty(); // Change to search-results-list
-        });
-
-        $('#add-whitelist').on('click', function() {
-            var ingredient = $('#new-whitelist-input').val().trim();
-            addWhitelistIngredient(ingredient);
-        });
-
-        $('#add-blacklist').on('click', function() {
-            var ingredient = $('#new-blacklist-input').val().trim();
-            addBlacklistIngredient(ingredient);
-        });
-
-        $('#new-whitelist-input, #new-blacklist-input').on('keyup', function(e) {
-            if (e.keyCode === 13) {
-                var ingredient = $(this).val().trim();
-                if ($(this).is('#new-whitelist-input')) {
-                    addWhitelistIngredient(ingredient);
-                } else {
-                    addBlacklistIngredient(ingredient);
-                }
-            }
-        });
-
-        // Toggle mode between include/exclude
-        $('#quick-add-mode').on('change', function() {
-            if ($(this).is(':checked')) {
-                $('#add-whitelist').show();
-                $('#add-blacklist').hide();
-            } else {
-                $('#add-whitelist').hide();
-                $('#add-blacklist').show();
-            }
-        });
+        }
     });
+
+    $('#clear-search').on('click', function() {
+        $('#search-input').val('');
+        $('#search-results-list').empty(); // Clear the search results
+    });
+
+    $('#add-whitelist').on('click', function() {
+        var ingredient = $('#new-whitelist-input').val().trim();
+        addWhitelistIngredient(ingredient);
+    });
+
+    $('#add-blacklist').on('click', function() {
+        var ingredient = $('#new-blacklist-input').val().trim();
+        addBlacklistIngredient(ingredient);
+    });
+
+    $('#new-whitelist-input, #new-blacklist-input').on('keyup', function(e) {
+        if (e.keyCode === 13) {
+            var ingredient = $(this).val().trim();
+            if ($(this).is('#new-whitelist-input')) {
+                addWhitelistIngredient(ingredient);
+            } else {
+                addBlacklistIngredient(ingredient);
+            }
+        }
+    });
+
+    // Handle Find Recipes button
+    $('#find-recipes-button').on('click', function() {
+        var whitelistCount = $('.whitelist-tag').length;
+        if (whitelistCount > 0) {
+            fetchRecipes('', true);  // Use whitelisted ingredients if available
+        } else {
+            alert("Please add at least one ingredient to the whitelist.");
+        }
+    });
+
+    // Toggle mode between include/exclude
+    $('#quick-add-mode').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#add-whitelist').show();
+            $('#add-blacklist').hide();
+        } else {
+            $('#add-whitelist').hide();
+            $('#add-blacklist').show();
+        }
+    });
+});
+
+
 </script>
 {% endblock %}
