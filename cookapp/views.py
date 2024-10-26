@@ -3,6 +3,7 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.contrib import messages
 
 from django.http import JsonResponse
@@ -96,6 +97,38 @@ class RecipeSearch(View):
         return JsonResponse({
             'recipes': recipe_list,
         })
+
+@method_decorator(login_required, name='dispatch')
+class SavePreferences(View):
+    def post(self, request):
+        data = json.loads(request.body)
+        whitelist = data.get('whitelist', [])
+        blacklist = data.get('blacklist', [])
+        
+        user_preference, created = UserPreference.objects.get_or_create(user=request.user)
+        
+        # Update whitelist
+        user_preference.whitelist.clear()
+        for ingredient_name in whitelist:
+            ingredient, _ = Ingredient.objects.get_or_create(name=ingredient_name)
+            user_preference.whitelist.add(ingredient)
+        
+        # Update blacklist
+        user_preference.blacklist.clear()
+        for ingredient_name in blacklist:
+            ingredient, _ = Ingredient.objects.get_or_create(name=ingredient_name)
+            user_preference.blacklist.add(ingredient)
+        
+        return JsonResponse({'status': 'success'})
+
+class GetPreferences(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user_preference, created = UserPreference.objects.get_or_create(user=request.user)
+            whitelist = list(user_preference.whitelist.values_list('name', flat=True))
+            blacklist = list(user_preference.blacklist.values_list('name', flat=True))
+            return JsonResponse({'whitelist': whitelist, 'blacklist': blacklist})
+        return JsonResponse({'whitelist': [], 'blacklist': []})
 
 
 class RecipeDetailView(View):

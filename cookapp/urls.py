@@ -12,6 +12,10 @@ urlpatterns = [
     
     # Recipe detail page
     path('recipe/<int:id>/', views.RecipeDetailView.as_view(), name='recipe_detail'),
+
+    # User preferences
+    path('save_preferences/', views.SavePreferences.as_view(), name='save_preferences'),
+    path('get_preferences/', views.GetPreferences.as_view(), name='get_preferences'),
     
     # User authentication
     path('accounts/login/', views.CustomLoginView.as_view(), name='login'),
