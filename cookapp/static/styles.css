@@ -730,7 +730,60 @@ footer .navbar-text {
   box-shadow: none;
   border-color: var(--eventBorderColor); /* Reset to original border color */
 }
-  
+
+  /* Media query for responsive design */
+@media (max-width: 768px) {
+  .meal-plan-table th,
+  .meal-plan-table td {
+    padding: 8px; /* Reduce padding */
+    font-size: 14px; /* Reduce font size */
+  }
+
+  .meal-plan-table th.rotate {
+    writing-mode: horizontal-tb; /* Change writing mode */
+    transform: rotate(0); /* Reset rotation */
+  }
+}
+
+@media (max-width: 576px) {
+  .meal-plan-table,
+  .meal-plan-table thead,
+  .meal-plan-table tbody,
+  .meal-plan-table th,
+  .meal-plan-table td,
+  .meal-plan-table tr {
+    display: block; /* Make table elements block */
+  }
+
+  .meal-plan-table th {
+    position: absolute; /* Hide table headers */
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .meal-plan-table tr {
+    margin-bottom: 10px; /* Add space between rows */
+  }
+
+  .meal-plan-table td {
+    border: none; /* Remove borders */
+    position: relative;
+    padding-left: 50%; /* Add padding to left */
+    text-align: left; /* Align text to left */
+  }
+
+  .meal-plan-table td:before {
+    content: attr(data-label); /* Add data-label attribute content */
+    position: absolute;
+    left: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+
+  .meal-plan-table td[data-label="Day"] {
+    background-color: var(--eventColor1); /* Add background color to day cells */
+  }
+}
 
 /* Global / Etc */
 

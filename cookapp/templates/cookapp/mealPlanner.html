@@ -9,14 +9,14 @@ rel="stylesheet"
 
 <div class="container">
     <h2 class="text-center">Weekly Meal Planner</h2>
-    <card class="card card-planner-title no-hover">
+    <div class="card card-planner-title no-hover">
         <div class="card-body">
             <h5 class="card-title">
                 <i class="fa-regular fa-lightbulb" style="color: gold; font-size: 1.5em;"></i> Plan your meals for the week by dragging and dropping recipes
             </h5>
             <p class="card-text">Search for recipes and drag them into the meal planner below. You can save your meal plan and download it as a PDF.</p>
         </div>
-    </card>
+    </div>
 
     <!-- Recipe Search Section -->
     <section class="search-section">
@@ -42,11 +42,11 @@ rel="stylesheet"
     
     <!-- Meal Planner Section -->
     <section class="meal-plan-section">
-        <div id="renderMe" class="meal-plan-table-wrapper">
+        <div id="renderMe" class="meal-plan-table-wrapper table-responsive">
             <table class="meal-plan-table table table-bordered">
                 <thead>
                     <tr>
-                        <th class="rotate">Day</th>
+                        <th>Day</th>
                         <th>Breakfast</th>
                         <th>Lunch</th>
                         <th>Snack</th>
