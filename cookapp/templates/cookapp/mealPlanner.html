@@ -6,7 +6,18 @@
 href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
 rel="stylesheet"
 />
+
 <div class="container">
+    <h2 class="text-center">Weekly Meal Planner</h2>
+    <card class="card card-planner-title no-hover">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fa-regular fa-lightbulb" style="color: gold; font-size: 1.5em;"></i> Plan your meals for the week by dragging and dropping recipes
+            </h5>
+            <p class="card-text">Search for recipes and drag them into the meal planner below. You can save your meal plan and download it as a PDF.</p>
+        </div>
+    </card>
+
     <!-- Recipe Search Section -->
     <section class="search-section">
         <div class="container d-flex flex-column align-items-center">
@@ -17,7 +28,7 @@ rel="stylesheet"
                             <input type="text" id="search-input" class="form-control" placeholder="Search for a recipe">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
-                                <button class="btn btn-outline-secondary" type="button" id="clear-search">X</button>
+                                <button class="btn btn-outline-secondary" type="button" id="clear-search"><i class="fa fa-times" aria-hidden="true"></i></button>
                             </div>
                         </div>
                         <ul id="results-list" class="list-group w-100 mt-3">
@@ -28,15 +39,14 @@ rel="stylesheet"
             </div>
         </div>
     </section>
-
+    
     <!-- Meal Planner Section -->
     <section class="meal-plan-section">
-        <h2 class="text-center">Meal Planner</h2>
-        <div class="meal-plan-table-wrapper">
+        <div id="renderMe" class="meal-plan-table-wrapper">
             <table class="meal-plan-table table table-bordered">
                 <thead>
                     <tr>
-                        <th>Day</th>
+                        <th class="rotate">Day</th>
                         <th>Breakfast</th>
                         <th>Lunch</th>
                         <th>Snack</th>
@@ -58,12 +68,13 @@ rel="stylesheet"
             </table>
         </div>
         <button id="save-meal-plan" class="btn-plan">Save Meal Plan</button>
-        <button id="export-to-pdf" class="btn-plan">Export as PDF</button>
+        <button id="pdfDownloader" class="btn-plan">Save as PDF</button>
     </section>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.debug.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     $(document).ready(function() {
         // Function to fetch recipes based on the search input
@@ -136,7 +147,7 @@ rel="stylesheet"
             var droppedRecipe = $(`li[data-recipe-id="${recipeId}"]`).html(); // Get recipe HTML
 
             // Append dropped recipe to the cell with a remove button
-            $(this).html(`<div class="card meal-card d-flex align-items-center"><span>${droppedRecipe}<i class="fa fa-times" aria-hidden="true"></i></span><button class="remove-recipe ml-2"></button></div>`);
+            $(this).html(`<div class="card meal-card d-flex align-items-center"><span>${droppedRecipe}</span><button class="remove-recipe ml-2"><i class="fa fa-times" aria-hidden="true"></i></button></div>`);
         });
 
         // Remove recipe from cell
@@ -171,18 +182,34 @@ rel="stylesheet"
             });
         }
 
-        // PDF Export
-        $('#export-to-pdf').on('click', function() {
-            const element = document.querySelector('.meal-plan-table-wrapper');
-            const opt = {
-                margin: 1,
-                filename: 'meal-plan.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            html2pdf().from(element).set(opt).save();
-        });
+        $('#pdfDownloader').on('click', function() {
+            $('body').addClass('pdf-mode'); // Add PDF mode to disable rotation
+        
+            html2canvas(document.querySelector('.meal-plan-table')).then(function(canvas) {
+                var imgData = canvas.toDataURL('image/png');
+                var doc = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+                
+                // Get the dimensions of the A4 page
+                var pageWidth = doc.internal.pageSize.width;
+                var pageHeight = doc.internal.pageSize.height;
+        
+                // Calculate the image dimensions to fill the page while keeping the aspect ratio
+                var imgWidth = pageWidth;
+                var imgHeight = canvas.height * imgWidth / canvas.width;
+        
+                // If the image height is larger than the page height, scale down to fit
+                if (imgHeight > pageHeight) {
+                    imgHeight = pageHeight;
+                    imgWidth = canvas.width * imgHeight / canvas.height;
+                }
+        
+                // Add the image to the PDF
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                doc.save('meal-plan.pdf');
+                
+                $('body').removeClass('pdf-mode'); // Remove PDF mode after generating the PDF
+            });
+        });        
     });
 </script>
 {% endblock %}
