@@ -1,0 +1,215 @@
+{% extends "cookapp/base.html" %}
+{% load static %}
+
+{% block content %}
+<link
+href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+rel="stylesheet"
+/>
+
+<div class="container">
+    <h2 class="text-center">Weekly Meal Planner</h2>
+    <div class="card card-planner-title no-hover">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fa-regular fa-lightbulb" style="color: gold; font-size: 1.5em;"></i> Plan your meals for the week by dragging and dropping recipes
+            </h5>
+            <p class="card-text">Search for recipes and drag them into the meal planner below. You can save your meal plan and download it as a PDF.</p>
+        </div>
+    </div>
+
+    <!-- Recipe Search Section -->
+    <section class="search-section">
+        <div class="container d-flex flex-column align-items-center">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8">
+                    <form id="search-form" class="justify-content-center">
+                        <div class="input-group mb-3 w-100">
+                            <input type="text" id="search-input" class="form-control" placeholder="Search for a recipe">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+                                <button class="btn btn-outline-secondary" type="button" id="clear-search"><i class="fa fa-times" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                        <ul id="results-list" class="list-group w-100 mt-3">
+                            <!-- Search results will be displayed here -->
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Meal Planner Section -->
+    <section class="meal-plan-section">
+        <div id="renderMe" class="meal-plan-table-wrapper table-responsive">
+            <table class="meal-plan-table table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Breakfast</th>
+                        <th>Lunch</th>
+                        <th>Snack</th>
+                        <th>Dinner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for day in days %}
+                        <tr>
+                            <td class="rotate"><div>{{ day }}</div></td>
+                            {% for meal in meals %}
+                                <td class="dropzone" data-day="{{ day }}" data-meal="{{ meal }}">
+                                    <!-- Dropped recipes will appear here -->
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button id="save-meal-plan" class="btn-plan">Save Meal Plan</button>
+        <button id="pdfDownloader" class="btn-plan">Save as PDF</button>
+    </section>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.debug.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Function to fetch recipes based on the search input
+        function fetchRecipes(query) {
+            $.ajax({
+                url: '{% url "recipe_search" %}',
+                data: {
+                    'term': query
+                },
+                dataType: 'json',
+                success: function(data) {
+                    $('#results-list').empty();
+                    if (data.recipes.length > 0) {
+                        var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
+                        recipeDetailUrl = recipeDetailUrl.replace('0/', '');
+
+                        data.recipes.forEach(function(recipe) {
+                            var listItem = `
+                                <li class="list-group-item draggable" draggable="true" data-recipe-id="${recipe.id}">
+                                    <a href="${recipeDetailUrl}${recipe.id}/" class="recipe-link" target="_blank">
+                                        ${recipe.title}
+                                    </a>
+                                </li>`;
+                            $('#results-list').append(listItem);
+                        });
+                    } else {
+                        $('#results-list').append('<li class="list-group-item no-hover">No results found</li>');
+                    }
+                }
+            });
+        }
+
+        // Search button click
+        $('#search-button').on('click', function() {
+            var query = $('#search-input').val();
+            if (query.length >= 3) {
+                fetchRecipes(query);
+            }
+        });
+
+        // Clear search input
+        $('#clear-search').on('click', function() {
+            $('#search-input').val('');
+            $('#results-list').empty();
+        });
+
+        // Ensure Enter key in search input only triggers search
+        $('#search-input').on('keypress', function(e) {
+            if (e.keyCode === 13) {  // Enter key
+                e.preventDefault();
+                var query = $(this).val();
+                if (query.length >= 3) {
+                    fetchRecipes(query);
+                }
+            }
+        });
+
+        // Drag & Drop functionality
+        $(document).on('dragstart', '.draggable', function(e) {
+            e.originalEvent.dataTransfer.setData('text/plain', $(this).data('recipe-id'));
+        });
+
+        $('.dropzone').on('dragover', function(e) {
+            e.preventDefault();
+        });
+
+        $('.dropzone').on('drop', function(e) {
+            e.preventDefault();
+            var recipeId = e.originalEvent.dataTransfer.getData('text/plain');
+            var droppedRecipe = $(`li[data-recipe-id="${recipeId}"]`).html(); // Get recipe HTML
+
+            // Append dropped recipe to the cell with a remove button
+            $(this).html(`<div class="card meal-card d-flex align-items-center"><span>${droppedRecipe}</span><button class="remove-recipe ml-2"><i class="fa fa-times" aria-hidden="true"></i></button></div>`);
+        });
+
+        // Remove recipe from cell
+        $(document).on('click', '.remove-recipe', function() {
+            $(this).closest('.meal-card').remove();
+        });
+
+        // Save to local storage
+        $('#save-meal-plan').on('click', function() {
+            let mealPlan = {};
+            $('.dropzone').each(function() {
+                let day = $(this).data('day');
+                let meal = $(this).data('meal');
+                let content = $(this).html();
+                if (!mealPlan[day]) mealPlan[day] = {};
+                mealPlan[day][meal] = content;
+            });
+            localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+            alert('Meal plan saved!');
+        });
+
+        // Load from local storage
+        let savedMealPlan = localStorage.getItem('mealPlan');
+        if (savedMealPlan) {
+            savedMealPlan = JSON.parse(savedMealPlan);
+            $('.dropzone').each(function() {
+                let day = $(this).data('day');
+                let meal = $(this).data('meal');
+                if (savedMealPlan[day] && savedMealPlan[day][meal]) {
+                    $(this).html(savedMealPlan[day][meal]);
+                }
+            });
+        }
+
+        $('#pdfDownloader').on('click', function() {
+            $('body').addClass('pdf-mode'); // Add PDF mode to disable rotation
+        
+            html2canvas(document.querySelector('.meal-plan-table')).then(function(canvas) {
+                var imgData = canvas.toDataURL('image/png');
+                var doc = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+                
+                // Get the dimensions of the A4 page
+                var pageWidth = doc.internal.pageSize.width;
+                var pageHeight = doc.internal.pageSize.height;
+        
+                // Calculate the image dimensions to fill the page while keeping the aspect ratio
+                var imgWidth = pageWidth;
+                var imgHeight = canvas.height * imgWidth / canvas.width;
+        
+                // If the image height is larger than the page height, scale down to fit
+                if (imgHeight > pageHeight) {
+                    imgHeight = pageHeight;
+                    imgWidth = canvas.width * imgHeight / canvas.height;
+                }
+        
+                // Add the image to the PDF
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                doc.save('meal-plan.pdf');
+                
+                $('body').removeClass('pdf-mode'); // Remove PDF mode after generating the PDF
+            });
+        });        
+    });
+</script>
+{% endblock %}

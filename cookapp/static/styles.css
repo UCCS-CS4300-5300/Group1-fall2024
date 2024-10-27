@@ -7,6 +7,13 @@
   --color-beige: #fff4ea;
   --color-light-blue: #7eacb5;
   --color-dark: #333;
+
+  --calBgColor: #fff1f8;
+  --eventBorderColor: #f2d3d8;
+  --eventColor1: #ffd6d1;
+  --eventColor3: #e2f8ff;
+  --cardBgColor: #fff4ea; /* New color for card-like cells */
+
 }
 
 /* fill viewport  */
@@ -26,7 +33,7 @@ body {
 
 body {
   font-family: Arial, sans-serif;
-  background-color: var(--color-beige);
+  background-color: var(--color-beige) !important;
   color: var(--color-dark);
   display: flex;
   flex-direction: column;
@@ -137,6 +144,68 @@ nav.navbar ul li a:hover {
   color: var(--color-primary-peach);
 }
 
+/* Dropdown menu styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background-color: var(--color-dark);
+  color: var(--color-beige);
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--color-dark);
+  min-width: 160px;
+  box-shadow: var(--color-black) var(--color-black) 0 0 10px;
+  z-index: 1;
+}
+
+.dropdown-content a,
+.dropdown-content form {
+  color: var(--color-beige);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover,
+.dropdown-content form:hover {
+  background-color: var(--color-primary-peach);
+  color: var(--color-black) !important; /* Text turns black on hover */
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  color: var(--color-primary-peach); /* Only the text color changes */
+}
+
+/* Style for the logout button to look like a link */
+.dropdown-logout {
+  background: none;
+  border: none;
+  color: var(--color-beige);
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.dropdown-logout:hover {
+  background-color: var(--color-primary-peach);
+  color: var(--color-black); /* Text turns black on hover */
+}
+
 /* Media query for navbar on small screens */
 @media (max-width: 768px) {
   nav.navbar ul {
@@ -225,10 +294,9 @@ footer .navbar-text {
   color: var(--color-dark);
 }
 
-
 .list-group-item.active {
   background-color: var(--color-secondary-yellow);
-  color: var (--color-dark);
+  color: var(--color-dark);
 }
 
 #search-form {
@@ -300,9 +368,14 @@ footer .navbar-text {
   margin-right: 10px;
 }
 
-.list-group-item.active {
-  background-color: var(--color-secondary-yellow);
-  color: var(--color-dark);
+.recipe-link {
+  color: var(--color-dark); /* Set the link color to match the text color */
+  text-decoration: none; /* Remove the underline from the link */
+}
+
+.recipe-link:hover {
+  color: var(--color-primary-peach); /* Change color on hover */
+  text-decoration: underline; /* Add underline on hover */
 }
 
 /* Updated Recipe Search specific styles */
@@ -527,7 +600,7 @@ footer .navbar-text {
 #new-blacklist-input:focus {
   outline: none; /* Remove the default outline */
   box-shadow: 0 0 0 2px var(--color-primary-peach); /* Custom focus outline */
-  border-color: var(--color-primary-peach); /* Change border color on focus */
+  border-color: var (--color-primary-peach); /* Change border color on focus */
 }
 
 /* Highlighted text for search matches */
@@ -729,4 +802,174 @@ footer .navbar-text {
 
 .login-links a:hover {
   text-decoration: underline;
+}
+
+
+/* Meal Planner Table */
+.meal-plan-table-wrapper {
+  margin-bottom: 20px; /* Add margin to the bottom of the table */
+}
+
+.meal-plan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.meal-plan-table th,
+.meal-plan-table td {
+  border: 1px solid var(--calBgColor); /* Inverse table appearance */
+  padding: 10px;
+  text-align: center;
+}
+
+.meal-plan-table th {
+  background-color: var(--eventColor1);
+  color: var(--color-dark);
+}
+
+.meal-plan-table td {
+  background-color: var(--cardBgColor); /* Card-like background color */
+  color: var(--color-dark);
+  border-radius: 5px; /* Rounded corners for card-like appearance */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for card-like appearance */
+  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+}
+
+.meal-plan-table td:hover {
+  background-color: var(--eventColor3); /* Change background color on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Increase shadow on hover */
+}
+
+.rotate {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.pdf-mode .rotate {
+  transform: none; /* Disable the flip when in PDF mode */
+}
+
+
+.meal-cell {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px; /* Adjust height as needed */
+}
+
+.meal-card {
+  background-color: var(--cardBgColor);
+  border: 1px solid var(--eventBorderColor);
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remove-recipe {
+  background: none;
+  border: none;
+  color: var(--color-dark);
+  font-size: 1.2em;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.remove-recipe:hover {
+  color: var(--color-primary-peach);
+}
+
+.card-planner-title {
+  background-color: var(--cardBgColor);
+  border: 1px solid var(--eventBorderColor);
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;  
+}
+
+/* Override hover styles for card-planner-title */
+.card-planner-title:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--eventBorderColor); /* Reset to original border color */
+}
+
+  /* Media query for responsive design */
+@media (max-width: 768px) {
+  .meal-plan-table th,
+  .meal-plan-table td {
+    padding: 8px; /* Reduce padding */
+    font-size: 14px; /* Reduce font size */
+  }
+
+  .meal-plan-table th.rotate {
+    writing-mode: horizontal-tb; /* Change writing mode */
+    transform: rotate(0); /* Reset rotation */
+  }
+}
+
+@media (max-width: 576px) {
+  .meal-plan-table,
+  .meal-plan-table thead,
+  .meal-plan-table tbody,
+  .meal-plan-table th,
+  .meal-plan-table td,
+  .meal-plan-table tr {
+    display: block; /* Make table elements block */
+  }
+
+  .meal-plan-table th {
+    position: absolute; /* Hide table headers */
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .meal-plan-table tr {
+    margin-bottom: 10px; /* Add space between rows */
+  }
+
+  .meal-plan-table td {
+    border: none; /* Remove borders */
+    position: relative;
+    padding-left: 50%; /* Add padding to left */
+    text-align: left; /* Align text to left */
+  }
+
+  .meal-plan-table td:before {
+    content: attr(data-label); /* Add data-label attribute content */
+    position: absolute;
+    left: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+
+  .meal-plan-table td[data-label="Day"] {
+    background-color: var(--eventColor1); /* Add background color to day cells */
+  }
+}
+
+/* Global / Etc */
+
+.btn-plan {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: var(--color-primary-peach);
+  border: none;
+  padding: 10px;
+  color: var(--color-white);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-plan:hover {
+  background-color: var(--color-dark);
 }

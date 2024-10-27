@@ -17,6 +17,8 @@ urlpatterns = [
     path('save_preferences/', views.SavePreferences.as_view(), name='save_preferences'),
     path('get_preferences/', views.GetPreferences.as_view(), name='get_preferences'),
     
+    # Meal plan
+    path('mealplan/', views.MealPlanView.as_view(), name='meal_plan'),
     # User authentication
     path('accounts/login/', views.CustomLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),

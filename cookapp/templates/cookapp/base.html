@@ -5,12 +5,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link
-      href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
-      rel="stylesheet"
-    />
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    rel="stylesheet"
+  />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="{% static 'styles.css' %}" />
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon" />
     <title>{% block title %}We Need To Cook{% endblock %}</title>
   </head>
   <body class="page-container">
@@ -31,24 +34,16 @@
         <li><a href="{% url 'index' %}">Home</a></li>
         <li><a href="#">Recipes</a></li>
         {% if user.is_authenticated %}
-        <li><a href="#">Favorites</a></li>
-        <li>
-          <form method="POST" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button
-              type="submit"
-              style="
-                background: none;
-                border: none;
-                color: inherit;
-                padding: 0;
-                font: inherit;
-                cursor: pointer;
-              "
-            >
-              Logout {{ user }}
-            </button>
-          </form>
+        <li class="dropdown">
+          <a href="#" class="dropbtn">Profile</a>
+          <div class="dropdown-content">
+            <a href="#">Favorites</a>
+            <a href="{% url 'meal_plan' %}">Meal Planner</a>
+            <form method="POST" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="dropdown-logout">Logout {{ user }}</button>
+            </form>
+          </div>
         </li>
         {% else %}
         <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
@@ -66,7 +61,7 @@
             class="github-icon"
             target="_blank"
           >
-            <i class="fa fa-github-square fa-2x"></i>
+            <i class="fab fa-github-square fa-2x"></i>
           </a>
         </div>
       </div>

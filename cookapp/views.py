@@ -138,3 +138,13 @@ class RecipeDetailView(View):
             'recipe': recipe
         }
         return render(request, 'cookapp/recipe_detail.html', context)
+
+class MealPlanView(View):
+    def get(self, request):
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        meals = ["Breakfast", "Lunch", "Snack", "Dinner"]
+        context = {
+            'days': days,
+            'meals': meals,
+        }
+        return render(request, 'cookapp/mealPlanner.html', context)
