@@ -74,7 +74,16 @@
                             </div>
                         </div>
 
-                        <h5 class="text-left mt-4">Recipe Search</h5>
+                        <!-- Find Recipes Button -->
+                        <button type="button" id="find-recipes-button" class="btn btn-primary mb-4">Find Recipes</button>
+
+                        <!-- OR Label -->
+                        <div class="text-center mb-3">
+                            <span class="text-muted">or</span>
+                        </div>
+
+                        <!-- Search Bar -->
+                        <h5 class="text-left">Recipe Search</h5>
                         <div class="input-group mb-3 w-100">
                             <input type="text" id="search-input" class="form-control" placeholder="What are you looking for?">
                             <div class="input-group-append">
@@ -87,8 +96,6 @@
                             <!-- Search results will be displayed here -->
                         </ul>
 
-                        <button type="button" id="find-recipes-button" class="btn btn-primary mb-3">Find Recipes</button>
-                        
                         <ul id="find-results-list" class="list-group w-100 mb-3">
                             <!-- Results from Find Recipes will be displayed here -->
                         </ul>
@@ -225,11 +232,24 @@
             }
         }
 
-        // Quick add buttons
-        $('.common-ingredient-btn').on('click', function(e) {
-            e.preventDefault();
+        // Event listeners for adding ingredients to the lists
+        $('#add-whitelist').on('click', function() {
+            var ingredient = $('#new-whitelist-input').val().trim();
+            addWhitelistIngredient(ingredient);
+            savePreferences();
+        });
+
+        $('#add-blacklist').on('click', function() {
+            var ingredient = $('#new-blacklist-input').val().trim();
+            addBlacklistIngredient(ingredient);
+            savePreferences();
+        });
+
+        $('.common-ingredient-btn').on('click', function() {
             var ingredient = $(this).data('ingredient');
-            if ($('#quick-add-mode').is(':checked')) {
+            var mode = $('#quick-add-mode').prop('checked') ? 'whitelist' : 'blacklist';
+
+            if (mode === 'whitelist') {
                 addWhitelistIngredient(ingredient);
             } else {
                 addBlacklistIngredient(ingredient);
@@ -237,33 +257,17 @@
             savePreferences();
         });
 
-        // Add new whitelist ingredient
-        $('#add-whitelist').on('click', function() {
-            var ingredient = $('#new-whitelist-input').val().trim();
-            addWhitelistIngredient(ingredient);
-            savePreferences();
+        // Search and Find Recipes button event listeners
+        $('#search-button').on('click', function() {
+            var query = $('#search-input').val();
+            fetchRecipes(query);
         });
 
-        // Add new blacklist ingredient
-        $('#add-blacklist').on('click', function() {
-            var ingredient = $('#new-blacklist-input').val().trim();
-            addBlacklistIngredient(ingredient);
-            savePreferences();
-        });
-
-        // Clear search field
         $('#clear-search').on('click', function() {
             $('#search-input').val('');
             $('#search-results-list').empty();
         });
 
-        // Perform search
-        $('#search-button').on('click', function() {
-            var query = $('#search-input').val().trim();
-            fetchRecipes(query);
-        });
-
-        // Find recipes based on whitelist
         $('#find-recipes-button').on('click', function() {
             fetchRecipes('', true);
         });
