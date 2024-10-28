@@ -67,6 +67,7 @@
                                 <input type="text" id="new-whitelist-input" class="form-control" placeholder="Include an ingredient">
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-success" type="button" id="add-whitelist">Add</button>
+                                    <button class="btn btn-outline-success ml-2" type="button" id="clear-all-whitelist">Clear All</button>
                                 </div>
                             </div>
                         </div>
@@ -353,6 +354,10 @@ $(document).ready(function() {
         var ingredient = $('#new-whitelist-input').val().trim();
         addWhitelistIngredient(ingredient);
         savePreferences();
+    });
+
+    $('#clear-all-whitelist').on('click', function() {
+        $('#whitelist-container').empty(); // Removes all blacklist tags
     });
 
     $('#add-blacklist').on('click', function() {
