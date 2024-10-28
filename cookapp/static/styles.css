@@ -547,6 +547,39 @@ footer .navbar-text {
   text-decoration: none;
 }
 
+/* Search Results Container */
+#search-results-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--color-dark);
+  border-radius: 0.25rem;
+  margin-top: 1rem;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  padding: 1rem;
+  text-align: center;
+  color: var(--color-dark);
+}
+
+/* Results List */
+#search-results-list {
+  margin-bottom: 0;
+}
+
+#search-results-list .list-group-item:last-child {
+  border-bottom: none;
+}
+
+/* Highlighted Text */
+.highlight {
+  background-color: var(--color-secondary-yellow);
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.2rem;
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .ingredients-section {

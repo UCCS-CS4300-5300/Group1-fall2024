@@ -58,9 +58,11 @@ def registerPage(request):
 
 class RecipeSearch(View):
     def get(self, request):
-        query = request.GET.get('term', '')
+        query = request.GET.get('term', '').strip()
         blacklist_query = request.GET.get('blacklist', '[]')
         whitelist_query = request.GET.get('whitelist', '[]')
+        offset = int(request.GET.get('offset', 0))
+        limit = int(request.GET.get('limit', 10))
 
         try:
             blacklist = json.loads(blacklist_query)
@@ -69,20 +71,23 @@ class RecipeSearch(View):
             blacklist = []
             whitelist = []
 
-        # Start with base query
-        recipe_results = Recipe.objects.filter(Q(title__icontains=query) | Q(tags__icontains=query))
+        # Initialize the query
+        if query:
+            recipe_results = Recipe.objects.filter(Q(title__icontains=query) | Q(tags__icontains=query))
+        else:
+            recipe_results = Recipe.objects.all()
 
-        # Apply whitelist filter if any ingredients are specified
+        # Apply whitelist filter (include only recipes with all specified whitelist ingredients)
         if whitelist:
-            whitelist_filter = Q()
             for ingredient in whitelist:
                 try:
                     whitelisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
-                    whitelist_filter |= Q(ingredients=whitelisted_ingredient)
+                    recipe_results = recipe_results.filter(ingredients=whitelisted_ingredient)
                 except Ingredient.DoesNotExist:
-                    continue
-            if whitelist_filter:
-                recipe_results = recipe_results.filter(whitelist_filter)
+                    # If any ingredient in the whitelist is not found, no recipes can match
+                    return JsonResponse({
+                        'recipes': [],
+                    })
 
         # Apply blacklist filter
         for ingredient in blacklist:
@@ -92,11 +97,14 @@ class RecipeSearch(View):
             except Ingredient.DoesNotExist:
                 continue
 
-        recipe_list = list(recipe_results.distinct().values('title', 'id')[:10])
+        # Paginate the results
+        recipe_list = list(recipe_results.distinct().values('title', 'id')[offset:offset + limit])
 
         return JsonResponse({
             'recipes': recipe_list,
         })
+
+
 
 @method_decorator(login_required, name='dispatch')
 class SavePreferences(View):
