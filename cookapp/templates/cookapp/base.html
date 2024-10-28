@@ -37,8 +37,8 @@
         <li class="dropdown">
           <a href="#" class="dropbtn">Profile</a>
           <div class="dropdown-content">
-            <a href="#">Favorites</a>
             <a href="{% url 'meal_plan' %}">Meal Planner</a>
+            <a href="{% url 'favorites' %}">Favorites</a>
             <form method="POST" action="{% url 'logout' %}">
               {% csrf_token %}
               <button type="submit" class="dropdown-logout">Logout {{ user }}</button>

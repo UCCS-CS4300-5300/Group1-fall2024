@@ -75,7 +75,14 @@ class UserPreference(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s preferences"
-    
+
+# model for favorite 
+class FavoriteRecipe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'recipe')  # Prevent duplicate entries
 
 # maybe implement later
 # class FavoriteRecipe(models.Model):

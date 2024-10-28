@@ -25,6 +25,10 @@ urlpatterns = [
     path('accounts/register/', views.registerPage, name='register_page'),
     path('logout/', views.logout_message, name='logout_message'),
     
+    # Favorite functionality
+    path('recipe/<int:recipe_id>/toggle_favorite/', views.toggle_favorite, name='toggle_favorite'),  # Combined toggle
+    path('profile/favorites/', views.favorites, name='favorites'),
+    
     # Django's built-in authentication URL patterns (for reference)
     # accounts/login/          [name='login']
     # accounts/logout/         [name='logout']

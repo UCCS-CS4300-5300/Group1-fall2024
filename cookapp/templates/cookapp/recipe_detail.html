@@ -13,6 +13,24 @@
         {% endif %}
     </div>
 
+    {% if user.is_authenticated %}
+    {% if is_favorited %}
+        <form action="{% url 'toggle_favorite' recipe.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Remove from Favorites</button>
+        </form>
+    {% else %}
+        <form action="{% url 'toggle_favorite' recipe.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Add to Favorites</button>
+        </form>
+    {% endif %}
+{% else %}
+    <a href="{% url 'login' %}" class="btn btn-secondary">Log in to add to Favorites</a>
+{% endif %}
+</div>
+</div>
+
     <!-- Ingredients Section -->
     <div class="ingredients-section py-4 px-5 mb-5" style="background-color: #eaf2f8; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <h3 class="font-weight-bold mb-4" style="color: #2874a6;">Ingredients</h3>

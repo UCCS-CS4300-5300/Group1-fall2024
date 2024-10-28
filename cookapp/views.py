@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
 
-from .models import Ingredient, Recipe, UserPreference
+from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe
 from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
@@ -142,10 +142,20 @@ class GetPreferences(View):
 class RecipeDetailView(View):
     def get(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
+        
+        # Set favorite status for authenticated users
+        is_favorited = self._is_favorited_by_user(request.user, recipe)
+
         context = {
-            'recipe': recipe
+            'recipe': recipe,
+            'is_favorited': is_favorited,
         }
         return render(request, 'cookapp/recipe_detail.html', context)
+    
+    def _is_favorited_by_user(self, user, recipe):
+        if user.is_authenticated:
+            return FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists()
+        return False
 
 class MealPlanView(View):
     def get(self, request):
@@ -156,3 +166,27 @@ class MealPlanView(View):
             'meals': meals,
         }
         return render(request, 'cookapp/mealPlanner.html', context)
+
+
+def toggle_favorite(request, recipe_id):
+    if request.method == 'POST':
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        # Check if the user already has this recipe as a favorite
+        favorite, created = FavoriteRecipe.objects.get_or_create(user=request.user, recipe=recipe)
+        if not created:  # If it was not created, it means it already exists, so remove it
+            favorite.delete()  # Remove from favorites
+        # If created, it means it was added, so no action is needed.
+
+    return redirect('recipe_detail', id=recipe_id)
+
+@login_required
+def favorites(request):
+    """
+    View to display the user's favorite recipes.
+    """
+    # Get the favorite recipes for the logged-in user
+    favorite_recipes = FavoriteRecipe.objects.filter(user=request.user).select_related('recipe')
+    context = {
+        'favorite_recipes': favorite_recipes,
+    }
+    return render(request, 'cookapp/favorites.html', context)

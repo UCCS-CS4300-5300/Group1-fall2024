@@ -1,0 +1,18 @@
+<!-- favorites.html -->
+{% extends "cookapp/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Your Favorite Recipes</h2>
+    <ul class="list-group mt-4 list-unstyled">
+        {% for favorite in favorite_recipes %}
+            <li class="list-group-item mb-3 text-center" style="font-size: 1.25rem;">
+                <a href="{% url 'recipe_detail' favorite.recipe.id %}" class="text-decoration-none">{{ favorite.recipe.title }}</a>
+            </li>
+        {% empty %}
+            <li class="text-center" style="font-size: 1.25rem;">No favorite recipes yet!</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
