@@ -41,6 +41,7 @@ rel="stylesheet"
                             <input type="text" id="new-blacklist-input" class="form-control" placeholder="Add an ingredient to blacklist">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" id="add-blacklist">Add</button>
+                                <button class="btn btn-outline-danger ml-2" type="button" id="clear-all-blacklist">Clear All</button>
                             </div>
                         </div>
                         <div id="common-ingredients" class="w-100 mb-3">
@@ -160,6 +161,10 @@ rel="stylesheet"
         $('#add-blacklist').on('click', function() {
             var ingredient = $('#new-blacklist-input').val().trim();
             addBlacklistIngredient(ingredient);
+        });
+
+        $('#clear-all-blacklist').on('click', function() {
+            $('#blacklist-container').empty(); // Removes all blacklist tags
         });
 
         $('#new-blacklist-input').on('keyup', function(e) {
