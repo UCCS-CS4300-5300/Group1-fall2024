@@ -1,0 +1,55 @@
+[33m67f45a9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m now it should be gone..
+[33m0778b78[m i made the recipe page prettier
+[33m670f484[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mpretty_pages[m[33m)[m whitelist fixes
+[33m8107745[m navbar fix
+[33mf1ccb63[m Merge branch 'main' into whitelist
+[33mc79d662[m[33m ([m[1;31morigin/whitelist[m[33m)[m saved search additions
+[33m31735da[m saved search additions
+[33mce46989[m saved search
+[33mb1a47c7[m lil formatting thing
+[33ma9e60c7[m[33m ([m[1;31morigin/mealPlanning[m[33m)[m Refactor meal planner table styles and functionality
+[33m1508288[m whitelist fix
+[33m5201cdf[m whitelist
+[33m02ef567[m Refactor meal planner table styles and functionality
+[33m6b250b6[m basic table for meal planning - save to local storage
+[33m54d7985[m[33m ([m[1;33mtag: [m[1;33msprint1[m[33m)[m blacklist integration/unit tests
+[33m0944d8b[m added test_models
+[33mb38ea43[m jquery fix
+[33md216830[m wrote unit tests for user model and index view
+[33m9a63ee8[m Merge pull request #4 from UCCS-CS4300-5300/recipePages
+[33mcc20ce3[m Merge branch 'main' into recipePages
+[33m733d1e3[m Merge pull request #3 from UCCS-CS4300-5300/userAuth
+[33m27c0522[m Pages exist now, lets goooo
+[33mc9aacbe[m pycache go away
+[33me759b52[m pycache was being annoying
+[33md203dd9[m Resolved merge conflicts in favor of blacklist
+[33md97a23c[m post-merge fix
+[33m80a8578[m Merge remote-tracking branch 'origin/userAuth' into blacklist
+[33m8b3fa6a[m Merge branch 'blacklist' of https://github.com/UCCS-CS4300-5300/Group1-fall2024 into blacklist
+[33mfc7eee8[m moved order, added quick add blacklist
+[33md272013[m updated login UI
+[33me626284[m footer fix
+[33m6804c7c[m blacklist feature + logo
+[33m76cb1c3[m Merge pull request #2 from UCCS-CS4300-5300/userAuth
+[33m454e873[m functional account creation, login, logout, etc
+[33m87a76b4[m Added recipe search and added tags to API
+[33ma32213d[m Update command_resources.txt
+[33m5ffab60[m I finished clarifying instructions for setting up the database in command_resorces.txt
+[33m048a242[m I added the management folder, with the python script fetch_meals that uses the 'TheMealDB' API to populate the database with 301 recipes.
+[33m0a1a1d5[m Update Django version in requirements.txt and update database script
+[33m6c5971b[m Update script and remove cached venv directory
+[33m4bf4d46[m new update script!
+[33m0f69aec[m Update initial data
+[33m2b955b8[m Update initial data
+[33md80dd8b[m Refactor admin.py and models.py
+[33mdb587dc[m added admin
+[33m91c7803[m[33m ([m[1;33mtag: [m[1;33msprint0-3[m[33m)[m updated static file structure, moved inline style to styles.css
+[33m192946a[m Added line breaks
+[33mb8e2ca2[m Mild style/wording tweaks to the landing page
+[33m45ce7b2[m Enhance landing page design with improved text styles and images
+[33md32874e[m Refactor CSS styles and update HTML structure - navigation bar and a footer
+[33med5d87a[m Fixed static
+[33me383f33[m I added peoples host names
+[33mcdaa789[m upload requirements.txt
+[33m350863c[m Initial django app commit; file path prototype
+[33m6525915[m Initial commit
