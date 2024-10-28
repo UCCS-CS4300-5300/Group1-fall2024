@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
 
-from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe
+from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets
 from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
@@ -19,9 +19,18 @@ def index(request):
     # works by counting the number of recipes that use each ingredient and ordering by that count
     # annotate adds a new field to each ingredient object with the count
     common_ingredients = Ingredient.objects.annotate(recipe_count=Count('recipe')).order_by('-recipe_count')[:10]
+    diets = Diets.objects.annotate(diet_count=Count('name')).order_by('-diet_count')
+
+    # Create a dictionary of diet names and their respective blacklisted ingredients
+    diet_blacklists = {
+        diet.name: list(diet.blacklist.values_list('name', flat=True))
+        for diet in diets
+    }
 
     context = {
         'common_ingredients': common_ingredients,
+        'diets': diets,
+        'diet_blacklists': json.dumps(diet_blacklists),  # Convert to JSON for JavaScript access
     }
     return render(request, 'cookapp/index.html', context)
 

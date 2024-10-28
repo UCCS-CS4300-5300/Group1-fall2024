@@ -36,6 +36,7 @@
                                     <span class="toggle-label ms-2">Exclude</span>
                                 </div>
                             </div>
+
                             <div id="common-ingredients" class="w-100">
                                 {% for ingredient in common_ingredients %}
                                 <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn" 
@@ -44,6 +45,16 @@
                                 </button>
                                 {% endfor %}
                             </div>
+                            <!-- Allergens/Dietary Restrictions Section -->
+                            <div id="dietary-restrictions" class="w-100 mb-3">
+                                <h5 class="text-left mb-0">Allergens/Dietary Restrictions:</h5>
+                                {% for diet in diets %}
+                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn" 
+                                        data-diet="{{ diet.name }}">
+                                    {{ diet.name }}
+                                </button>
+                                {% endfor %}
+                                </div>
                         </div>
 
                         <!-- Whitelist Section -->
@@ -70,6 +81,7 @@
                                 <input type="text" id="new-blacklist-input" class="form-control" placeholder="Exclude an ingredient">
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-danger" type="button" id="add-blacklist">Add</button>
+                                    <button class="btn btn-outline-danger ml-2" type="button" id="clear-all-blacklist">Clear All</button>
                                 </div>
                             </div>
                         </div>
@@ -127,6 +139,8 @@ $(document).ready(function() {
     let hasMoreResults = true;
     let currentSearchQuery = '';
     let isSearchMode = false;
+
+    const dietBlacklists = JSON.parse('{{ diet_blacklists|safe }}');
 
     // Add CSS for scrollable container
     $('<style>')
@@ -214,12 +228,28 @@ $(document).ready(function() {
         var blacklist = [];
         $('.blacklist-tag').each(function() {
             blacklist.push($(this).data('ingredient'));
-        });
 
         var whitelist = [];
         $('.whitelist-tag').each(function() {
             whitelist.push($(this).data('ingredient'));
         });
+        });
+
+
+        function addAllergens(diet) {
+            const ingredients = dietBlacklists[diet] || [];
+            ingredients.forEach(ingredient => addBlacklistIngredient(ingredient));
+        }
+
+        $('#search-button').on('click', function() {
+            var query = $('#search-input').val();
+            if (query.length >= 3) {
+                fetchRecipes(query);
+            }
+        });
+
+
+
 
         // Add loading indicator
         if (!append) {
@@ -329,6 +359,15 @@ $(document).ready(function() {
         var ingredient = $('#new-blacklist-input').val().trim();
         addBlacklistIngredient(ingredient);
         savePreferences();
+    });
+
+    $('#clear-all-blacklist').on('click', function() {
+        $('#blacklist-container').empty(); // Removes all blacklist tags
+    });
+
+    $('.dietary-restriction-btn').on('click', function() {
+        const diet = $(this).data('diet');
+        addAllergens(diet);
     });
 
     $('.common-ingredient-btn').on('click', function() {
