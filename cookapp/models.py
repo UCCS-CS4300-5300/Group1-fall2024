@@ -24,6 +24,23 @@ class Ingredient(models.Model):
     class Meta:
         ordering = ['name'] # orders the ingredients by name A-Z
 
+
+# model for dietary restrictions (allergies, vegan/vegetarian)
+class Diets(models.Model):
+    """
+    Model representing diets that restrict options.
+
+    Fields:
+        name: CharField representing the restriction
+        blacklist: ManyToManyField representing the blacklisted ingredients related to the dietary restriction (relationship to Ingredient model)
+    """
+    name = models.CharField(max_length=50)
+    blacklist = models.ManyToManyField(Ingredient, related_name='diet_blacklist')
+
+    def __str__(self):
+        return self.name
+
+
 # model to store recipes and their details
 class Recipe(models.Model):
     """

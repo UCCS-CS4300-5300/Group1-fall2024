@@ -49,6 +49,12 @@ rel="stylesheet"
                                 <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn" data-ingredient="{{ ingredient.name }}">{{ ingredient.name }}</button>
                             {% endfor %}
                         </div>
+                        <div id="dietary-restrictions" class="w-100 mb-3">
+                            <p class="text-left">Allergens/Dietary Restrictions</p>
+                            {% for diet in diets %}
+                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn" data-diet="{{ diet.name }}">{{ diet.name }}</button>
+                            {% endfor %}
+                        </div>
                     </form>
                 </div>
             </div>
@@ -73,6 +79,8 @@ rel="stylesheet"
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        const dietBlacklists = JSON.parse('{{ diet_blacklists|safe }}');
+
         function fetchRecipes(query) {
             var blacklist = [];
             $('.blacklist-tag').each(function() {
@@ -123,6 +131,11 @@ rel="stylesheet"
             }
         }
 
+        function addAllergens(diet) {
+            const ingredients = dietBlacklists[diet] || [];
+            ingredients.forEach(ingredient => addBlacklistIngredient(ingredient));
+        }
+
         $('#search-button').on('click', function() {
             var query = $('#search-input').val();
             if (query.length >= 3) {
@@ -165,6 +178,13 @@ rel="stylesheet"
             event.preventDefault();  // Prevent the default form submission behavior
             var ingredient = $(this).data('ingredient');
             addBlacklistIngredient(ingredient);
+        });
+
+        // Add event listener for allergen buttons
+        $(document).on('click', '.dietary-restriction-btn', function(event) {
+            event.preventDefault();  // Prevent the default form submission behavior
+            const diet = $(this).data('diet');
+            addAllergens(diet);
         });
 
         // Prevent Enter key from triggering both actions
