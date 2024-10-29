@@ -16,10 +16,11 @@ from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
 def index(request):
-    # Get the most common ingredients
-    # works by counting the number of recipes that use each ingredient and ordering by that count
-    # annotate adds a new field to each ingredient object with the count
-    common_ingredients = Ingredient.objects.annotate(recipe_count=Count('recipe')).order_by('-recipe_count')[:10]
+    # Count recipes by referencing the related `recipeingredient` set, due to the through model
+    common_ingredients = Ingredient.objects.annotate(
+        recipe_count=Count('recipeingredient')
+    ).order_by('-recipe_count')[:10]
+    
     diets = Diets.objects.annotate(diet_count=Count('name')).order_by('-diet_count')
 
     # Create a dictionary of diet names and their respective blacklisted ingredients
@@ -66,6 +67,7 @@ def registerPage(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
+
 class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '').strip()
@@ -83,39 +85,37 @@ class RecipeSearch(View):
 
         # Initialize the query
         if query:
-            recipe_results = Recipe.objects.filter(Q(title__icontains=query) | Q(tags__icontains=query))
+            recipe_results = Recipe.objects.filter(
+                Q(title__icontains=query) | Q(tags__icontains=query)
+            )
         else:
             recipe_results = Recipe.objects.all()
 
-        # Apply whitelist filter (include only recipes with all specified whitelist ingredients)
+        # Apply whitelist filter (include only recipes containing all specified whitelist ingredients)
         if whitelist:
-            for ingredient in whitelist:
-                try:
-                    whitelisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
-                    recipe_results = recipe_results.filter(recipeingredient__ingredient=whitelisted_ingredient)
-                except Ingredient.DoesNotExist:
-                    # If any ingredient in the whitelist is not found, no recipes can match
-                    return JsonResponse({'recipes': []})
+            for ingredient_name in whitelist:
+                recipe_results = recipe_results.filter(
+                    recipeingredient__ingredient__name__iexact=ingredient_name
+                )
+        
+        # Apply blacklist filter (exclude recipes containing any blacklisted ingredients)
+        if blacklist:
+            for ingredient_name in blacklist:
+                recipe_results = recipe_results.exclude(
+                    recipeingredient__ingredient__name__iexact=ingredient_name
+                )
 
-        # Apply blacklist filter
-        for ingredient in blacklist:
-            try:
-                blacklisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
-                recipe_results = recipe_results.exclude(recipeingredient__ingredient=blacklisted_ingredient)
-            except Ingredient.DoesNotExist:
-                continue
+        # Remove duplicates and annotate with ingredient count
+        recipe_results = recipe_results.distinct().annotate(
+            ingredient_count=Count('recipeingredient')
+        )
 
         # Paginate the results
-        recipe_list = list(recipe_results.distinct().values('title', 'id')[offset:offset + limit])
+        recipe_list = list(
+            recipe_results.values('title', 'id', 'ingredient_count')[offset:offset + limit]
+        )
 
-        # Add ingredient count to each recipe
-        for recipe in recipe_list:
-            recipe_obj = Recipe.objects.get(id=recipe['id'])
-            recipe['ingredient_count'] = recipe_obj.ingredients.count()
-
-        return JsonResponse({
-            'recipes': recipe_list,
-        })
+        return JsonResponse({'recipes': recipe_list})
 
 @method_decorator(login_required, name='dispatch')
 class SavePreferences(View):
