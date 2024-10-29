@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 from django.contrib import messages
-
+import inflect
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
@@ -65,6 +65,7 @@ def registerPage(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
+
 class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '').strip()
@@ -80,6 +81,9 @@ class RecipeSearch(View):
             blacklist = []
             whitelist = []
 
+        # Initialize the inflect engine
+        p = inflect.engine()
+
         # Initialize the query
         if query:
             recipe_results = Recipe.objects.filter(Q(title__icontains=query) | Q(tags__icontains=query))
@@ -90,8 +94,26 @@ class RecipeSearch(View):
         if whitelist:
             for ingredient in whitelist:
                 try:
-                    whitelisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
-                    recipe_results = recipe_results.filter(ingredients=whitelisted_ingredient)
+                    whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
+                    if whitelisted_ingredients.exists():
+                        recipe_results = recipe_results.filter(ingredients__in=whitelisted_ingredients)
+                    else:
+                        # Try singular form
+                        singular_ingredient = p.singular_noun(ingredient)
+                        if singular_ingredient:
+                            whitelisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
+                            if whitelisted_ingredients.exists():
+                                recipe_results = recipe_results.filter(ingredients__in=whitelisted_ingredients)
+                            else:
+                                # If any ingredient in the whitelist is not found, no recipes can match
+                                return JsonResponse({
+                                    'recipes': [],
+                                })
+                        else:
+                            # If any ingredient in the whitelist is not found, no recipes can match
+                            return JsonResponse({
+                                'recipes': [],
+                            })
                 except Ingredient.DoesNotExist:
                     # If any ingredient in the whitelist is not found, no recipes can match
                     return JsonResponse({
@@ -101,8 +123,20 @@ class RecipeSearch(View):
         # Apply blacklist filter
         for ingredient in blacklist:
             try:
-                blacklisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
-                recipe_results = recipe_results.exclude(ingredients=blacklisted_ingredient)
+                blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
+                if blacklisted_ingredients.exists():
+                    recipe_results = recipe_results.exclude(ingredients__in=blacklisted_ingredients)
+                else:
+                    # Try singular form
+                    singular_ingredient = p.singular_noun(ingredient)
+                    if singular_ingredient:
+                        blacklisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
+                        if blacklisted_ingredients.exists():
+                            recipe_results = recipe_results.exclude(ingredients__in=blacklisted_ingredients)
+                        else:
+                            continue
+                    else:
+                        continue
             except Ingredient.DoesNotExist:
                 continue
 
@@ -117,7 +151,6 @@ class RecipeSearch(View):
         return JsonResponse({
             'recipes': recipe_list,
         })
-
 @method_decorator(login_required, name='dispatch')
 class SavePreferences(View):
     def post(self, request):

@@ -62,7 +62,6 @@
                   </p>
                 </div>
 
-                <hr style="border-width: 1px; border-color: gray" />
                 <div id="common-ingredients" class="w-100">
                   {% for ingredient in common_ingredients %}
                   <button
@@ -73,6 +72,8 @@
                   </button>
                   {% endfor %}
                 </div>
+                <hr style="border-width: 1px; border-color: gray" />
+
                 <!-- Allergens/Dietary Restrictions Section -->
                 <div id="dietary-restrictions" class="w-100 mb-3">
                     <h5 class="text-left mb-0">Allergens/Dietary Restrictions:</h5>
@@ -89,7 +90,6 @@
                 <!-- Whitelist Section -->
                 <div class="ingredients-section mb-4">
                   <h5 class="text-left">Included Ingredients</h5>
-                  <hr style="border-width: 1px; border-color: gray" />
                   <div id="whitelist-container" class="w-100 mb-3">
                     <!-- Placeholder message -->
                     <p id="whitelist-placeholder" class="text-muted">
@@ -117,11 +117,11 @@
                     </div>
                   </div>
                 </div>
+                <hr style="border-width: 1px; border-color: gray" />
 
                 <!-- Blacklist Section -->
                 <div class="ingredients-section mb-4">
                   <h5 class="text-left">Excluded Ingredients</h5>
-                  <hr style="border-width: 1px; border-color: gray" />
                   <div id="blacklist-container" class="w-100 mb-3">
                     <!-- Placeholder message -->
                     <p id="blacklist-placeholder" class="text-muted">
@@ -159,7 +159,6 @@
                 <!-- Recipe Search Section -->
                 <div class="ingredients-section mb-4">
                   <h5 class="text-left">Recipe Search</h5>
-                  <hr style="border-width: 1px; border-color: gray" />
                   <div class="input-group mb-3 w-100">
                     <input
                       type="text"

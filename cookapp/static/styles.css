@@ -308,10 +308,10 @@ footer .navbar-text {
 
 /* Vertical Divider */
 .vl {
-  border-left: 1px solid var(--color-dark); /* Adjust the color and width as needed */
-  height: 440px; /* Set to the actual height of the form or container */
+  border-left: 1px solid gray; /* Adjust the color and width as needed */
+  height: 500px; /* Set to the actual height of the form or container */
   margin: 0 20px; /* Adjust the margin as needed */
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 /* Recipe Search classes */
@@ -643,19 +643,22 @@ footer .navbar-text {
 }
 
 /* Custom styles for the clear search button */
-#clear-search {
-  color: var(--color-primary-peach);
-  border-color: var(--color-primary-peach);
+#clear-search,
+.clear-search {
+  color: var(--color-primary-peach) !important;
+  border-color: var(--color-primary-peach) !important;
 }
 
-#clear-search:hover {
-  background-color: var(--color-primary-peach);
-  color: var(--color-white);
+#clear-search:hover,
+.clear-search:hover {
+  background-color: var(--color-primary-peach) !important;
+  color: var(--color-white) !important;
 }
 
-#clear-search:active {
-  background-color: var(--color-dark);
-  color: var(--color-white);
+#clear-search:active,
+.clear-search:active {
+  background-color: var(--color-dark) !important;
+  color: var(--color-white) !important;
 }
 
 #new-blacklist-input:focus {
