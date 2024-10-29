@@ -35,6 +35,7 @@ def index(request):
     }
     return render(request, 'cookapp/index.html', context)
 
+
 def logout_message(request):
     return render(request, 'registration/logout.html')
 
@@ -91,18 +92,16 @@ class RecipeSearch(View):
             for ingredient in whitelist:
                 try:
                     whitelisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
-                    recipe_results = recipe_results.filter(ingredients=whitelisted_ingredient)
+                    recipe_results = recipe_results.filter(recipeingredient__ingredient=whitelisted_ingredient)
                 except Ingredient.DoesNotExist:
                     # If any ingredient in the whitelist is not found, no recipes can match
-                    return JsonResponse({
-                        'recipes': [],
-                    })
+                    return JsonResponse({'recipes': []})
 
         # Apply blacklist filter
         for ingredient in blacklist:
             try:
                 blacklisted_ingredient = Ingredient.objects.get(name__iexact=ingredient)
-                recipe_results = recipe_results.exclude(ingredients=blacklisted_ingredient)
+                recipe_results = recipe_results.exclude(recipeingredient__ingredient=blacklisted_ingredient)
             except Ingredient.DoesNotExist:
                 continue
 
@@ -150,7 +149,6 @@ class GetPreferences(View):
             blacklist = list(user_preference.blacklist.values_list('name', flat=True))
             return JsonResponse({'whitelist': whitelist, 'blacklist': blacklist})
         return JsonResponse({'whitelist': [], 'blacklist': []})
-
 
 class RecipeDetailView(View):
     def get(self, request, id):

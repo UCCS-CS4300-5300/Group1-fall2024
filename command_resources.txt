@@ -43,6 +43,6 @@ is in cookapp/management/commands/fetch_meals. Run the following:
 
     python manage.py fetch_meals
 
-            This will take around 10 minutes since each recipe is calling GPT, getting a response, and creating json stuff 300 times. 
+            This will take around 30 minutes since each recipe is calling GPT, getting a response, and creating json stuff 300 times. :/
 
 5.)         When it's done it should give you some notification like "301 Recipes succesfully created"
