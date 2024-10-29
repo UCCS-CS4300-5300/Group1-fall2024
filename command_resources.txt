@@ -18,3 +18,31 @@ but you can check in your terminal with:
 3. You should be good to try running the custom script to populate the database. The script I made 
 is in cookapp/management/commands/fetch_meals. Run the following:
     python manage.py fetch_meals
+
+
+
+----------------------Setting up ENHANCED database-------------------------------
+
+1.)         So there's a minor update to the models, so start with:
+
+    python manage.py makamigrations
+    python manage.py migrate
+
+2.)         Next, you need to clear out the bad data from the old database. I made a custom command for this:
+
+    python manage.py clear_database
+
+3.)         Now we'll look to set up the database command. You'll need an openai api key for this. I'll give you each the key 
+            personally since github doesn't allow you to store it. After I give you the key, run this command:
+
+    export OPENAI_API_KEY='API_KEY_HERE'
+
+            Of course replace API_KEY_HERE with the key given. Make sure to leave the '' though.
+
+4.)         Now you should be good to run the command to update the database again:
+
+    python manage.py fetch_meals
+
+            This will take around 10 minutes since each recipe is calling GPT, getting a response, and creating json stuff 300 times. 
+
+5.)         When it's done it should give you some notification like "301 Recipes succesfully created"
