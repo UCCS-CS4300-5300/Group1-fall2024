@@ -1,65 +1,69 @@
-<!-- recipe_detail.html -->
-
 {% extends "cookapp/base.html" %}
 {% load static %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Recipe Title Section -->
-    <div class="recipe-header text-center py-3 mb-5" style="background-color: #f7f7f7; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h1 class="display-4 font-weight-bold" style="color: #34495e;">{{ recipe.title }}</h1>
+    <div class="recipe-header text-center py-3 mb-4" style="background-color: #f7f7f7; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <h1 class="display-4 font-weight-bold mb-3" style="color: #333; font-size: 2.5rem; margin: 0; display: inline;">{{ recipe.title }}</h1>
+            
+            <!-- Tags Section -->
+            {% if recipe.tags %}
+            <div class="tags-section" style="display: inline-block; margin-left: 20px;">
+                {% for tag in recipe.tags %}
+                <span class="badge badge-pill" style="background-color: #7eacb5; color: white; padding: 6px 12px; font-size: 13px; margin: 3px;">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Favorite Button -->
+            {% if user.is_authenticated %}
+            <form action="{% url 'toggle_favorite' recipe.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-primary-favorite" style="position: absolute; top: 20px; right: 20px;">
+                <strong>{% if is_favorited %}Remove from{% else %}Add to{% endif %} Favorites</strong>
+                </button>
+            </form>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn-primary-favorite" style="position: absolute; top: 20px; right: 20px;">Log in to add to Favorites</a>
+            {% endif %}
+        </div>
+        
+        <!-- Recipe Image -->
         {% if recipe.image %}
-            <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="img-fluid my-4" style="max-width: 70%; border-radius: 15px; box-shadow: 0 6px 10px rgba(0,0,0,0.15);">
+            <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="img-fluid my-3" style="max-width: 60%; height: 500px; border-radius: 10px; box-shadow: 0 6px 10px rgba(0,0,0,0.15);">
         {% endif %}
     </div>
+    
 
-    {% if user.is_authenticated %}
-    {% if is_favorited %}
-        <form action="{% url 'toggle_favorite' recipe.id %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Remove from Favorites</button>
-        </form>
-    {% else %}
-        <form action="{% url 'toggle_favorite' recipe.id %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Add to Favorites</button>
-        </form>
-    {% endif %}
-{% else %}
-    <a href="{% url 'login' %}" class="btn btn-secondary">Log in to add to Favorites</a>
-{% endif %}
-</div>
-</div>
-
-    <!-- Ingredients Section -->
-    <div class="ingredients-section py-4 px-5 mb-5" style="background-color: #eaf2f8; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 class="font-weight-bold mb-4" style="color: #2874a6;">Ingredients</h3>
-        <ul class="list-group">
-            {% for ingredient in recipe.ingredients.all %}
-                <li class="list-group-item" style="border: none; background-color: #d6eaf8; border-radius: 5px; margin-bottom: 8px;">
-                    <i class="fa fa-check-circle" style="color: #2ecc71; margin-right: 8px;"></i> 
-                    {{ ingredient.name }}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <!-- Instructions Section -->
-    <div class="instructions-section py-4 px-5 mb-5" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 class="font-weight-bold mb-4" style="color: #2874a6;">Instructions</h3>
-        <p style="line-height: 1.8; color: #2c3e50;">{{ recipe.instructions }}</p>
-    </div>
-
-    <!-- Tags Section -->
-    {% if recipe.tags %}
-        <div class="tags-section text-center py-3 px-5" style="background-color: #f5f5f5; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h4 class="font-weight-bold mb-3" style="color: #2874a6;">Tags</h4>
-            <p>
-                {% for tag in recipe.tags %}
-                    <span class="badge badge-pill" style="background-color: #3498db; color: white; padding: 8px 15px; font-size: 14px; margin: 3px;">{{ tag }}</span>
-                {% endfor %}
-            </p>
+    <!-- Two-Column Layout for Ingredients and Instructions -->
+    <div class="row">
+        <!-- Ingredients Section -->
+        <div class="col-md-6 mb-4">
+            <div class="ingredients-section p-4" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h3 class="font-weight-bold mb-3" style="color: #333; font-size: 1.6rem;">Ingredients</h3>
+                <ul class="list-group list-group-flush">
+                    {% for ingredient in recipe.ingredients.all %}
+                        <li class="list-group-item" style="background-color: #d6eaf8; border: none; border-radius: 5px; margin-bottom: 8px;">
+                            🥕 {{ ingredient.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    {% endif %}
+
+        <!-- Instructions Section -->
+        <div class="col-md-6 mb-4">
+            <div class="instructions-section p-4" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h3 class="font-weight-bold mb-3" style="color: #333; font-size: 1.6rem;">Instructions</h3>
+                <ol style="line-height: 1.7; color: #2c3e50;">
+                    {% for instruction in instructions_list %}
+                        <li style="margin-bottom: 8px; text-align: left;">{{ instruction }}</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

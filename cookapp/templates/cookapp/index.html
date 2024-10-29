@@ -1,151 +1,232 @@
-{% extends "cookapp/base.html" %}
-{% load static %}
-
-{% block content %}
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+{% extends "cookapp/base.html" %} {% load static %} {% block content %}
+<link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
 
 <main>
-    <section class="search-section">
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        <div class="container d-flex flex-column align-items-center">
-            <div class="row justify-content-center w-100">
-                <div class="col-md-8">
-                    <h3 class="text-center mb-4">Recipe Finder</h3>
-                    <form id="search-form" class="justify-content-center">
-                        <!-- Quick Add Section -->
-                        <div class="ingredients-section mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="text-left mb-0">Quick Add:</h5>
-                                <div class="mode-toggle d-flex align-items-center">
-                                    <span class="toggle-label me-2">Include</span>
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="quick-add-mode" checked>
-                                        <label class="custom-control-label" for="quick-add-mode"></label>
-                                    </div>
-                                    <span class="toggle-label ms-2">Exclude</span>
-                                </div>
-                            </div>
-
-                            <div id="common-ingredients" class="w-100">
-                                {% for ingredient in common_ingredients %}
-                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn" 
-                                        data-ingredient="{{ ingredient.name }}">
-                                    {{ ingredient.name }}
-                                </button>
-                                {% endfor %}
-                            </div>
-                            <!-- Allergens/Dietary Restrictions Section -->
-                            <div id="dietary-restrictions" class="w-100 mb-3">
-                                <h5 class="text-left mb-0">Allergens/Dietary Restrictions:</h5>
-                                {% for diet in diets %}
-                                <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn" 
-                                        data-diet="{{ diet.name }}">
-                                    {{ diet.name }}
-                                </button>
-                                {% endfor %}
-                                </div>
-                        </div>
-
-                        <!-- Whitelist Section -->
-                        <div class="ingredients-section mb-4">
-                            <h5 class="text-left">Included Ingredients:</h5>
-                            <div id="whitelist-container" class="w-100 mb-3">
-                                <!-- Whitelist tags will be added here -->
-                            </div>
-                            <div class="input-group mb-3 w-100">
-                                <input type="text" id="new-whitelist-input" class="form-control" placeholder="Include an ingredient">
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-success" type="button" id="add-whitelist">Add</button>
-                                    <button class="btn btn-outline-success ml-2" type="button" id="clear-all-whitelist">Clear All</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Blacklist Section -->
-                        <div class="ingredients-section mb-4">
-                            <h5 class="text-left">Excluded Ingredients:</h5>
-                            <div id="blacklist-container" class="w-100 mb-3">
-                                <!-- Blacklist tags will be added here -->
-                            </div>
-                            <div class="input-group mb-3 w-100">
-                                <input type="text" id="new-blacklist-input" class="form-control" placeholder="Exclude an ingredient">
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-danger" type="button" id="add-blacklist">Add</button>
-                                    <button class="btn btn-outline-danger ml-2" type="button" id="clear-all-blacklist">Clear All</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Find Recipes Button -->
-                        <button type="button" id="find-recipes-button" class="btn btn-primary mb-4">Find Recipes</button>
-
-                        <!-- Or Label -->
-                        <div class="text-center mb-3">
-                            <span class="text-muted">or</span>
-                        </div>
-
-                        <!-- Search Bar -->
-                        <h5 class="text-left">Recipe Search</h5>
-                        <div class="input-group mb-3 w-100">
-                            <input type="text" id="search-input" class="form-control" placeholder="What are you looking for?">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
-                                <button class="btn btn-outline-secondary" type="button" id="clear-search">X</button>
-                            </div>
-                        </div>
-
-                        <ul id="search-results-list" class="list-group w-100">
-                            <!-- Search results will be displayed here -->
-                        </ul>
-
-                        <ul id="find-results-list" class="list-group w-100 mb-3">
-                            <!-- Results from Find Recipes will be displayed here -->
-                        </ul>
-                    </form>
+  <section class="search-section">
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="container d-flex flex-column align-items-center">
+      <div class="row justify-content-center w-100">
+        <div class="col-md-11">
+          <h3 class="text-center mb-4">Recipe Finder</h3>
+          <hr style="border-width: 1px; border-color: gray" />
+          <form id="search-form" class="justify-content-center">
+            <div class="d-flex flex-wrap">
+              <!-- Quick Add Section -->
+              <div class="ingredients-section mb-2">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-2"
+                >
+                  <h5 class="text-left mb-0">Quick Add</h5>
+                  <div class="mode-toggle d-flex align-items-center">
+                    <span class="toggle-label me-2">Include</span>
+                    <div class="custom-control custom-switch">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="quick-add-mode"
+                        checked
+                      />
+                      <label
+                        class="custom-control-label"
+                        for="quick-add-mode"
+                      ></label>
+                    </div>
+                    <span class="toggle-label ms-2">Exclude</span>
+                  </div>
                 </div>
-            </div>
-        </div>
-    </section>
+                <div>
+                  <p class="text-muted text-left">
+                    Click on an ingredient to include or exclude an ingredient!
+                  </p>
+                </div>
 
-    <section class="intro text-center">
-        <img class="index-image img-fluid" src="{% static 'images/calum-lewis-rkT_TG5NKF8-unsplash.jpg' %}" alt="A kitchen table with various baking ingredients" style="margin-top: 40px;">
-        <h2>Welcome to We Need To Cook!</h2>
-        <p>You give ingredients, we give recipes!</p>
-        <p>
-            With a list of ingredients that you already have, we will provide you with amazing recipes!<br>
-            You can specify ingredients you must include and those you want to avoid.<br>
-            Save your favorite recipes and navigate to the favorites page.
-        </p>
-    </section>
+                <hr style="border-width: 1px; border-color: gray" />
+                <div id="common-ingredients" class="w-100">
+                  {% for ingredient in common_ingredients %}
+                  <button
+                    class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn"
+                    data-ingredient="{{ ingredient.name }}"
+                  >
+                    {{ ingredient.name }}
+                  </button>
+                  {% endfor %}
+                </div>
+                <!-- Allergens/Dietary Restrictions Section -->
+                <div id="dietary-restrictions" class="w-100 mb-3">
+                    <h5 class="text-left mb-0">Allergens/Dietary Restrictions:</h5>
+                    {% for diet in diets %}
+                    <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn" 
+                            data-diet="{{ diet.name }}">
+                        {{ diet.name }}
+                    </button>
+                    {% endfor %}
+                </div>
+              </div>
+              <!-- Left Column -->
+              <div class="left-column">
+                <!-- Whitelist Section -->
+                <div class="ingredients-section mb-4">
+                  <h5 class="text-left">Included Ingredients</h5>
+                  <hr style="border-width: 1px; border-color: gray" />
+                  <div id="whitelist-container" class="w-100 mb-3">
+                    <!-- Placeholder message -->
+                    <p id="whitelist-placeholder" class="text-muted">
+                      No ingredients added yet. Add some ingredients to include
+                      in your recipes.
+                    </p>
+                    <!-- Whitelist tags will be added here -->
+                  </div>
+                  <div class="input-group mb-3 w-100">
+                    <input
+                      type="text"
+                      id="new-whitelist-input"
+                      class="form-control"
+                      placeholder="Include an ingredient"
+                    />
+                    <div class="input-group-append">
+                      <button
+                        class="btn btn-outline-success"
+                        type="button"
+                        id="add-whitelist"
+                      >
+                        Add
+                      </button>
+                      <button class="btn btn-outline-danger" type="button" id="clear-all-whitelist">Clear All</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Blacklist Section -->
+                <div class="ingredients-section mb-4">
+                  <h5 class="text-left">Excluded Ingredients</h5>
+                  <hr style="border-width: 1px; border-color: gray" />
+                  <div id="blacklist-container" class="w-100 mb-3">
+                    <!-- Placeholder message -->
+                    <p id="blacklist-placeholder" class="text-muted">
+                      No ingredients added yet. Add some ingredients to exclude
+                      in your recipes.
+                    </p>
+                    <!-- Blacklist tags will be added here -->
+                  </div>
+                  <div class="input-group mb-3 w-100">
+                    <input
+                      type="text"
+                      id="new-blacklist-input"
+                      class="form-control"
+                      placeholder="Exclude an ingredient"
+                    />
+                    <div class="input-group-append">
+                      <button
+                        class="btn btn-outline-danger"
+                        type="button"
+                        id="add-blacklist"
+                      >
+                        Add
+                      </button>
+                      <button class="btn btn-outline-danger" type="button" id="clear-all-blacklist">Clear All</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- vertical divider -->
+              <div class="vl"></div>
+
+              <!-- Right Column -->
+              <div class="right-column">
+                <!-- Recipe Search Section -->
+                <div class="ingredients-section mb-4">
+                  <h5 class="text-left">Recipe Search</h5>
+                  <hr style="border-width: 1px; border-color: gray" />
+                  <div class="input-group mb-3 w-100">
+                    <input
+                      type="text"
+                      id="search-input"
+                      class="form-control"
+                      placeholder="Looking for something specific?"
+                    />
+                    <div class="input-group-append">
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        id="search-button"
+                      >
+                        Search
+                      </button>
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        id="clear-search"
+                      >
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              id="find-recipes-button"
+              class="btn-primary-recipe mb-4"
+            >
+              Find Recipes
+            </button>
+
+            <!-- Results List -->
+            <ul id="search-results-list" class="list-group w-100">
+              <!-- Search results will be displayed here -->
+            </ul>
+
+            <ul id="find-results-list" class="list-group w-100 mb-3">
+              <!-- Results from Find Recipes will be displayed here -->
+            </ul>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    
+  $(document).ready(function () {
     let isLoading = false;
     let currentOffset = 0;
     const limit = 10;
     let hasMoreResults = true;
-    let currentSearchQuery = '';
+    let currentSearchQuery = "";
     let isSearchMode = false;
 
     const dietBlacklists = JSON.parse('{{ diet_blacklists|safe }}');
 
+
     // Add CSS for scrollable container
-    $('<style>')
-        .text(`
+    $("<style>")
+      .text(
+        `
             #search-results-container {
                 max-height: 400px;
                 overflow-y: auto;
@@ -169,130 +250,140 @@ $(document).ready(function() {
                 padding: 0.1rem 0.2rem;
                 border-radius: 0.2rem;
             }
-        `)
-        .appendTo('head');
+        `
+      )
+      .appendTo("head");
 
     // Wrap the results list in a scrollable container
-    $('#search-results-list').wrap('<div id="search-results-container"></div>');
+    $("#search-results-list").wrap('<div id="search-results-container"></div>');
 
     // Fetch saved preferences on page load
-    $.get('{% url "get_preferences" %}', function(data) {
-        data.whitelist.forEach(addWhitelistIngredient);
-        data.blacklist.forEach(addBlacklistIngredient);
+    $.get('{% url "get_preferences" %}', function (data) {
+      data.whitelist.forEach(addWhitelistIngredient);
+      data.blacklist.forEach(addBlacklistIngredient);
     });
 
     // Save preferences to the server
     function savePreferences() {
-        var whitelist = [];
-        $('.whitelist-tag').each(function() {
-            whitelist.push($(this).data('ingredient'));
-        });
-        
-        var blacklist = [];
-        $('.blacklist-tag').each(function() {
-            blacklist.push($(this).data('ingredient'));
-        });
+      var whitelist = [];
+      $(".whitelist-tag").each(function () {
+        whitelist.push($(this).data("ingredient"));
+      });
 
-        $.ajax({
-            url: '{% url "save_preferences" %}',
-            method: 'POST',
-            data: JSON.stringify({
-                'whitelist': whitelist,
-                'blacklist': blacklist
-            }),
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            contentType: 'application/json',
-            success: function(response) {
-                console.log('Preferences saved:', response);
-            }
-        });
+      var blacklist = [];
+      $(".blacklist-tag").each(function () {
+        blacklist.push($(this).data("ingredient"));
+      });
+
+      $.ajax({
+        url: '{% url "save_preferences" %}',
+        method: "POST",
+        data: JSON.stringify({
+          whitelist: whitelist,
+          blacklist: blacklist,
+        }),
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        contentType: "application/json",
+        success: function (response) {
+          console.log("Preferences saved:", response);
+        },
+      });
     }
 
     // Search and Find Recipes Function
     function fetchRecipes(query, useWhitelist = false, append = false) {
-        if (isLoading) return;
-        
-        if (!append) {
-            currentOffset = 0;
-            hasMoreResults = true;
-            $('#search-results-list').empty();
-        }
+      if (isLoading) return;
 
-        if (!hasMoreResults) return;
+      if (!append) {
+        currentOffset = 0;
+        hasMoreResults = true;
+        $("#search-results-list").empty();
+      }
 
-        isLoading = true;
-        currentSearchQuery = query;
-        isSearchMode = true;
+      if (!hasMoreResults) return;
 
-        var blacklist = [];
-        $('.blacklist-tag').each(function() {
-            blacklist.push($(this).data('ingredient'));
-        });
+      isLoading = true;
+      currentSearchQuery = query;
+      isSearchMode = true;
 
-        var whitelist = [];
-        $('.whitelist-tag').each(function() {
-            whitelist.push($(this).data('ingredient'));
-        });
+      var blacklist = [];
+      $(".blacklist-tag").each(function () {
+        blacklist.push($(this).data("ingredient"));
+      });
 
+      var whitelist = [];
+      $(".whitelist-tag").each(function () {
+        whitelist.push($(this).data("ingredient"));
+      });
 
+      // Add loading indicator
+      if (!append) {
+        $("#search-results-list").append(
+          '<li class="list-group-item loading-indicator">Loading...</li>'
+        );
+      } else {
+        $("#search-results-list").append(
+          '<li class="list-group-item loading-indicator">Loading more...</li>'
+        );
+      }
 
+      $.ajax({
+        url: '{% url "recipe_search" %}',
+        data: {
+          term: query,
+          blacklist: JSON.stringify(blacklist),
+          whitelist: JSON.stringify(whitelist),
+          offset: currentOffset,
+          limit: limit,
+        },
+        dataType: "json",
+        success: function (data) {
+          $(".loading-indicator").remove();
 
-        // Add loading indicator
-        if (!append) {
-            $('#search-results-list').append('<li class="list-group-item loading-indicator">Loading...</li>');
-        } else {
-            $('#search-results-list').append('<li class="list-group-item loading-indicator">Loading more...</li>');
-        }
+          if (data.recipes.length > 0) {
+            var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
+            recipeDetailUrl = recipeDetailUrl.replace("0/", "");
 
-        $.ajax({
-            url: '{% url "recipe_search" %}',
-            data: {
-                'term': query,
-                'blacklist': JSON.stringify(blacklist),
-                'whitelist': JSON.stringify(whitelist),
-                'offset': currentOffset,
-                'limit': limit
-            },
-            dataType: 'json',
-            success: function(data) {
-                $('.loading-indicator').remove();
-
-                if (data.recipes.length > 0) {
-                    var recipeDetailUrl = "{% url 'recipe_detail' id=0 %}";
-                    recipeDetailUrl = recipeDetailUrl.replace('0/', '');
-
-                    for (var i = 0; i < data.recipes.length; i++) {
-                        var title = data.recipes[i].title;
-                        var id = data.recipes[i].id;
-                        var highlightedTitle = query ? 
-                            title.replace(new RegExp(query, 'gi'), (match) => `<span class="highlight">${match}</span>`) : 
-                            title;
-                        var listItem = `<li class="list-group-item">
+            for (var i = 0; i < data.recipes.length; i++) {
+              var title = data.recipes[i].title;
+              var id = data.recipes[i].id;
+              var ingredientCount = data.recipes[i].ingredient_count;
+              var highlightedTitle = query
+                ? title.replace(
+                    new RegExp(query, "gi"),
+                    (match) => `<span class="highlight">${match}</span>`
+                  )
+                : title;
+              var listItem = `<li class="list-group-item">
                             <a href="${recipeDetailUrl}${id}/" class="recipe-link">
-                                <i class="fa fa-book"></i> ${highlightedTitle}
+                                <i class="fa fa-book"></i> ${highlightedTitle} <span class="badge badge-info">${ingredientCount} ingredients</span>
                             </a>
                         </li>`;
-                        $('#search-results-list').append(listItem);
-                    }
-
-                    currentOffset += data.recipes.length;
-                    hasMoreResults = data.recipes.length === limit;
-                } else {
-                    if (!append) {
-                        $('#search-results-list').append('<li class="list-group-item no-hover no-active">No results found</li>');
-                    }
-                    hasMoreResults = false;
-                }
-                isLoading = false;
-            },
-            error: function() {
-                $('.loading-indicator').remove();
-                $('#search-results-list').append('<li class="list-group-item no-hover no-active">Error loading results</li>');
-                isLoading = false;
+              $("#search-results-list").append(listItem);
             }
-        });
+
+            currentOffset += data.recipes.length;
+            hasMoreResults = data.recipes.length === limit;
+          } else {
+            if (!append) {
+              $("#search-results-list").append(
+                '<li class="list-group-item no-hover no-active">No results found</li>'
+              );
+            }
+            hasMoreResults = false;
+          }
+          isLoading = false;
+        },
+        error: function () {
+          $(".loading-indicator").remove();
+          $("#search-results-list").append(
+            '<li class="list-group-item no-hover no-active">Error loading results</li>'
+          );
+          isLoading = false;
+        },
+      });
     }
 
     function addAllergens(diet) {
@@ -300,59 +391,90 @@ $(document).ready(function() {
         ingredients.forEach(ingredient => addBlacklistIngredient(ingredient));
     }
 
-    $('#search-button').on('click', function() {
-        var query = $('#search-input').val();
-        if (query.length >= 3) {
-            fetchRecipes(query);
-        }
-    });
-
     // Scroll event handler for the results container
-    $('#search-results-container').on('scroll', function() {
-        if (isSearchMode && !isLoading && hasMoreResults) {
-            const scrollHeight = $(this)[0].scrollHeight;
-            const scrollTop = $(this).scrollTop();
-            const containerHeight = $(this).height();
-            
-            // Check if we're near the bottom of the container
-            if (scrollHeight - (scrollTop + containerHeight) < 50) {
-                fetchRecipes(currentSearchQuery, false, true);
-            }
+    $("#search-results-container").on("scroll", function () {
+      if (isSearchMode && !isLoading && hasMoreResults) {
+        const scrollHeight = $(this)[0].scrollHeight;
+        const scrollTop = $(this).scrollTop();
+        const containerHeight = $(this).height();
+
+        // Check if we're near the bottom of the container
+        if (scrollHeight - (scrollTop + containerHeight) < 50) {
+          fetchRecipes(currentSearchQuery, false, true);
         }
+      }
     });
 
     // Helper functions to add ingredients to the whitelist and blacklist
     function addWhitelistIngredient(ingredient) {
-        if (ingredient && !$('.whitelist-tag[data-ingredient="' + ingredient + '"]').length) {
-            var tag = $('<span class="badge badge-success whitelist-tag mr-2" data-ingredient="' + ingredient + '">' + 
-                        ingredient + '</span>');
-            tag.on('click', function() {
-                $(this).remove();
-                savePreferences();
-            });
-            $('#whitelist-container').append(tag);
-            $('#new-whitelist-input').val('');  
-        }
+      if (
+        ingredient &&
+        !$('.whitelist-tag[data-ingredient="' + ingredient + '"]').length
+      ) {
+        var tag = $(
+          '<span class="badge badge-success whitelist-tag mr-2" data-ingredient="' +
+            ingredient +
+            '">' +
+            ingredient +
+            "</span>"
+        );
+        tag.on("click", function () {
+          $(this).remove();
+          savePreferences();
+          toggleWhitelistPlaceholder();
+        });
+        $("#whitelist-container").append(tag);
+        $("#new-whitelist-input").val("");
+        toggleWhitelistPlaceholder();
+      }
     }
 
     function addBlacklistIngredient(ingredient) {
-        if (ingredient && !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length) {
-            var tag = $('<span class="badge badge-danger blacklist-tag mr-2" data-ingredient="' + ingredient + '">' + 
-                        ingredient + '</span>');
-            tag.on('click', function() {
-                $(this).remove();
-                savePreferences();
-            });
-            $('#blacklist-container').append(tag);
-            $('#new-blacklist-input').val('');
-        }
+      if (
+        ingredient &&
+        !$('.blacklist-tag[data-ingredient="' + ingredient + '"]').length
+      ) {
+        var tag = $(
+          '<span class="badge badge-danger blacklist-tag mr-2" data-ingredient="' +
+            ingredient +
+            '">' +
+            ingredient +
+            "</span>"
+        );
+        tag.on("click", function () {
+          $(this).remove();
+          savePreferences();
+          toggleBlacklistPlaceholder();
+        });
+        $("#blacklist-container").append(tag);
+        $("#new-blacklist-input").val("");
+        toggleBlacklistPlaceholder();
+      }
+    }
+
+    // Function to toggle the whitelist placeholder
+    function toggleWhitelistPlaceholder() {
+      if ($("#whitelist-container .whitelist-tag").length === 0) {
+        $("#whitelist-placeholder").show();
+      } else {
+        $("#whitelist-placeholder").hide();
+      }
+    }
+
+    // Function to toggle the blacklist placeholder
+    function toggleBlacklistPlaceholder() {
+      if ($("#blacklist-container .blacklist-tag").length === 0) {
+        $("#blacklist-placeholder").show();
+      } else {
+        $("#blacklist-placeholder").hide();
+      }
     }
 
     // Event listeners for adding ingredients to the lists
-    $('#add-whitelist').on('click', function() {
-        var ingredient = $('#new-whitelist-input').val().trim();
-        addWhitelistIngredient(ingredient);
-        savePreferences();
+    $("#add-whitelist").on("click", function () {
+      var ingredient = $("#new-whitelist-input").val().trim();
+      addWhitelistIngredient(ingredient);
+      savePreferences();
     });
 
     $('#clear-all-whitelist').on('click', function() {
@@ -376,37 +498,73 @@ $(document).ready(function() {
         addAllergens(diet);
         savePreferences();
     });
+    
+    $(".common-ingredient-btn").on("click", function () {
+      var ingredient = $(this).data("ingredient");
+      var mode = $("#quick-add-mode").prop("checked")
+        ? "whitelist"
+        : "blacklist";
 
-    $('.common-ingredient-btn').on('click', function() {
-        var ingredient = $(this).data('ingredient');
-        var mode = $('#quick-add-mode').prop('checked') ? 'whitelist' : 'blacklist';
-
-        if (mode === 'whitelist') {
-            addWhitelistIngredient(ingredient);
-        } else {
-            addBlacklistIngredient(ingredient);
-        }
-        savePreferences();
+      if (mode === "whitelist") {
+        addWhitelistIngredient(ingredient);
+      } else {
+        addBlacklistIngredient(ingredient);
+      }
+      savePreferences();
     });
+
+    // Initialize the state of the placeholders
+    toggleWhitelistPlaceholder();
+    toggleBlacklistPlaceholder();
+
+    // Toggle button event listener
+    $("#quick-add-mode").on("change", function () {
+      if ($(this).prop("checked")) {
+        $("#add-whitelist").show();
+        $("#add-blacklist").hide();
+      } else {
+        $("#add-whitelist").hide();
+        $("#add-blacklist").show();
+      }
+    });
+
+    // Initialize the state of the add buttons based on the toggle
+    if ($("#quick-add-mode").prop("checked")) {
+      $("#add-whitelist").show();
+      $("#add-blacklist").hide();
+    } else {
+      $("#add-whitelist").hide();
+      $("#add-blacklist").show();
+    }
 
     // Search and Find Recipes button event listeners
-    $('#search-button').on('click', function() {
-        var query = $('#search-input').val();
-        fetchRecipes(query);
+    $("#search-button").on("click", function () {
+      var query = $("#search-input").val();
+      fetchRecipes(query);
     });
 
-    $('#clear-search').on('click', function() {
-        $('#search-input').val('');
-        $('#search-results-list').empty();
-        isSearchMode = false;
-        currentSearchQuery = '';
-        currentOffset = 0;
-        hasMoreResults = true;
+    $("#clear-search").on("click", function () {
+      $("#search-input").val("");
+      $("#search-results-list").empty();
+      isSearchMode = false;
+      currentSearchQuery = "";
+      currentOffset = 0;
+      hasMoreResults = true;
     });
 
-    $('#find-recipes-button').on('click', function() {
-        fetchRecipes('', true);
+    $("#find-recipes-button").on("click", function () {
+      fetchRecipes("", true);
     });
-});
+
+    // Scroll to the results section on "Find Recipes" button click
+    $("#find-recipes-button").on("click", function () {
+      $("html, body").animate(
+        {
+          scrollTop: $("#find-results-list").offset().top,
+        },
+        800
+      ); // Adjust the animation speed as needed (in milliseconds)
+    });
+  });
 </script>
 {% endblock %}

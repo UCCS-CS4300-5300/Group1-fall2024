@@ -1,5 +1,5 @@
 import json
-
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
@@ -65,7 +65,6 @@ def registerPage(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
-
 class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '').strip()
@@ -110,11 +109,14 @@ class RecipeSearch(View):
         # Paginate the results
         recipe_list = list(recipe_results.distinct().values('title', 'id')[offset:offset + limit])
 
+        # Add ingredient count to each recipe
+        for recipe in recipe_list:
+            recipe_obj = Recipe.objects.get(id=recipe['id'])
+            recipe['ingredient_count'] = recipe_obj.ingredients.count()
+
         return JsonResponse({
             'recipes': recipe_list,
         })
-
-
 
 @method_decorator(login_required, name='dispatch')
 class SavePreferences(View):
@@ -138,6 +140,7 @@ class SavePreferences(View):
             user_preference.blacklist.add(ingredient)
         
         return JsonResponse({'status': 'success'})
+    
 
 class GetPreferences(View):
     def get(self, request):
@@ -156,9 +159,23 @@ class RecipeDetailView(View):
         # Set favorite status for authenticated users
         is_favorited = self._is_favorited_by_user(request.user, recipe)
 
+        # Check if the instructions contain numbered steps
+        if re.search(r'\d+\.\s*', recipe.instructions):
+            # Split instructions using a regular expression to capture numbered steps
+            instructions_list = re.split(r'(?<=\d\.)\s*', recipe.instructions.strip())
+        else:
+            # Split by period and space
+            instructions_list = re.split(r'\.\s+', recipe.instructions.strip())
+            # Add a new period to the end of each instruction
+            instructions_list = [instruction + '.' for instruction in instructions_list if instruction]
+
+        # Clean up the instructions list
+        instructions_list = [instruction.strip() for instruction in instructions_list if instruction]
+
         context = {
             'recipe': recipe,
             'is_favorited': is_favorited,
+            'instructions_list': instructions_list,
         }
         return render(request, 'cookapp/recipe_detail.html', context)
     
@@ -166,7 +183,7 @@ class RecipeDetailView(View):
         if user.is_authenticated:
             return FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists()
         return False
-
+    
 class MealPlanView(View):
     def get(self, request):
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
