@@ -23,26 +23,54 @@ is in cookapp/management/commands/fetch_meals. Run the following:
 
 ----------------------Setting up ENHANCED database-------------------------------
 
-1.)         So there's a minor update to the models, so start with:
 
-    python manage.py makamigrations
-    python manage.py migrate
+Getting Started Guide: Recipe Project Setup
 
-2.)         Next, you need to clear out the bad data from the old database. I made a custom command for this:
+Follow these steps to clear old data, set up the database, and load recipes using the OpenAI API.
 
-    python manage.py clear_database
+1. Install OpenAI Requirements
 
-3.)         Now we'll look to set up the database command. You'll need an openai api key for this. I'll give you each the key 
-            personally since github doesn't allow you to store it. After I give you the key, run this command:
+   First, install the OpenAI API library. Run this in your terminal:
 
-    export OPENAI_API_KEY='API_KEY_HERE'
+   ```bash
+   pip install openai
+   ```
 
-            Of course replace API_KEY_HERE with the key given. Make sure to leave the '' though.
+2. Run Database Migrations
 
-4.)         Now you should be good to run the command to update the database again:
+   Update the database with recent model changes:
 
-    python manage.py fetch_meals
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
 
-            This will take around 30 minutes since each recipe is calling GPT, getting a response, and creating json stuff 300 times. :/
+3. Clear Old Data
 
-5.)         When it's done it should give you some notification like "301 Recipes succesfully created"
+   Clean out old, incompatible data:
+
+   ```bash
+   python manage.py clear_database
+   ```
+
+4. Set Up the OpenAI API Key
+
+   Obtain your OpenAI API key (provided by me) and set it as an environment variable:
+
+   ```bash
+   export OPENAI_API_KEY='YOUR_API_KEY_HERE'
+   ```
+
+   *Make sure to keep the single quotes (``).*
+
+5. Fetch Recipe Data
+
+   Load recipes with OpenAI (Note: This process will take approximately 30 minutes as it generates recipes one by one):
+
+   ```bash
+   python manage.py fetch_meals
+   ```
+
+   You’ll see a final confirmation message like `301 Recipes successfully created` once complete.
+
+After these steps, you’ll be ready to access the recipes via the site’s interface! Yippee!
