@@ -1,36 +1,13 @@
+<!-- recipe_detail.html -->
+
 {% extends "cookapp/base.html" %}
 {% load static %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Recipe Title Section -->
-    <div class="recipe-header text-center py-3 mb-4" style="background-color: #f7f7f7; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <h1 class="display-4 font-weight-bold mb-3" style="color: #333; font-size: 2.5rem; margin: 0; display: inline;">{{ recipe.title }}</h1>
-            
-            <!-- Tags Section -->
-            {% if recipe.tags %}
-            <div class="tags-section" style="display: inline-block; margin-left: 20px;">
-                {% for tag in recipe.tags %}
-                <span class="badge badge-pill" style="background-color: #7eacb5; color: white; padding: 6px 12px; font-size: 13px; margin: 3px;">{{ tag }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-            
-            <!-- Favorite Button -->
-            {% if user.is_authenticated %}
-            <form action="{% url 'toggle_favorite' recipe.id %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn-primary-favorite" style="position: absolute; top: 20px; right: 20px;">
-                <strong>{% if is_favorited %}Remove from{% else %}Add to{% endif %} Favorites</strong>
-                </button>
-            </form>
-            {% else %}
-            <a href="{% url 'login' %}" class="btn-primary-favorite" style="position: absolute; top: 20px; right: 20px;">Log in to add to Favorites</a>
-            {% endif %}
-        </div>
-        
-        <!-- Recipe Image -->
+    <div class="recipe-header text-center py-3 mb-5" style="background-color: #f7f7f7; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h1 class="display-4 font-weight-bold" style="color: #34495e;">{{ recipe.title }}</h1>
         {% if recipe.image %}
             <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="img-fluid my-4" style="max-width: 500px; height: auto; border-radius: 15px; box-shadow: 0 6px 10px rgba(0,0,0,0.15);">
         {% endif %}
@@ -52,7 +29,11 @@
     <!-- Instructions Section -->
     <div class="instructions-section py-4 px-5 mb-5" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <h3 class="font-weight-bold mb-4" style="color: #2874a6;">Instructions</h3>
-        <p style="line-height: 1.8; color: #2c3e50; white-space: pre-line;">{{ recipe.instructions }}</p>
+        <ol style="line-height: 1.8; color: #2c3e50;">
+            {% for instruction in instructions_list %}
+                <li>{{ instruction }}</li>
+            {% endfor %}
+        </ol>
     </div>
 
     <!-- Nutrition Information Section -->
@@ -86,6 +67,20 @@
                 {% endfor %}
             </p>
         </div>
+    {% endif %}
+
+    <!-- Favorite Button -->
+    <div class="text-center mb-5">
+        {% if user.is_authenticated %}
+            <form action="{% url 'toggle_favorite' recipe.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    {% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Log in to add to Favorites</a>
+        {% endif %}
     </div>
 </div>
 

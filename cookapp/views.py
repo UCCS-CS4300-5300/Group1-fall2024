@@ -16,10 +16,11 @@ from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
 def index(request):
-    # Get the most common ingredients
-    # works by counting the number of recipes that use each ingredient and ordering by that count
-    # annotate adds a new field to each ingredient object with the count
-    common_ingredients = Ingredient.objects.annotate(recipe_count=Count('recipe')).order_by('-recipe_count')[:10]
+    # Count recipes by referencing the related `recipeingredient` set, due to the through model
+    common_ingredients = Ingredient.objects.annotate(
+        recipe_count=Count('recipeingredient')
+    ).order_by('-recipe_count')[:10]
+    
     diets = Diets.objects.annotate(diet_count=Count('name')).order_by('-diet_count')
 
     # Create a dictionary of diet names and their respective blacklisted ingredients
@@ -67,6 +68,7 @@ def registerPage(request):
     return render(request, 'registration/register.html', context)
 
 
+
 class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '').strip()
@@ -87,11 +89,13 @@ class RecipeSearch(View):
 
         # Initialize the query
         if query:
-            recipe_results = Recipe.objects.filter(Q(title__icontains=query) | Q(tags__icontains=query))
+            recipe_results = Recipe.objects.filter(
+                Q(title__icontains=query) | Q(tags__icontains=query)
+            )
         else:
             recipe_results = Recipe.objects.all()
 
-        # Apply whitelist filter (include only recipes with all specified whitelist ingredients)
+        # Apply whitelist filter (include only recipes containing all specified whitelist ingredients)
         if whitelist:
             for ingredient in whitelist:
                 try:
@@ -140,12 +144,9 @@ class RecipeSearch(View):
                 continue
 
         # Paginate the results
-        recipe_list = list(recipe_results.distinct().values('title', 'id')[offset:offset + limit])
-
-        # Add ingredient count to each recipe
-        for recipe in recipe_list:
-            recipe_obj = Recipe.objects.get(id=recipe['id'])
-            recipe['ingredient_count'] = recipe_obj.ingredients.count()
+        recipe_list = list(
+            recipe_results.values('title', 'id', 'ingredient_count')[offset:offset + limit]
+        )
 
         return JsonResponse({
             'recipes': recipe_list,
