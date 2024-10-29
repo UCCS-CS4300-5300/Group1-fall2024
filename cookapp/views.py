@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.utils.safestring import mark_safe
 from django.contrib import messages
 
 from django.http import JsonResponse
@@ -30,7 +31,7 @@ def index(request):
     context = {
         'common_ingredients': common_ingredients,
         'diets': diets,
-        'diet_blacklists': json.dumps(diet_blacklists),  # Convert to JSON for JavaScript access
+        'diet_blacklists': mark_safe(json.dumps(diet_blacklists)),  # Convert to JSON for JavaScript access
     }
     return render(request, 'cookapp/index.html', context)
 
