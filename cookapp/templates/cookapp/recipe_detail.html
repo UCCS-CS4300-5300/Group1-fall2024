@@ -66,4 +66,55 @@
         </div>
     </div>
 </div>
+
+
+<!-- PDF Download Button at the bottom -->
+<div class="text-center mt-4">
+    <button id="pdfDownloader" class="btn btn-primary">Download Recipe as PDF</button>
+</div>
+</div>
+
+<!-- Include jsPDF and html2canvas Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- JavaScript for PDF Download -->
+<script>
+    document.getElementById('pdfDownloader').addEventListener('click', function() {
+        document.body.classList.add('pdf-mode');
+    
+        // Use html2canvas with specific options to ensure images are fully loaded and rendered
+        html2canvas(document.querySelector('.container'), {
+            allowTaint: true, // Enables cross-origin images to be captured
+            useCORS: true,    // Ensures CORS-enabled images are rendered
+            logging: true     // Logs process steps for debugging if needed
+        }).then(function(canvas) {
+            var imgData = canvas.toDataURL('image/png');
+    
+            // Initialize jsPDF correctly based on the library's version
+            const { jsPDF } = window.jspdf;
+            var doc = new jsPDF('p', 'mm', 'a4');
+    
+            // Page dimensions in mm
+            var pageWidth = doc.internal.pageSize.width;
+            var pageHeight = doc.internal.pageSize.height;
+    
+            // Calculate dimensions to fit the page while preserving aspect ratio
+            var imgWidth = pageWidth;
+            var imgHeight = canvas.height * imgWidth / canvas.width;
+            if (imgHeight > pageHeight) {
+                imgHeight = pageHeight;
+                imgWidth = canvas.width * imgHeight / canvas.height;
+            }
+    
+            // Add the image to the PDF
+            doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            doc.save('{{ recipe.title }}.pdf');
+    
+            document.body.classList.remove('pdf-mode');
+        }).catch(error => {
+            console.error("Error generating PDF: ", error);
+        });
+    });
+    </script>
 {% endblock %}
