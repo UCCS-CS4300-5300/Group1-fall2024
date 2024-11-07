@@ -1,4 +1,6 @@
-{% extends "cookapp/base.html" %} {% load static %} {% block content %}
+{% extends "cookapp/base.html" %}
+{% load static %}
+{% block content %}
 <link
   href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
   rel="stylesheet"
@@ -151,7 +153,7 @@
                 </div>
               </div>
 
-              <!-- vertical divider -->
+              <!-- Vertical Divider -->
               <div class="vl"></div>
 
               <!-- Right Column -->
@@ -220,7 +222,6 @@
     let isSearchMode = false;
 
     const dietBlacklists = JSON.parse('{{ diet_blacklists|safe }}');
-
 
     // Add CSS for scrollable container
     $("<style>")
@@ -348,7 +349,6 @@
             for (var i = 0; i < data.recipes.length; i++) {
               var title = data.recipes[i].title;
               var id = data.recipes[i].id;
-              var ingredientCount = data.recipes[i].ingredient_count;
               var highlightedTitle = query
                 ? title.replace(
                     new RegExp(query, "gi"),
@@ -356,10 +356,10 @@
                   )
                 : title;
               var listItem = `<li class="list-group-item">
-                            <a href="${recipeDetailUrl}${id}/" class="recipe-link">
-                                <i class="fa fa-book"></i> ${highlightedTitle} <span class="badge badge-info">${ingredientCount} ingredients</span>
-                            </a>
-                        </li>`;
+                              <a href="${recipeDetailUrl}${id}/" class="recipe-link">
+                                  <i class="fa fa-book"></i> ${highlightedTitle}
+                              </a>
+                          </li>`;
               $("#search-results-list").append(listItem);
             }
 
@@ -477,19 +477,21 @@
     });
 
     $('#clear-all-whitelist').on('click', function() {
-        $('#whitelist-container').empty(); // Removes all blacklist tags
+        $('#whitelist-container').empty(); // Removes all whitelist tags
         savePreferences();
+        toggleWhitelistPlaceholder();
     });
 
     $('#add-blacklist').on('click', function() {
-        var ingredient = $('#new-blacklist-input').val().trim();
-        addBlacklistIngredient(ingredient);
-        savePreferences();
+      var ingredient = $('#new-blacklist-input').val().trim();
+      addBlacklistIngredient(ingredient);
+      savePreferences();
     });
 
     $('#clear-all-blacklist').on('click', function() {
         $('#blacklist-container').empty(); // Removes all blacklist tags
         savePreferences();
+        toggleBlacklistPlaceholder();
     });
 
     $('.dietary-restriction-btn').on('click', function() {
@@ -497,7 +499,7 @@
         addAllergens(diet);
         savePreferences();
     });
-    
+
     $(".common-ingredient-btn").on("click", function () {
       var ingredient = $(this).data("ingredient");
       var mode = $("#quick-add-mode").prop("checked")

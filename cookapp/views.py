@@ -16,11 +16,11 @@ from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
 def index(request):
-    # Count recipes by referencing the related `recipeingredient` set, due to the through model
+    # Count recipes by referencing the related `recipeingredient` set
     common_ingredients = Ingredient.objects.annotate(
         recipe_count=Count('recipeingredient')
     ).order_by('-recipe_count')[:10]
-    
+
     diets = Diets.objects.annotate(diet_count=Count('name')).order_by('-diet_count')
 
     # Create a dictionary of diet names and their respective blacklisted ingredients
@@ -35,7 +35,6 @@ def index(request):
         'diet_blacklists': mark_safe(json.dumps(diet_blacklists)),  # Convert to JSON for JavaScript access
     }
     return render(request, 'cookapp/index.html', context)
-
 
 def logout_message(request):
     return render(request, 'registration/logout.html')
@@ -62,12 +61,9 @@ def registerPage(request):
             user.save()
 
             messages.success(request, f'Welcome, {username}!')
-            print(f'Messages: {messages.get_messages(request)}')  # Debugging line
             return redirect('index')  # Redirect to the home page
     context = {'form': form}
     return render(request, 'registration/register.html', context)
-
-
 
 class RecipeSearch(View):
     def get(self, request):
@@ -98,87 +94,72 @@ class RecipeSearch(View):
         # Apply whitelist filter (include only recipes containing all specified whitelist ingredients)
         if whitelist:
             for ingredient in whitelist:
-                try:
-                    whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
-                    if whitelisted_ingredients.exists():
-                        recipe_results = recipe_results.filter(ingredients__in=whitelisted_ingredients)
-                    else:
-                        # Try singular form
-                        singular_ingredient = p.singular_noun(ingredient)
-                        if singular_ingredient:
-                            whitelisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
-                            if whitelisted_ingredients.exists():
-                                recipe_results = recipe_results.filter(recipeingredient__ingredient__in=whitelisted_ingredients)
-                            else:
-                                # If any ingredient in the whitelist is not found, no recipes can match
-                                return JsonResponse({
-                                    'recipes': [],
-                                })
-                        else:
-                            # If any ingredient in the whitelist is not found, no recipes can match
-                            return JsonResponse({
-                                'recipes': [],
-                            })
-                except Ingredient.DoesNotExist:
-                    # If any ingredient in the whitelist is not found, no recipes can match
-                    return JsonResponse({'recipes': []})
-
-        # Apply blacklist filter
-        for ingredient in blacklist:
-            try:
-                blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
-                if blacklisted_ingredients.exists():
-                    recipe_results = recipe_results.exclude(ingredients__in=blacklisted_ingredients)
-                else:
+                # Try to find ingredients matching the name
+                whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient)
+                if not whitelisted_ingredients.exists():
                     # Try singular form
                     singular_ingredient = p.singular_noun(ingredient)
                     if singular_ingredient:
-                        blacklisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
-                        if blacklisted_ingredients.exists():
-                            recipe_results = recipe_results.exclude(recipeingredient__ingredient__in=blacklisted_ingredients)
-                        else:
-                            continue
-                    else:
-                        continue
-            except Ingredient.DoesNotExist:
-                continue
+                        whitelisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient)
+                if whitelisted_ingredients.exists():
+                    recipe_results = recipe_results.filter(
+                        recipeingredient__ingredient__in=whitelisted_ingredients
+                    )
+                else:
+                    # Skip ingredients that are not found
+                    continue
 
-        # Paginate the results
+        # Apply blacklist filter
+        if blacklist:
+            for ingredient in blacklist:
+                blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient)
+                if not blacklisted_ingredients.exists():
+                    # Try singular form
+                    singular_ingredient = p.singular_noun(ingredient)
+                    if singular_ingredient:
+                        blacklisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient)
+                if blacklisted_ingredients.exists():
+                    recipe_results = recipe_results.exclude(
+                        recipeingredient__ingredient__in=blacklisted_ingredients
+                    )
+
+        # Remove duplicates and paginate the results
+        recipe_results = recipe_results.distinct()
         recipe_list = list(
-            recipe_results.values('title', 'id', 'ingredient_count')[offset:offset + limit]
+            recipe_results.values('title', 'id')[offset:offset + limit]
         )
 
         return JsonResponse({
             'recipes': recipe_list,
         })
+
 @method_decorator(login_required, name='dispatch')
 class SavePreferences(View):
     def post(self, request):
         data = json.loads(request.body)
         whitelist = data.get('whitelist', [])
         blacklist = data.get('blacklist', [])
-        
+
         user_preference, created = UserPreference.objects.get_or_create(user=request.user)
-        
+
         # Update whitelist
         user_preference.whitelist.clear()
         for ingredient_name in whitelist:
             ingredient, _ = Ingredient.objects.get_or_create(name=ingredient_name)
             user_preference.whitelist.add(ingredient)
-        
+
         # Update blacklist
         user_preference.blacklist.clear()
         for ingredient_name in blacklist:
             ingredient, _ = Ingredient.objects.get_or_create(name=ingredient_name)
             user_preference.blacklist.add(ingredient)
-        
+
         return JsonResponse({'status': 'success'})
-    
 
 class GetPreferences(View):
     def get(self, request):
         if request.user.is_authenticated:
-            user_preference, created = UserPreference.objects.get_or_create(user=request.user)
+            user_preference, _ = UserPreference.objects.get_or_create(user=request.user)
             whitelist = list(user_preference.whitelist.values_list('name', flat=True))
             blacklist = list(user_preference.blacklist.values_list('name', flat=True))
             return JsonResponse({'whitelist': whitelist, 'blacklist': blacklist})
@@ -187,7 +168,7 @@ class GetPreferences(View):
 class RecipeDetailView(View):
     def get(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
-        
+
         # Set favorite status for authenticated users
         is_favorited = self._is_favorited_by_user(request.user, recipe)
 
@@ -210,12 +191,12 @@ class RecipeDetailView(View):
             'instructions_list': instructions_list,
         }
         return render(request, 'cookapp/recipe_detail.html', context)
-    
+
     def _is_favorited_by_user(self, user, recipe):
         if user.is_authenticated:
             return FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists()
         return False
-    
+
 class MealPlanView(View):
     def get(self, request):
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -225,7 +206,6 @@ class MealPlanView(View):
             'meals': meals,
         }
         return render(request, 'cookapp/mealPlanner.html', context)
-
 
 def toggle_favorite(request, recipe_id):
     if request.method == 'POST':
