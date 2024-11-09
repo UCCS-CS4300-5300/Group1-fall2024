@@ -65,6 +65,8 @@ def registerPage(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
+from django.db.models import Count
+
 class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '').strip()
@@ -94,45 +96,62 @@ class RecipeSearch(View):
         # Apply whitelist filter (include only recipes containing all specified whitelist ingredients)
         if whitelist:
             for ingredient in whitelist:
-                # Try to find ingredients matching the name
-                whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-                if not whitelisted_ingredients.exists():
-                    # Try singular form
-                    singular_ingredient = p.singular_noun(ingredient)
-                    if singular_ingredient:
-                        whitelisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient)
-                if whitelisted_ingredients.exists():
-                    recipe_results = recipe_results.filter(
-                        recipeingredient__ingredient__in=whitelisted_ingredients
-                    )
-                else:
-                    # Skip ingredients that are not found
-                    continue
+                try:
+                    whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
+                    if whitelisted_ingredients.exists():
+                        recipe_results = recipe_results.filter(ingredients__in=whitelisted_ingredients)
+                    else:
+                        # Try singular form
+                        singular_ingredient = p.singular_noun(ingredient)
+                        if singular_ingredient:
+                            whitelisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
+                            if whitelisted_ingredients.exists():
+                                recipe_results = recipe_results.filter(recipeingredient__ingredient__in=whitelisted_ingredients)
+                            else:
+                                # If any ingredient in the whitelist is not found, no recipes can match
+                                return JsonResponse({
+                                    'recipes': [],
+                                })
+                        else:
+                            # If any ingredient in the whitelist is not found, no recipes can match
+                            return JsonResponse({
+                                'recipes': [],
+                            })
+                except Ingredient.DoesNotExist:
+                    # If any ingredient in the whitelist is not found, no recipes can match
+                    return JsonResponse({'recipes': []})
 
         # Apply blacklist filter
-        if blacklist:
-            for ingredient in blacklist:
-                blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-                if not blacklisted_ingredients.exists():
+        for ingredient in blacklist:
+            try:
+                blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
+                if blacklisted_ingredients.exists():
+                    recipe_results = recipe_results.exclude(ingredients__in=blacklisted_ingredients)
+                else:
                     # Try singular form
                     singular_ingredient = p.singular_noun(ingredient)
                     if singular_ingredient:
-                        blacklisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient)
-                if blacklisted_ingredients.exists():
-                    recipe_results = recipe_results.exclude(
-                        recipeingredient__ingredient__in=blacklisted_ingredients
-                    )
+                        blacklisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
+                        if blacklisted_ingredients.exists():
+                            recipe_results = recipe_results.exclude(recipeingredient__ingredient__in=blacklisted_ingredients)
+                        else:
+                            continue
+                    else:
+                        continue
+            except Ingredient.DoesNotExist:
+                continue
 
-        # Remove duplicates and paginate the results
-        recipe_results = recipe_results.distinct()
+        # Annotate the queryset with the count of ingredients
+        recipe_results = recipe_results.annotate(ingredient_count=Count('recipeingredient'))
+
+        # Paginate the results
         recipe_list = list(
-            recipe_results.values('title', 'id')[offset:offset + limit]
+            recipe_results.values('title', 'id', 'ingredient_count')[offset:offset + limit]
         )
 
         return JsonResponse({
             'recipes': recipe_list,
         })
-
 @method_decorator(login_required, name='dispatch')
 class SavePreferences(View):
     def post(self, request):

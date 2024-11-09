@@ -1,6 +1,4 @@
-{% extends "cookapp/base.html" %}
-{% load static %}
-{% block content %}
+{% extends "cookapp/base.html" %} {% load static %} {% block content %}
 <link
   href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
   rel="stylesheet"
@@ -78,13 +76,17 @@
 
                 <!-- Allergens/Dietary Restrictions Section -->
                 <div id="dietary-restrictions" class="w-100 mb-3">
-                    <h5 class="text-left mb-0">Allergens/Dietary Restrictions:</h5>
-                    {% for diet in diets %}
-                    <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn" 
-                            data-diet="{{ diet.name }}">
-                        {{ diet.name }}
-                    </button>
-                    {% endfor %}
+                  <h5 class="text-left mb-0">
+                    Allergens/Dietary Restrictions:
+                  </h5>
+                  {% for diet in diets %}
+                  <button
+                    class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn"
+                    data-diet="{{ diet.name }}"
+                  >
+                    {{ diet.name }}
+                  </button>
+                  {% endfor %}
                 </div>
               </div>
               <!-- Left Column -->
@@ -115,7 +117,13 @@
                       >
                         Add
                       </button>
-                      <button class="btn btn-outline-danger" type="button" id="clear-all-whitelist">Clear All</button>
+                      <button
+                        class="btn btn-outline-danger"
+                        type="button"
+                        id="clear-all-whitelist"
+                      >
+                        Clear All
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -147,7 +155,13 @@
                       >
                         Add
                       </button>
-                      <button class="btn btn-outline-danger" type="button" id="clear-all-blacklist">Clear All</button>
+                      <button
+                        class="btn btn-outline-danger"
+                        type="button"
+                        id="clear-all-blacklist"
+                      >
+                        Clear All
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -181,7 +195,7 @@
                         type="button"
                         id="clear-search"
                       >
-                      <i class="fa fa-times" aria-hidden="true"></i>
+                        <i class="fa fa-times" aria-hidden="true"></i>
                       </button>
                     </div>
                   </div>
@@ -221,7 +235,7 @@
     let currentSearchQuery = "";
     let isSearchMode = false;
 
-    const dietBlacklists = JSON.parse('{{ diet_blacklists|safe }}');
+    const dietBlacklists = JSON.parse("{{ diet_blacklists|safe }}");
 
     // Add CSS for scrollable container
     $("<style>")
@@ -348,6 +362,7 @@
 
             for (var i = 0; i < data.recipes.length; i++) {
               var title = data.recipes[i].title;
+              var ingredientCount = data.recipes[i].ingredient_count;
               var id = data.recipes[i].id;
               var highlightedTitle = query
                 ? title.replace(
@@ -356,10 +371,10 @@
                   )
                 : title;
               var listItem = `<li class="list-group-item">
-                              <a href="${recipeDetailUrl}${id}/" class="recipe-link">
-                                  <i class="fa fa-book"></i> ${highlightedTitle}
-                              </a>
-                          </li>`;
+                  <a href="${recipeDetailUrl}${id}/" class="recipe-link">
+                      <i class="fa fa-book"></i> ${highlightedTitle} <span class="badge badge-info">${ingredientCount} ingredients</span>
+                  </a>
+              </li>`;
               $("#search-results-list").append(listItem);
             }
 
@@ -386,8 +401,8 @@
     }
 
     function addAllergens(diet) {
-        const ingredients = dietBlacklists[diet] || [];
-        ingredients.forEach(ingredient => addBlacklistIngredient(ingredient));
+      const ingredients = dietBlacklists[diet] || [];
+      ingredients.forEach((ingredient) => addBlacklistIngredient(ingredient));
     }
 
     // Scroll event handler for the results container
@@ -476,28 +491,28 @@
       savePreferences();
     });
 
-    $('#clear-all-whitelist').on('click', function() {
-        $('#whitelist-container').empty(); // Removes all whitelist tags
-        savePreferences();
-        toggleWhitelistPlaceholder();
+    $("#clear-all-whitelist").on("click", function () {
+      $("#whitelist-container").empty(); // Removes all whitelist tags
+      savePreferences();
+      toggleWhitelistPlaceholder();
     });
 
-    $('#add-blacklist').on('click', function() {
-      var ingredient = $('#new-blacklist-input').val().trim();
+    $("#add-blacklist").on("click", function () {
+      var ingredient = $("#new-blacklist-input").val().trim();
       addBlacklistIngredient(ingredient);
       savePreferences();
     });
 
-    $('#clear-all-blacklist').on('click', function() {
-        $('#blacklist-container').empty(); // Removes all blacklist tags
-        savePreferences();
-        toggleBlacklistPlaceholder();
+    $("#clear-all-blacklist").on("click", function () {
+      $("#blacklist-container").empty(); // Removes all blacklist tags
+      savePreferences();
+      toggleBlacklistPlaceholder();
     });
 
-    $('.dietary-restriction-btn').on('click', function() {
-        const diet = $(this).data('diet');
-        addAllergens(diet);
-        savePreferences();
+    $(".dietary-restriction-btn").on("click", function () {
+      const diet = $(this).data("diet");
+      addAllergens(diet);
+      savePreferences();
     });
 
     $(".common-ingredient-btn").on("click", function () {
