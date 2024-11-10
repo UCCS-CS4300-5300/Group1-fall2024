@@ -25,6 +25,9 @@ urlpatterns = [
     path('accounts/register/', views.registerPage, name='register_page'),
     path('logout/', views.logout_message, name='logout_message'),
     
+    # User reviews
+    path('reviews/', views.ReviewsView.as_view(), name='reviews'),
+
     # Favorite functionality
     path('recipe/<int:recipe_id>/toggle_favorite/', views.toggle_favorite, name='toggle_favorite'),  # Combined toggle
     path('profile/favorites/', views.favorites, name='favorites'),
