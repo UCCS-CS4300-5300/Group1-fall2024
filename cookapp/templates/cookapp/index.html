@@ -533,26 +533,6 @@
     toggleWhitelistPlaceholder();
     toggleBlacklistPlaceholder();
 
-    // Toggle button event listener
-    $("#quick-add-mode").on("change", function () {
-      if ($(this).prop("checked")) {
-        $("#add-whitelist").show();
-        $("#add-blacklist").hide();
-      } else {
-        $("#add-whitelist").hide();
-        $("#add-blacklist").show();
-      }
-    });
-
-    // Initialize the state of the add buttons based on the toggle
-    if ($("#quick-add-mode").prop("checked")) {
-      $("#add-whitelist").show();
-      $("#add-blacklist").hide();
-    } else {
-      $("#add-whitelist").hide();
-      $("#add-blacklist").show();
-    }
-
     // Search and Find Recipes button event listeners
     $("#search-button").on("click", function () {
       var query = $("#search-input").val();

@@ -99,7 +99,7 @@ class RecipeSearch(View):
                 try:
                     whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
                     if whitelisted_ingredients.exists():
-                        recipe_results = recipe_results.filter(ingredients__in=whitelisted_ingredients)
+                        recipe_results = recipe_results.filter(recipeingredient__ingredient__in=whitelisted_ingredients)
                     else:
                         # Try singular form
                         singular_ingredient = p.singular_noun(ingredient)
@@ -126,7 +126,7 @@ class RecipeSearch(View):
             try:
                 blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
                 if blacklisted_ingredients.exists():
-                    recipe_results = recipe_results.exclude(ingredients__in=blacklisted_ingredients)
+                    recipe_results = recipe_results.exclude(recipeingredient__ingredient__in=blacklisted_ingredients)
                 else:
                     # Try singular form
                     singular_ingredient = p.singular_noun(ingredient)
