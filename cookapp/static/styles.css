@@ -681,6 +681,14 @@ footer .navbar-text {
   color: var(--color-dark) !important; /* Override hover text color */
 }
 
+.no-hover-star:hover {
+  color: #ccc !important; /* Override hover text color */
+}
+
+.no-hover-star-checked:hover {
+  color: gold !important; /* Override hover text color */
+}
+
 .no-active:active {
   background-color: var(--color-white) !important;/* Override active background color */
   color: var(--color-dark) !important; /* Override active text color */
@@ -1050,4 +1058,22 @@ footer .navbar-text {
 
 .btn-plan:hover {
   background-color: var(--color-dark);
+}
+
+/* Recipe Details Star Rating */
+.fa-star {
+    color: #ccc; /* Default star color */
+}
+.fa-star.checked {
+    color: gold; /* Color for checked stars */
+}
+.fa-star:hover,
+.fa-star.hovered {
+    color: gold !important; /* Color for hovered stars */
+}
+.no-hover-star:hover {
+    color: #ccc !important; /* Override hover text color */
+}
+.no-hover-star-checked:hover {
+    color: gold !important; /* Override hover text color */
 }

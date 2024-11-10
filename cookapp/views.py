@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
 
-from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets
+from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets, Rating
 from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
@@ -191,23 +191,38 @@ class RecipeDetailView(View):
         # Set favorite status for authenticated users
         is_favorited = self._is_favorited_by_user(request.user, recipe)
 
-        # Check if the instructions contain numbered steps
-        if re.search(r'\d+\.\s*', recipe.instructions):
-            # Split instructions using a regular expression to capture numbered steps
-            instructions_list = re.split(r'(?<=\d\.)\s*', recipe.instructions.strip())
-        else:
-            # Split by period and space
-            instructions_list = re.split(r'\.\s+', recipe.instructions.strip())
-            # Add a new period to the end of each instruction
-            instructions_list = [instruction + '.' for instruction in instructions_list if instruction]
+        # Remove numbered steps from instructions
+        instructions = re.sub(r'\d+\.\s*', '', recipe.instructions.strip())
+
+        # Split instructions by periods
+        instructions_list = re.split(r'\.\s+', instructions)
+
+        # add a period to the end of each instruction if it doesn't already have one
+        instructions_list = [instruction + '.' if not instruction.endswith('.') else instruction for instruction in instructions_list]
 
         # Clean up the instructions list
         instructions_list = [instruction.strip() for instruction in instructions_list if instruction]
+        
+        # Initialize user_rating and user_review to None
+        user_rating = None
+        user_review = None
+        
+        if request.user.is_authenticated:
+            try:
+                # Try to get the user's rating for the recipe
+                rating = Rating.objects.get(user=request.user, recipe=recipe)
+                user_rating = rating.value
+                user_review = rating.review 
+            except Rating.DoesNotExist:
+                user_rating = None
+                user_review = None
 
         context = {
             'recipe': recipe,
             'is_favorited': is_favorited,
             'instructions_list': instructions_list,
+            'user_rating': user_rating,
+            'user_review': user_review,
         }
         return render(request, 'cookapp/recipe_detail.html', context)
 
@@ -216,6 +231,45 @@ class RecipeDetailView(View):
             return FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists()
         return False
 
+    @method_decorator(login_required)
+    def post(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
+        try:
+            rating_value = int(request.POST.get('rating', 0))
+            review_text = request.POST.get('review', '').strip()
+            if rating_value < 1 or rating_value > 5:
+                return JsonResponse({'status': 'error', 'message': 'Invalid rating value'}, status=400)
+            
+            # Get or create the rating
+            rating, created = Rating.objects.get_or_create(
+                user=request.user, 
+                recipe=recipe, 
+                defaults={'value': rating_value, 'review': review_text}
+            )
+            # Update the rating value
+            rating.value = rating_value
+            rating.review = review_text
+            rating.save()
+            
+            # Update the average rating for the recipe
+            recipe.update_average_rating()
+            
+            # Return a success message
+            message = 'Rating submitted successfully!' if created else 'Rating updated successfully!'
+            return JsonResponse({'status': 'success', 'message': message, 'average_rating': recipe.average_rating})
+        except Exception as e:
+            print("\n\n!!!! There was an error saving the rating:", e)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        
+class ReviewsView(View):
+    def get(self, request):
+        reviews = Rating.objects.filter(review__isnull=False).select_related('recipe', 'user')
+        rating = Rating.objects.filter(review__isnull=False).select_related('recipe', 'user')
+        context = {
+            'reviews': reviews,
+        }
+        return render(request, 'cookapp/reviews.html', context)
+    
 class MealPlanView(View):
     def get(self, request):
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]

@@ -57,6 +57,15 @@ class Recipe(models.Model):
     calories = models.IntegerField(null=True, blank=True)
     macros = models.JSONField(null=True, blank=True)  # Store macros as JSON
     tags = models.JSONField(null=True, blank=True)  # Store tags as JSON
+    average_rating = models.FloatField(default=0.0)  # New field for average rating
+
+    def update_average_rating(self):
+        ratings = self.ratings.all()
+        if ratings.exists():
+            self.average_rating = sum(rating.value for rating in ratings) / ratings.count()
+        else:
+            self.average_rating = 0.0
+        self.save()
 
     def __str__(self):
         return self.title
@@ -109,19 +118,12 @@ class FavoriteRecipe(models.Model):
     class Meta:
         unique_together = ('user', 'recipe')  # Prevent duplicate entries
 
-# maybe implement later
-# class FavoriteRecipe(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-#
-#     def __str__(self):
-#         return f"{self.user.username} - {self.recipe.title}"
-#
-# class Review(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-#     rating = models.IntegerField()
-#     comment = models.TextField()
-#
-#     def __str__(self):
-#         return f"{self.user.username} - {self.recipe.title} - {self.rating}"
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, related_name='ratings', on_delete=models.CASCADE)
+    value = models.IntegerField(null=False)
+    review = models.TextField(blank=True, null=True)  # Review text
+    class Meta:
+        unique_together = ('user', 'recipe')
+    def __str__(self):
+        return f"{self.user.username} rated {self.recipe.title} as {self.value}"
