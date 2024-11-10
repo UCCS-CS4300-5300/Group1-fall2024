@@ -1,5 +1,8 @@
 import json
 import re
+import openai
+import os  
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
@@ -15,15 +18,18 @@ from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets
 from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
+
+# Ensure OPENAI_API_KEY is loaded
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 def index(request):
-    # Count recipes by referencing the related `recipeingredient` set
+    # Fetch common ingredients and diets for display on the index page
     common_ingredients = Ingredient.objects.annotate(
         recipe_count=Count('recipeingredient')
     ).order_by('-recipe_count')[:10]
 
     diets = Diets.objects.annotate(diet_count=Count('name')).order_by('-diet_count')
 
-    # Create a dictionary of diet names and their respective blacklisted ingredients
     diet_blacklists = {
         diet.name: list(diet.blacklist.values_list('name', flat=True))
         for diet in diets
@@ -32,7 +38,7 @@ def index(request):
     context = {
         'common_ingredients': common_ingredients,
         'diets': diets,
-        'diet_blacklists': mark_safe(json.dumps(diet_blacklists)),  # Convert to JSON for JavaScript access
+        'diet_blacklists': mark_safe(json.dumps(diet_blacklists)),
     }
     return render(request, 'cookapp/index.html', context)
 
@@ -133,6 +139,19 @@ class RecipeSearch(View):
             'recipes': recipe_list,
         })
 
+class RedirectToDetailView(View):
+    def post(self, request):
+        # Collect data from POST request
+        data = json.loads(request.body)
+        search_term = data.get('term', 'No input')
+        whitelist = data.get('whitelist', ['No input'])
+        blacklist = data.get('blacklist', ['No input'])
+
+        # Redirect to the detail view with the arguments
+        redirect_url = f'/simple-recipe-detail/?term={search_term}&whitelist={"&whitelist=".join(whitelist)}&blacklist={"&blacklist=".join(blacklist)}'
+        return JsonResponse({'redirect_url': redirect_url})
+
+
 @method_decorator(login_required, name='dispatch')
 class SavePreferences(View):
     def post(self, request):
@@ -229,3 +248,63 @@ def favorites(request):
         'favorite_recipes': favorite_recipes,
     }
     return render(request, 'cookapp/favorites.html', context)
+
+
+class SimpleRecipeDetailView(View):
+    def get(self, request):
+        # Retrieve arguments from GET parameters or set default values
+        search_term = request.GET.get('term', 'No input')
+        whitelist = request.GET.getlist('whitelist', ['No input'])
+        blacklist = request.GET.getlist('blacklist', ['No input'])
+
+        # Pass arguments to the context
+        context = {
+            'search_term': search_term,
+            'whitelist': whitelist,
+            'blacklist': blacklist,
+        }
+        return render(request, 'cookapp/simple_recipe_detail.html', context)
+
+
+
+class RecipeDetailView(View):
+    def get(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
+        is_favorited = self._is_favorited_by_user(request.user, recipe)
+
+        instructions_list = re.split(r'\.\s+', recipe.instructions.strip())
+
+        context = {
+            'recipe': recipe,
+            'is_favorited': is_favorited,
+            'instructions_list': instructions_list,
+        }
+        return render(request, 'cookapp/recipe_detail.html', context)
+
+    def _is_favorited_by_user(self, user, recipe):
+        if user.is_authenticated:
+            return FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists()
+        return False
+
+@method_decorator(login_required, name='dispatch')
+class SavePreferences(View):
+    def post(self, request):
+        data = json.loads(request.body)
+        whitelist = data.get('whitelist', [])
+        blacklist = data.get('blacklist', [])
+
+        user_preference, created = UserPreference.objects.get_or_create(user=request.user)
+
+        # Update whitelist
+        user_preference.whitelist.clear()
+        for ingredient_name in whitelist:
+            ingredient, _ = Ingredient.objects.get_or_create(name=ingredient_name)
+            user_preference.whitelist.add(ingredient)
+
+        # Update blacklist
+        user_preference.blacklist.clear()
+        for ingredient_name in blacklist:
+            ingredient, _ = Ingredient.objects.get_or_create(name=ingredient_name)
+            user_preference.blacklist.add(ingredient)
+
+        return JsonResponse({'status': 'success'})

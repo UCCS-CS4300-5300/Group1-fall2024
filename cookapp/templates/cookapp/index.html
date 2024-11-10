@@ -34,6 +34,7 @@
           <h3 class="text-center mb-4">Recipe Finder</h3>
           <hr style="border-width: 1px; border-color: gray" />
           <form id="search-form" class="justify-content-center">
+            {% csrf_token %}
             <div class="d-flex flex-wrap">
               <!-- Quick Add Section -->
               <div class="ingredients-section mb-2">
@@ -60,13 +61,14 @@
                 </div>
                 <div>
                   <p class="text-muted text-left">
-                    Click on an ingredient to include or exclude an ingredient!
+                    Click on an ingredient to include or exclude it!
                   </p>
                 </div>
 
                 <div id="common-ingredients" class="w-100">
                   {% for ingredient in common_ingredients %}
                   <button
+                    type="button"
                     class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn"
                     data-ingredient="{{ ingredient.name }}"
                   >
@@ -78,13 +80,18 @@
 
                 <!-- Allergens/Dietary Restrictions Section -->
                 <div id="dietary-restrictions" class="w-100 mb-3">
-                    <h5 class="text-left mb-0">Allergens/Dietary Restrictions:</h5>
-                    {% for diet in diets %}
-                    <button class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn" 
-                            data-diet="{{ diet.name }}">
-                        {{ diet.name }}
-                    </button>
-                    {% endfor %}
+                  <h5 class="text-left mb-0">
+                    Allergens/Dietary Restrictions:
+                  </h5>
+                  {% for diet in diets %}
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn"
+                    data-diet="{{ diet.name }}"
+                  >
+                    {{ diet.name }}
+                  </button>
+                  {% endfor %}
                 </div>
               </div>
               <!-- Left Column -->
@@ -115,7 +122,13 @@
                       >
                         Add
                       </button>
-                      <button class="btn btn-outline-danger" type="button" id="clear-all-whitelist">Clear All</button>
+                      <button
+                        class="btn btn-outline-danger"
+                        type="button"
+                        id="clear-all-whitelist"
+                      >
+                        Clear All
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -147,7 +160,13 @@
                       >
                         Add
                       </button>
-                      <button class="btn btn-outline-danger" type="button" id="clear-all-blacklist">Clear All</button>
+                      <button
+                        class="btn btn-outline-danger"
+                        type="button"
+                        id="clear-all-blacklist"
+                      >
+                        Clear All
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -181,20 +200,32 @@
                         type="button"
                         id="clear-search"
                       >
-                      <i class="fa fa-times" aria-hidden="true"></i>
+                        <i class="fa fa-times" aria-hidden="true"></i>
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <button
-              type="button"
-              id="find-recipes-button"
-              class="btn-primary-recipe mb-4"
-            >
-              Find Recipes
-            </button>
+
+            <!-- Action Buttons -->
+            <div class="text-center mb-4">
+              <button
+                type="button"
+                id="find-recipes-button"
+                class="btn btn-primary mb-2"
+              >
+                Find Recipes
+              </button>
+              <p class="mt-3">Try our beta recipe generator!</p>
+              <button
+                type="button"
+                id="generate-ai-recipe-button"
+                class="btn btn-warning"
+              >
+                Generate Recipe
+              </button>
+            </div>
 
             <!-- Results List -->
             <ul id="search-results-list" class="list-group w-100">
@@ -263,6 +294,38 @@
       data.blacklist.forEach(addBlacklistIngredient);
     });
 
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim(); // Trim leading/trailing spaces
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(
+              cookie.substring(name.length + 1)
+            );
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    var csrftoken = getCookie("csrftoken");
+
+    // Set up CSRF token for all AJAX requests
+    $.ajaxSetup({
+      beforeSend: function (xhr, settings) {
+        if (
+          !this.crossDomain &&
+          !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)
+        ) {
+          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+      },
+    });
+
     // Save preferences to the server
     function savePreferences() {
       var whitelist = [];
@@ -276,15 +339,12 @@
       });
 
       $.ajax({
-        url: '{% url "save_preferences" %}',
+        url: "{% url 'save_preferences' %}",
         method: "POST",
         data: JSON.stringify({
           whitelist: whitelist,
           blacklist: blacklist,
         }),
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}",
-        },
         contentType: "application/json",
         success: function (response) {
           console.log("Preferences saved:", response);
@@ -330,7 +390,7 @@
       }
 
       $.ajax({
-        url: '{% url "recipe_search" %}',
+        url: "{% url 'recipe_search' %}",
         data: {
           term: query,
           blacklist: JSON.stringify(blacklist),
@@ -356,10 +416,10 @@
                   )
                 : title;
               var listItem = `<li class="list-group-item">
-                              <a href="${recipeDetailUrl}${id}/" class="recipe-link">
-                                  <i class="fa fa-book"></i> ${highlightedTitle}
-                              </a>
-                          </li>`;
+                                    <a href="${recipeDetailUrl}${id}/" class="recipe-link">
+                                        <i class="fa fa-book"></i> ${highlightedTitle}
+                                    </a>
+                                </li>`;
               $("#search-results-list").append(listItem);
             }
 
@@ -386,8 +446,8 @@
     }
 
     function addAllergens(diet) {
-        const ingredients = dietBlacklists[diet] || [];
-        ingredients.forEach(ingredient => addBlacklistIngredient(ingredient));
+      const ingredients = dietBlacklists[diet] || [];
+      ingredients.forEach((ingredient) => addBlacklistIngredient(ingredient));
     }
 
     // Scroll event handler for the results container
@@ -476,28 +536,28 @@
       savePreferences();
     });
 
-    $('#clear-all-whitelist').on('click', function() {
-        $('#whitelist-container').empty(); // Removes all whitelist tags
-        savePreferences();
-        toggleWhitelistPlaceholder();
+    $("#clear-all-whitelist").on("click", function () {
+      $("#whitelist-container").empty(); // Removes all whitelist tags
+      savePreferences();
+      toggleWhitelistPlaceholder();
     });
 
-    $('#add-blacklist').on('click', function() {
-      var ingredient = $('#new-blacklist-input').val().trim();
+    $("#add-blacklist").on("click", function () {
+      var ingredient = $("#new-blacklist-input").val().trim();
       addBlacklistIngredient(ingredient);
       savePreferences();
     });
 
-    $('#clear-all-blacklist').on('click', function() {
-        $('#blacklist-container').empty(); // Removes all blacklist tags
-        savePreferences();
-        toggleBlacklistPlaceholder();
+    $("#clear-all-blacklist").on("click", function () {
+      $("#blacklist-container").empty(); // Removes all blacklist tags
+      savePreferences();
+      toggleBlacklistPlaceholder();
     });
 
-    $('.dietary-restriction-btn').on('click', function() {
-        const diet = $(this).data('diet');
-        addAllergens(diet);
-        savePreferences();
+    $(".dietary-restriction-btn").on("click", function () {
+      const diet = $(this).data("diet");
+      addAllergens(diet);
+      savePreferences();
     });
 
     $(".common-ingredient-btn").on("click", function () {
@@ -565,6 +625,45 @@
         },
         800
       ); // Adjust the animation speed as needed (in milliseconds)
+    });
+
+    // Event listener for the Generate Recipe button
+    $("#generate-ai-recipe-button").on("click", function () {
+      var query = $("#search-input").val().trim();
+      var blacklist = [];
+      $(".blacklist-tag").each(function () {
+        blacklist.push($(this).data("ingredient"));
+      });
+
+      var whitelist = [];
+      $(".whitelist-tag").each(function () {
+        whitelist.push($(this).data("ingredient"));
+      });
+
+      // Prepare the data to send
+      var data = {
+        term: query || "No input",
+        blacklist: blacklist.length > 0 ? blacklist : ["No input"],
+        whitelist: whitelist.length > 0 ? whitelist : ["No input"],
+      };
+
+      // Send the data to the server via POST
+      $.ajax({
+        url: "{% url 'redirect_to_detail' %}",
+        method: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (response) {
+          // Redirect to the simple recipe detail page
+          window.location.href = response.redirect_url;
+        },
+        error: function (xhr, status, error) {
+          alert(
+            "An error occurred while processing your request. Please try again."
+          );
+          console.error("Error details:", status, error);
+        },
+      });
     });
   });
 </script>

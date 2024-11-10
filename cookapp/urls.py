@@ -3,6 +3,10 @@
 from django.urls import path, include
 from . import views
 
+from django.urls import path, include
+from . import views
+from .views import SimpleRecipeDetailView, RedirectToDetailView  # Import the new views
+
 urlpatterns = [
     # Home page
     path('', views.index, name='index'),
@@ -19,14 +23,19 @@ urlpatterns = [
     
     # Meal plan
     path('mealplan/', views.MealPlanView.as_view(), name='meal_plan'),
+    
     # User authentication
     path('accounts/login/', views.CustomLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', views.registerPage, name='register_page'),
     path('logout/', views.logout_message, name='logout_message'),
-    
+
+    # Simplified AI recipe generator
+    path('simple-recipe-detail/', SimpleRecipeDetailView.as_view(), name='simple_recipe_detail'),
+    path('redirect-to-detail/', RedirectToDetailView.as_view(), name='redirect_to_detail'),
+
     # Favorite functionality
-    path('recipe/<int:recipe_id>/toggle_favorite/', views.toggle_favorite, name='toggle_favorite'),  # Combined toggle
+    path('recipe/<int:recipe_id>/toggle_favorite/', views.toggle_favorite, name='toggle_favorite'),
     path('profile/favorites/', views.favorites, name='favorites'),
     
     # Django's built-in authentication URL patterns (for reference)
