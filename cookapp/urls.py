@@ -34,6 +34,9 @@ urlpatterns = [
     # Favorite functionality
     path('recipe/<int:recipe_id>/toggle_favorite/', views.toggle_favorite, name='toggle_favorite'),  # Combined toggle
     path('profile/favorites/', views.favorites, name='favorites'),
+
+    path('create/', views.create_recipe, name='create_recipe'),
+    path('add-ingredients/<int:recipe_id>/', views.add_ingredients, name='add_ingredients'),
     
     # Django's built-in authentication URL patterns (for reference)
     # accounts/login/          [name='login']

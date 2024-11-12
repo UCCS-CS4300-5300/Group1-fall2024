@@ -1,0 +1,12 @@
+{% extends "cookapp/base.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Create Recipe</h1>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- Renders all form fields, including calories -->
+    <button type="submit">Create Recipe</button>
+</form>
+</div>
+{% endblock %}

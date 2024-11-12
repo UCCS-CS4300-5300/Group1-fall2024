@@ -1,0 +1,19 @@
+{% extends "cookapp/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+<form method="POST">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    
+    {% for form in formset %}
+        <div class="form-row">
+            {{ form.as_p }}  <!-- This renders the form's fields (ingredient and quantity) -->
+        </div>
+    {% endfor %}
+    
+    <button type="submit">Add Ingredients</button>
+</form>
+</div>
+{% endblock %}

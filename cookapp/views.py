@@ -13,9 +13,13 @@ from django.views import View
 from django.db.models import Q, Count
 from django.db.models import Case, When, Value, IntegerField
 
-from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets, Rating
-from .forms import CreateUserForm
+from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets, Rating, RecipeIngredient
+from .forms import CreateUserForm, RecipeForm, RecipeIngredientForm
 from .decorators import unauthenticated_user
+from django.db import IntegrityError  # Import IntegrityError to handle database constraints
+import uuid
+from django.forms import modelformset_factory
+
 
 def index(request):
     # Count recipes by referencing the related `recipeingredient` set
@@ -341,3 +345,48 @@ class RecipeListView(ListView):
             queryset = queryset.order_by('title')
 
         return queryset
+
+def create_recipe(request):
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipe = form.save(commit=False)
+            
+            # If the recipe doesn't have an API ID, generate one
+            if not recipe.api_id:
+                recipe.api_id = str(uuid.uuid4())
+                
+            recipe.save()
+
+            return redirect('add_ingredients', recipe_id=recipe.id)
+    else:
+        form = RecipeForm()
+
+    return render(request, 'cookapp/create_recipe.html', {'form': form})
+
+
+# Define the formset for RecipeIngredient in the views
+RecipeIngredientFormSet = modelformset_factory(
+    RecipeIngredient,
+    form=RecipeIngredientForm,
+    extra=5,  # Allows up to 5 ingredients to be added
+)
+
+def add_ingredients(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+
+    if request.method == 'POST':
+        formset = RecipeIngredientFormSet(request.POST, queryset=RecipeIngredient.objects.none())
+        if formset.is_valid():
+            # Save the valid forms with data
+            for form in formset:
+                if form.cleaned_data:
+                    recipe_ingredient = form.save(commit=False)
+                    recipe_ingredient.recipe = recipe
+                    recipe_ingredient.save()
+            # Redirect after saving
+            return redirect('index')
+    else:
+        formset = RecipeIngredientFormSet(queryset=RecipeIngredient.objects.none())
+
+    return render(request, 'cookapp/add_ingredients.html', {'formset': formset, 'recipe': recipe})
