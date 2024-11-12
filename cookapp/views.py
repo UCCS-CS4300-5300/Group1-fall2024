@@ -2,6 +2,7 @@ import json
 import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
+from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
@@ -10,6 +11,7 @@ import inflect
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
+from django.db.models import Case, When, Value, IntegerField
 
 from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets, Rating
 from .forms import CreateUserForm
@@ -302,3 +304,40 @@ def favorites(request):
         'favorite_recipes': favorite_recipes,
     }
     return render(request, 'cookapp/favorites.html', context)
+
+from django.db.models import Avg
+from django.views.generic import ListView
+
+class RecipeListView(ListView):
+    model = Recipe
+    template_name = 'cookapp/recipe_list.html'
+    context_object_name = 'recipes'
+    paginate_by = 12
+
+    # Query for recipes depending on filter dropdown
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort = self.request.GET.get('sort', 'name')  # Default to 'name' for A-Z sorting
+
+        if sort == 'name_desc':
+            queryset = queryset.order_by('-title')
+        elif sort == 'rating':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('-rating_case', '-average_rating', 'title')  # First by non-zero ratings, then by rating
+        elif sort == 'rating_asc':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('rating_case', 'average_rating', 'title')  # First by non-zero ratings, then by rating
+        else:
+            queryset = queryset.order_by('title')
+
+        return queryset
