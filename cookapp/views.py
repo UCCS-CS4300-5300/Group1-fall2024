@@ -314,6 +314,7 @@ class RecipeListView(ListView):
     context_object_name = 'recipes'
     paginate_by = 12
 
+    # Query for recipes depending on filter dropdown
     def get_queryset(self):
         queryset = super().get_queryset()
         sort = self.request.GET.get('sort', 'name')  # Default to 'name' for A-Z sorting
@@ -336,7 +337,7 @@ class RecipeListView(ListView):
                     output_field=IntegerField(),
                 )
             ).order_by('rating_case', 'average_rating', 'title')  # First by non-zero ratings, then by rating
-        else:  # Default or sort == 'name'
+        else:
             queryset = queryset.order_by('title')
 
         return queryset

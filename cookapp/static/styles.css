@@ -1112,12 +1112,13 @@ footer .navbar-text {
   color: #7eacb5 !important;
 }
 
-/* Styles for Filter Dropdown */
+/* Styles for filter dropdown */
 .dropdown-item.active {
   background-color: transparent !important;
   color: white !important;
 }
 
+/* Hover/focus */
 .dropdown-item:hover, .dropdown-item:focus {
   background-color: #f8f9fa;
   color: white !important;
