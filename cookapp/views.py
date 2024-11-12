@@ -11,6 +11,7 @@ import inflect
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
+from django.db.models import Case, When, Value, IntegerField
 
 from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets, Rating
 from .forms import CreateUserForm
@@ -304,8 +305,38 @@ def favorites(request):
     }
     return render(request, 'cookapp/favorites.html', context)
 
+from django.db.models import Avg
+from django.views.generic import ListView
+
 class RecipeListView(ListView):
     model = Recipe
-    template_name = 'recipes/recipe_list.html'
+    template_name = 'cookapp/recipe_list.html'
     context_object_name = 'recipes'
     paginate_by = 12
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort = self.request.GET.get('sort', 'name')  # Default to 'name' for A-Z sorting
+
+        if sort == 'name_desc':
+            queryset = queryset.order_by('-title')
+        elif sort == 'rating':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('-rating_case', '-average_rating', 'title')  # First by non-zero ratings, then by rating
+        elif sort == 'rating_asc':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('rating_case', 'average_rating', 'title')  # First by non-zero ratings, then by rating
+        else:  # Default or sort == 'name'
+            queryset = queryset.order_by('title')
+
+        return queryset

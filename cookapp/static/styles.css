@@ -1099,7 +1099,7 @@ footer .navbar-text {
   color: white !important;
 }
 
-/* Style for hover and focus states */
+/* Style for page hover and focus states */
 .pagination .page-link:hover,
 .pagination .page-link:focus {
   background-color: #7eacb5 !important;
@@ -1107,7 +1107,19 @@ footer .navbar-text {
   color: white !important;
 }
 
-/* Normal state */
+/* Pagination normal state */
 .pagination .page-link {
   color: #7eacb5 !important;
 }
+
+/* Styles for Filter Dropdown */
+.dropdown-item.active {
+  background-color: transparent !important;
+  color: white !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: #f8f9fa;
+  color: white !important;
+}
+
