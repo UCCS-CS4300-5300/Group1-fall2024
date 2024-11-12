@@ -9,6 +9,9 @@ urlpatterns = [
     
     # Search functionality
     path('search/', views.RecipeSearch.as_view(), name='recipe_search'),
+
+    # List of all Recipes
+    path('recipes/', views.RecipeListView.as_view(), name='recipes'),
     
     # Recipe detail page
     path('recipe/<int:id>/', views.RecipeDetailView.as_view(), name='recipe_detail'),

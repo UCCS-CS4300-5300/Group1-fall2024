@@ -32,7 +32,7 @@
     <nav class="navbar comfortaa">
       <ul>
         <li><a href="{% url 'index' %}">Home</a></li>
-        <li><a href="#">Recipes</a></li>
+        <li><a href="{% url 'recipes' %}">Recipes</a></li>
         {% if user.is_authenticated %}
         <li class="dropdown">
           <a href="#" class="dropbtn">Profile</a>

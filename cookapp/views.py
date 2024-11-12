@@ -2,6 +2,7 @@ import json
 import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
+from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
@@ -302,3 +303,9 @@ def favorites(request):
         'favorite_recipes': favorite_recipes,
     }
     return render(request, 'cookapp/favorites.html', context)
+
+class RecipeListView(ListView):
+    model = Recipe
+    template_name = 'recipes/recipe_list.html'
+    context_object_name = 'recipes'
+    paginate_by = 12
