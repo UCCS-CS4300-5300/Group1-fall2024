@@ -383,3 +383,38 @@ class SavePreferences(View):
             user_preference.blacklist.add(ingredient)
 
         return JsonResponse({'status': 'success'})
+
+
+class RecipeListView(ListView):
+    model = Recipe
+    template_name = 'cookapp/recipe_list.html'
+    context_object_name = 'recipes'
+    paginate_by = 12
+
+    # Query for recipes depending on filter dropdown
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort = self.request.GET.get('sort', 'name')  # Default to 'name' for A-Z sorting
+
+        if sort == 'name_desc':
+            queryset = queryset.order_by('-title')
+        elif sort == 'rating':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('-rating_case', '-average_rating', 'title')  # First by non-zero ratings, then by rating
+        elif sort == 'rating_asc':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('rating_case', 'average_rating', 'title')  # First by non-zero ratings, then by rating
+        else:
+            queryset = queryset.order_by('title')
+
+        return queryset
