@@ -1,4 +1,6 @@
-{% extends "cookapp/base.html" %} {% load static %} {% block content %}
+{% extends "cookapp/base.html" %}
+{% load static %}
+{% block content %}
 <link
   href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
   rel="stylesheet"
@@ -32,7 +34,6 @@
           <h3 class="text-center mb-4">Recipe Finder</h3>
           <hr style="border-width: 1px; border-color: gray" />
           <form id="search-form" class="justify-content-center">
-            {% csrf_token %}
             <div class="d-flex flex-wrap">
               <!-- Quick Add Section -->
               <div class="ingredients-section mb-2">
@@ -59,14 +60,13 @@
                 </div>
                 <div>
                   <p class="text-muted text-left">
-                    Click on an ingredient to include or exclude it!
+                    Click on an ingredient to include or exclude an ingredient!
                   </p>
                 </div>
 
                 <div id="common-ingredients" class="w-100">
                   {% for ingredient in common_ingredients %}
                   <button
-                    type="button"
                     class="btn btn-sm btn-outline-secondary mr-2 mb-2 common-ingredient-btn"
                     data-ingredient="{{ ingredient.name }}"
                   >
@@ -83,7 +83,6 @@
                   </h5>
                   {% for diet in diets %}
                   <button
-                    type="button"
                     class="btn btn-sm btn-outline-secondary mr-2 mb-2 dietary-restriction-btn"
                     data-diet="{{ diet.name }}"
                   >
@@ -205,7 +204,6 @@
                 </div>
               </div>
             </div>
-
             <!-- Action Buttons -->
             <div class="text-center mb-4">
               <button
@@ -215,10 +213,11 @@
               >
                 Find Recipes
               </button>
+              <!-- Inserted AI Button -->
               <p class="mt-3">Try our beta recipe generator!</p>
               <button
                 type="button"
-                id="generate-ai-recipe-button"
+                id="generate-recipe-button"
                 class="btn btn-warning"
               >
                 Generate Recipe
@@ -350,38 +349,6 @@
         toggleBlacklistPlaceholder();
     }
 
-    // Function to get CSRF token from cookies
-    function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie !== "") {
-        var cookies = document.cookie.split(";");
-        for (var i = 0; i < cookies.length; i++) {
-          var cookie = cookies[i].trim(); // Trim leading/trailing spaces
-          if (cookie.substring(0, name.length + 1) === name + "=") {
-            cookieValue = decodeURIComponent(
-              cookie.substring(name.length + 1)
-            );
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-
-    var csrftoken = getCookie("csrftoken");
-
-    // Set up CSRF token for all AJAX requests
-    $.ajaxSetup({
-      beforeSend: function (xhr, settings) {
-        if (
-          !this.crossDomain &&
-          !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)
-        ) {
-          xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-      },
-    });
-
     // Save preferences function
     function savePreferences() {
         const whitelist = $('.whitelist-tag').map(function() {
@@ -462,7 +429,7 @@
         $("#search-results-list").append(loadingIndicator);
 
         $.ajax({
-            url: "{% url 'recipe_search' %}",
+            url: '{% url "recipe_search" %}',
             data: {
                 term: query,
                 blacklist: JSON.stringify(blacklist),
@@ -484,11 +451,11 @@
                             
                         const listItem = `
                             <li class="list-group-item">
-                                      <a href="${recipeDetailUrl}${recipe.id}/" class="recipe-link">
-                                          <i class="fa fa-book"></i> ${highlightedTitle} 
+                                <a href="${recipeDetailUrl}${recipe.id}/" class="recipe-link">
+                                    <i class="fa fa-book"></i> ${highlightedTitle} 
                                     <span class="badge badge-info">${recipe.ingredient_count} ingredients</span>
-                                      </a>
-                                  </li>`;
+                                </a>
+                            </li>`;
                         $("#search-results-list").append(listItem);
                     });
 
@@ -538,16 +505,10 @@
         toggleWhitelistPlaceholder();
     });
 
-    $("#add-blacklist").on("click", function () {
-      var ingredient = $("#new-blacklist-input").val().trim();
-      addBlacklistIngredient(ingredient);
-      savePreferences();
-    });
-
-    $("#clear-all-blacklist").on("click", function () {
-      $("#blacklist-container").empty(); // Removes all blacklist tags
-      savePreferences();
-      toggleBlacklistPlaceholder();
+    $("#clear-all-blacklist").on('click', function() {
+        $("#blacklist-container").empty();
+        savePreferences();
+        toggleBlacklistPlaceholder();
     });
 
     $(".dietary-restriction-btn").on('click', function() {
@@ -591,6 +552,51 @@
         }, 800);
     });
 
+    // Event listener for the Generate Recipe button
+    $("#generate-recipe-button").on("click", function () {
+        var query = $("#search-input").val().trim();
+        var blacklist = [];
+        $(".blacklist-tag").each(function () {
+            blacklist.push($(this).data("ingredient"));
+        });
+
+        var whitelist = [];
+        $(".whitelist-tag").each(function () {
+            whitelist.push($(this).data("ingredient"));
+        });
+
+        // Prepare the data to send
+        var data = {
+            term: query,
+            blacklist: blacklist,
+            whitelist: whitelist,
+        };
+
+        // Show loading indicator
+        $(this).prop("disabled", true).text("Processing...");
+
+        // Send the data to the server via POST
+        $.ajax({
+            url: "{% url 'generate_recipe' %}",
+            method: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function (response) {
+                // Redirect to the URL provided by the server
+                window.location.href = response.redirect_url;
+            },
+            error: function (xhr, status, error) {
+                alert(
+                    "An error occurred while processing your request. Please try again."
+                );
+                $("#generate-recipe-button")
+                    .prop("disabled", false)
+                    .text("Generate Recipe");
+                console.error("Error details:", status, error);
+            },
+        });
+    });
+
     // Infinite scroll handler
     $("#search-results-container").on('scroll', function() {
         if (isSearchMode && !isLoading && hasMoreResults) {
@@ -608,45 +614,6 @@
     toggleWhitelistPlaceholder();
     toggleBlacklistPlaceholder();
     loadPreferences();
-
-    // Event listener for the Generate Recipe button
-    $("#generate-ai-recipe-button").on("click", function () {
-      var query = $("#search-input").val().trim();
-      var blacklist = [];
-      $(".blacklist-tag").each(function () {
-        blacklist.push($(this).data("ingredient"));
-      });
-
-      var whitelist = [];
-      $(".whitelist-tag").each(function () {
-        whitelist.push($(this).data("ingredient"));
-      });
-
-      // Prepare the data to send
-      var data = {
-        term: query || "No input",
-        blacklist: blacklist.length > 0 ? blacklist : ["No input"],
-        whitelist: whitelist.length > 0 ? whitelist : ["No input"],
-      };
-
-      // Send the data to the server via POST
-      $.ajax({
-        url: "{% url 'redirect_to_detail' %}",
-        method: "POST",
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        success: function (response) {
-          // Redirect to the simple recipe detail page
-          window.location.href = response.redirect_url;
-        },
-        error: function (xhr, status, error) {
-          alert(
-            "An error occurred while processing your request. Please try again."
-          );
-          console.error("Error details:", status, error);
-        },
-      });
-    });
-});
+  });
 </script>
 {% endblock %}

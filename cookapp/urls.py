@@ -41,7 +41,7 @@ urlpatterns = [
     # Simplified AI recipe generator
     path('simple-recipe-detail/', SimpleRecipeDetailView.as_view(), name='simple_recipe_detail'),
     path('redirect-to-detail/', RedirectToDetailView.as_view(), name='redirect_to_detail'),
-
+    path('generate-recipe/', RedirectToDetailView.as_view(), name='generate_recipe'),
     # Favorite functionality
     path('recipe/<int:recipe_id>/toggle_favorite/', views.toggle_favorite, name='toggle_favorite'),
     path('profile/favorites/', views.favorites, name='favorites'),
