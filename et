@@ -1,0 +1,23 @@
+[33m6db24c7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m my views were missing something from main
+[33mdf68465[m Merge branch 'main' of https://github.com/UCCS-CS4300-5300/Group1-fall2024
+[33m20fce6a[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m home page fix
+[33m9e94b3f[m Merge pull request #6 from UCCS-CS4300-5300/recipe_page
+[33m70a7472[m filter button
+[33m8bb0ace[m filter button
+[33m24c6d1f[m allergens db fix (actually this time)
+[33m7cdbf8a[m recipe page
+[33m8e413d9[m dumpdata fix
+[33mecc9d4f[m Merge branch 'main' of https://github.com/UCCS-CS4300-5300/Group1-fall2024
+[33m8d98d12[m allergen database fixes
+[33m9d97861[m simplified, no AI button is working
+[33m6ba2a31[m recipe search fixes
+[33m923e73e[m recipes and stuff
+[33mbbad54b[m added ingredient count back
+[33m6e8e5e1[m I fixed the issue where the recipes can 't be searched.
+[33me9ffc39[m[33m ([m[1;32mdatabase_rework[m[33m)[m I updated the command resource doc so everyone can update the database
+[33m6e03f17[m my slightly more advanced recipe models are now compatible with everything there is in this world.
+[33mcdd2455[m My work here is done, time to climb the mountain of safe merging.
+[33me3ca290[m updated views so the site doesn't ppoop after slight changes to models
+[33m9e7311f[m i think i got the gpt stuff working
+[33m4a4f742[m[33m ([m[1;31morigin/User_Adds_Recipe[m[33m)[m Add PDF download feature
+[33m471508d[m[33m ([m[1;33mtag: [m[1;33msprint2[m[33m)[m revised dividers - added more logic to blacklist
