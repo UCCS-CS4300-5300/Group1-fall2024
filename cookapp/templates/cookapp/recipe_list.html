@@ -1,0 +1,90 @@
+{% extends 'cookapp/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>All Recipes</h1>
+        <div class="dropdown">
+            <a href="#" class="btn-primary-recipe btn-sm dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                {% if request.GET.sort == 'name_desc' %}
+                    Alphabetical (Z-A)
+                {% elif request.GET.sort == 'rating' %}
+                    Rating (High to Low)
+                {% elif request.GET.sort == 'rating_asc' %}
+                    Rating (Low to High)
+                {% else %}
+                    Alphabetical (A-Z)
+                {% endif %}
+            </a>
+            <div class="dropdown-content">
+                <a class="dropdown-item {% if not request.GET.sort or request.GET.sort == 'name' %}active{% endif %}" href="?sort=name">Alphabetical (A-Z)</a>
+                <a class="dropdown-item {% if request.GET.sort == 'name_desc' %}active{% endif %}" href="?sort=name_desc">Alphabetical (Z-A)</a>
+                <a class="dropdown-item {% if request.GET.sort == 'rating' %}active{% endif %}" href="?sort=rating">Rating (High to Low)</a>
+                <a class="dropdown-item {% if request.GET.sort == 'rating_asc' %}active{% endif %}" href="?sort=rating_asc">Rating (Low to High)</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 recipe-grid">
+        {% for recipe in recipes %}
+        <div class="col mb-5">
+            <div class="card h-100 recipe-card">
+                {% if recipe.image %}
+                    <img src="{{ recipe.image }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="text-muted">No Image Available</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                    <div class="mb-2">
+                        <small>
+                            <span class="text-warning">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= recipe.average_rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span style="color: black;"> ({{ recipe.average_rating|floatformat:1 }}) </span>
+                        </small>
+                    </div>
+                    <a href="{% url 'recipe_detail' recipe.pk %}" class="btn-primary-recipe btn-sm mb-4">View Recipe</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">No recipes found.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-5 mb-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

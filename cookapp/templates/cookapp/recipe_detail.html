@@ -1,94 +1,141 @@
-<!-- recipe_detail.html -->
-
 {% extends "cookapp/base.html" %}
 {% load static %}
 
 {% block content %}
+{% if not user.is_authenticated %}
+<a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary-recipe position-absolute" style="top: 10px; right: 10px; background-color: #7eacb5; ">Log in to add to Favorites</a>
+{% endif %}
+<!-- Favorite Button -->
+<div class="text-center mb-2 mt-3">
+    {% if user.is_authenticated %}
+        <form action="{% url 'toggle_favorite' recipe.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary-favorite position-absolute" style="top: 10px; right: 10px;">
+                {% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}
+            </button>
+        </form>
+    {% endif %}
+</div>
+
 <div class="container mt-5">
     <!-- Recipe Title Section -->
-    <div class="recipe-header text-center py-3 mb-5" style="background-color: #f7f7f7; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h1 class="display-4 font-weight-bold" style="color: #34495e;">{{ recipe.title }}</h1>
+    <div class="recipe-header text-center py-3 position-relative" style="background-color: #f7f7f7; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h1 class="display-4 font-weight-bold" style="color: #333;">{{ recipe.title }}
+            <!-- Tags Section -->
+            {% if recipe.tags %}
+                <p>
+                    {% for tag in recipe.tags %}
+                        <span class="badge badge-pill" style="background-color: #7eacb5; color: white; padding: 8px 15px; font-size: 14px; ">{{ tag }}</span>
+                    {% endfor %}
+                </p>
+            {% endif %}
+        </h1>
         {% if recipe.image %}
             <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="img-fluid my-4" style="max-width: 500px; height: auto; border-radius: 15px; box-shadow: 0 6px 10px rgba(0,0,0,0.15);">
         {% endif %}
-    </div>
-
-    <!-- Ingredients Section -->
-    <div class="ingredients-section py-4 px-5 mb-5" style="background-color: #eaf2f8; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 class="font-weight-bold mb-4" style="color: #2874a6;">Ingredients</h3>
-        <ul class="list-group">
-            {% for recipe_ingredient in recipe.recipeingredient_set.all %}
-                <li class="list-group-item" style="border: none; background-color: #d6eaf8; border-radius: 5px; margin-bottom: 8px;">
-                    <i class="fa fa-check-circle" style="color: #2ecc71; margin-right: 8px;"></i> 
-                    {{ recipe_ingredient.quantity }} {{ recipe_ingredient.ingredient.name }}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <!-- Instructions Section -->
-    <div class="instructions-section py-4 px-5 mb-5" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 class="font-weight-bold mb-4" style="color: #2874a6;">Instructions</h3>
-        <ol style="line-height: 1.8; color: #2c3e50;">
-            {% for instruction in instructions_list %}
-                <li>{{ instruction }}</li>
-            {% endfor %}
-        </ol>
-    </div>
-
-    <!-- Nutrition Information Section -->
-    {% if recipe.calories or recipe.macros %}
-        <div class="nutrition-section py-4 px-5 mb-5" style="background-color: #e8f8f5; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h3 class="font-weight-bold mb-4" style="color: #2874a6;">Nutrition Information</h3>
-            <ul class="list-group">
-                {% if recipe.calories %}
-                    <li class="list-group-item" style="border: none; background-color: #d1f2eb; border-radius: 5px; margin-bottom: 8px;">
-                        <strong>Calories:</strong> {{ recipe.calories }} kcal
-                    </li>
-                {% endif %}
-                {% if recipe.macros %}
-                    {% for macro, value in recipe.macros.items %}
-                        <li class="list-group-item" style="border: none; background-color: #d1f2eb; border-radius: 5px; margin-bottom: 8px;">
-                            <strong>{{ macro|title }}:</strong> {{ value }} g
-                        </li>
-                    {% endfor %}
-                {% endif %}
-            </ul>
-        </div>
-    {% endif %}
-
-    <!-- Tags Section -->
-    {% if recipe.tags %}
-        <div class="tags-section text-center py-3 px-5 mb-5" style="background-color: #f5f5f5; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h4 class="font-weight-bold mb-3" style="color: #2874a6;">Tags</h4>
-            <p>
-                {% for tag in recipe.tags %}
-                    <span class="badge badge-pill" style="background-color: #3498db; color: white; padding: 8px 15px; font-size: 14px; margin: 3px;">{{ tag }}</span>
-                {% endfor %}
-            </p>
-        </div>
-    {% endif %}
-
-    <!-- Favorite Button -->
-    <div class="text-center mb-5">
         {% if user.is_authenticated %}
-            <form action="{% url 'toggle_favorite' recipe.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary">
-                    {% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}
-                </button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Log in to add to Favorites</a>
+            <div id="average-rating" class="rating position-absolute" style="top: 10px; right: 10px;">
+                {% for i in "12345" %}
+                <span class="fa fa-star no-hover-star {% if i <= recipe.average_rating|floatformat:0 %}checked no-hover-star-checked{% endif %}" data-value="{{ i }}"></span>
+                {% endfor %}{{ recipe.average_rating|floatformat:1 }} ({{ recipe.ratings.count }})
+            </div>
         {% endif %}
     </div>
-</div>
 
+    <div class="row mt-5">
+        <!-- Left Column: Nutrition Information and Ingredients -->
+        <div class="col-md-6">
+            <!-- Nutrition Information Section -->
+            {% if recipe.calories or recipe.macros %}
+                <div class="nutrition-section py-4 px-5 mb-5" style="background-color: #e8f8f5; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <h3 class="font-weight-bold mb-4" style="color: #333;">Nutrition Information</h3>
+                    <ul class="list-group">
+                        {% if recipe.calories %}
+                            <li class="list-group-item" style="border: none; background-color: #d1f2eb; border-radius: 5px; margin-bottom: 8px;">
+                                <strong>Calories:</strong> {{ recipe.calories }} kcal
+                            </li>
+                        {% endif %}
+                        {% if recipe.macros %}
+                            {% for macro, value in recipe.macros.items %}
+                                <li class="list-group-item" style="border: none; background-color: #d1f2eb; border-radius: 5px; margin-bottom: 8px;">
+                                    <strong>{{ macro|title }}:</strong> {{ value }} g
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Ingredients Section -->
+            <div class="ingredients-section py-4 px-5 mb-5" style="background-color: #eaf2f8; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h3 class="font-weight-bold mb-4" style="color: #333;">Ingredients</h3>
+                <ul class="list-group">
+                    {% for recipe_ingredient in recipe.recipeingredient_set.all %}
+                        <li class="list-group-item" style="border: none; background-color: #d6eaf8; border-radius: 5px; margin-bottom: 8px;">
+                            <i class="fa fa-check-circle" style="color: #2ecc71; margin-right: 8px;"></i> 
+                            {{ recipe_ingredient.quantity }} {{ recipe_ingredient.ingredient.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Column: Instructions -->
+        <div class="col-md-6">
+            <div class="instructions-section py-4 px-5 mb-5" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h3 class="font-weight-bold mb-4" style="color: #333;">Instructions</h3>
+                <strong><ol style="line-height: 1.8; color: #2c3e50;" class="text-left"> </strong>
+                    {% for instruction in instructions_list %}
+                        <li>{{ instruction }}</li>
+                        <hr style="border-top: dotted 1px; border-color: gray" />
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Rating and Review-->
+    <div class="rating text-center mt-4">
+        {% if user.is_authenticated %}
+        <div class="instructions-section py-4 px-5 mb-5" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h2 class="font-weight-bold mb-2 text-left" style="color: #333;">Reviews</h2>
+            <p class=" font-weight-bold text-left" style="color: #333;">{{ recipe.title }}</p>
+            <form id="rating-form" action="{% url 'recipe_detail' recipe.id %}" method="post">
+                {% csrf_token %}
+                <div class="rating text-left">
+                    <span class="fa fa-star  {% if 1 <= user_rating %}checked{% endif %}" data-value="1"></span>
+                    <span class="fa fa-star  {% if 2 <= user_rating %}checked{% endif %}" data-value="2"></span>
+                    <span class="fa fa-star  {% if 3 <= user_rating %}checked{% endif %}" data-value="3"></span>
+                    <span class="fa fa-star  {% if 4 <= user_rating %}checked{% endif %}" data-value="4"></span>
+                    <span class="fa fa-star  {% if 5 <= user_rating %}checked{% endif %}" data-value="5"></span> <p class="text-muted" style="display: inline;">(required)</p>
+                </div>
+                <div class="form-group text-left mt-3">
+                    <label for="review">My Review</label>
+                    <textarea id="review" name="review" class="form-control" 
+                              style="border: 1px solid black;" 
+                              rows="4" placeholder="What did you think about this recipe? Did you make any changes or notes?">{% if user_review %}{{ user_review }}{% endif %}</textarea>
+                </div>
+                <button type="submit" class="btn-primary-recipe mt-3">Submit</button>
+            </form>
+            <!-- Show all Reviews -->
+             <h2 class="font-weight-bold mb-2 text-left" style="color: #333;">All Reviews</h2>
+            {% for rating in recipe.ratings.all %}
+                <p class="font-weight-bold text-left" style="color: #333;">{{ rating.user }} rated this recipe {{ rating.value }} stars</p>
+                <p class="text-left">{{ rating.review }}</p>
+                <hr style="border-top: dotted 1px; border-color: gray" />
+            {% endfor %}
+
+            <div id="rating-success" style="display: none;">
+                <i class="fa fa-check-circle" style="color: #2ecc71; margin-left: 10px;"></i>
+            </div>
+        </div>
+        {% endif %}
+    </div>  
+</div>
 
 <!-- PDF Download Button at the bottom -->
 <div class="text-center mt-4">
-    <button id="pdfDownloader" class="btn btn-primary">Download Recipe as PDF</button>
-</div>
+    <button id="pdfDownloader" class="btn-primary-recipe">Download Recipe as PDF</button>
 </div>
 
 <!-- Include jsPDF and html2canvas Libraries -->
@@ -100,38 +147,137 @@
     document.getElementById('pdfDownloader').addEventListener('click', function() {
         document.body.classList.add('pdf-mode');
     
-        // Use html2canvas with specific options to ensure images are fully loaded and rendered
         html2canvas(document.querySelector('.container'), {
-            allowTaint: true, // Enables cross-origin images to be captured
-            useCORS: true,    // Ensures CORS-enabled images are rendered
-            logging: true     // Logs process steps for debugging if needed
+            scale: 2,           // Increase the scale to capture at higher DPI
+            allowTaint: true,
+            useCORS: true,
+            logging: true
         }).then(function(canvas) {
-            var imgData = canvas.toDataURL('image/png');
-    
-            // Initialize jsPDF correctly based on the library's version
+            const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
-            var doc = new jsPDF('p', 'mm', 'a4');
+            const doc = new jsPDF('p', 'mm', 'a4');
     
-            // Page dimensions in mm
-            var pageWidth = doc.internal.pageSize.width;
-            var pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+            const pageHeight = doc.internal.pageSize.height;
     
-            // Calculate dimensions to fit the page while preserving aspect ratio
-            var imgWidth = pageWidth;
-            var imgHeight = canvas.height * imgWidth / canvas.width;
-            if (imgHeight > pageHeight) {
-                imgHeight = pageHeight;
-                imgWidth = canvas.width * imgHeight / canvas.height;
+            // Dimensions of the full canvas image in PDF units (adjusted for page width)
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * pageWidth) / canvas.width;
+    
+            // The position to start drawing the image
+            let yOffset = 0;
+    
+            while (yOffset < imgHeight) {
+                // Add each section to the PDF
+                doc.addImage(imgData, 'PNG', 0, -yOffset, imgWidth, imgHeight);
+    
+                yOffset += pageHeight;  // Move the Y offset to the next page start
+    
+                // Add a new page if content overflows
+                if (yOffset < imgHeight) {
+                    doc.addPage();
+                }
             }
     
-            // Add the image to the PDF
-            doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
             doc.save('{{ recipe.title }}.pdf');
-    
             document.body.classList.remove('pdf-mode');
         }).catch(error => {
             console.error("Error generating PDF: ", error);
         });
     });
-    </script>
+</script>   
+<!-- JavaScript for Star Rating -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Select all star elements for rating
+        const stars = document.querySelectorAll('.rating .fa-star');
+        const ratingSuccess = document.getElementById('rating-success');
+        const reviewTextarea = document.getElementById('review');
+        const ratingForm = document.getElementById('rating-form');
+        let selectedRating = null;
+
+        // Add event listeners to each star
+        stars.forEach(star => {
+            // Handle mouseover event to highlight stars
+            star.addEventListener('mouseover', function () {
+                if (!this.closest('#average-rating')) {
+                    resetStars();
+                    this.classList.add('hovered');
+                    let previousSibling = this.previousElementSibling;
+                    while (previousSibling) {
+                        previousSibling.classList.add('hovered');
+                        previousSibling = previousSibling.previousElementSibling;
+                    }
+                }
+            });
+
+            // Handle mouseout event to reset star highlights
+            star.addEventListener('mouseout', function () {
+                if (!this.closest('#average-rating')) {
+                    resetStars();
+                }
+            });
+
+            // Handle click event to set the rating
+            star.addEventListener('click', function () {
+                if (!this.closest('#average-rating')) {
+                    selectedRating = this.getAttribute('data-value');
+                    setRating(selectedRating);
+                }
+            });
+        });
+
+        // Handle form submission
+        ratingForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            if (selectedRating) {
+                // Send the rating and review to the server
+                fetch("{% url 'recipe_detail' recipe.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: new URLSearchParams({
+                        rating: selectedRating,
+                        review: reviewTextarea.value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        ratingSuccess.style.display = 'inline';
+                        location.reload();
+                    } else {
+                        alert('Error submitting rating: ' + data.message);
+                    }
+                });
+            } else {
+                alert('Please select a rating.');
+            }
+        });
+
+        // Function to reset star highlights
+        function resetStars() {
+            stars.forEach(star => {
+                if (!star.closest('#average-rating')) {
+                    star.classList.remove('hovered');
+                }
+            });
+        }
+
+        // Function to set the rating
+        function setRating(rating) {
+            stars.forEach(star => {
+                if (!star.closest('#average-rating')) {
+                    star.classList.remove('checked');
+                    if (star.getAttribute('data-value') <= rating) {
+                        star.classList.add('checked');
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

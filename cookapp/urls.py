@@ -13,6 +13,9 @@ urlpatterns = [
     
     # Search functionality
     path('search/', views.RecipeSearch.as_view(), name='recipe_search'),
+
+    # List of all Recipes
+    path('recipes/', views.RecipeListView.as_view(), name='recipes'),
     
     # Recipe detail page
     path('recipe/<int:id>/', views.RecipeDetailView.as_view(), name='recipe_detail'),
@@ -29,6 +32,11 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', views.registerPage, name='register_page'),
     path('logout/', views.logout_message, name='logout_message'),
+    
+ 
+    # User reviews
+    path('reviews/', views.ReviewsView.as_view(), name='reviews'),
+
 
     # Simplified AI recipe generator
     path('simple-recipe-detail/', SimpleRecipeDetailView.as_view(), name='simple_recipe_detail'),

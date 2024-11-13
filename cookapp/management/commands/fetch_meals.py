@@ -16,7 +16,7 @@ class Command(BaseCommand):
         client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
         base_url = 'https://www.themealdb.com/api/json/v1/1/search.php?f='
-        letters = 'abc'  # Adjust as needed
+        letters = 'abcdefghijklmnopqrstuvwxyz'  # Adjust as needed
         total_meals_added = 0
 
         for letter in letters:

@@ -681,6 +681,14 @@ footer .navbar-text {
   color: var(--color-dark) !important; /* Override hover text color */
 }
 
+.no-hover-star:hover {
+  color: #ccc !important; /* Override hover text color */
+}
+
+.no-hover-star-checked:hover {
+  color: gold !important; /* Override hover text color */
+}
+
 .no-active:active {
   background-color: var(--color-white) !important;/* Override active background color */
   color: var(--color-dark) !important; /* Override active text color */
@@ -1051,3 +1059,68 @@ footer .navbar-text {
 .btn-plan:hover {
   background-color: var(--color-dark);
 }
+
+/* Recipe Details Star Rating */
+.fa-star {
+    color: #ccc; /* Default star color */
+}
+.fa-star.checked {
+    color: gold; /* Color for checked stars */
+}
+.fa-star:hover,
+.fa-star.hovered {
+    color: gold !important; /* Color for hovered stars */
+}
+.no-hover-star:hover {
+    color: #ccc !important; /* Override hover text color */
+}
+.no-hover-star-checked:hover {
+    color: gold !important; /* Override hover text color */
+}
+
+/* Custom spacing for recipe grid */
+.recipe-grid {
+    --bs-gutter-x: 2rem;
+    --bs-gutter-y: 4rem; 
+}
+  
+/* Hover effect for recipe cards */
+.recipe-card {
+    transition: transform 0.2s;
+}
+.recipe-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Custom pagination colors */
+.pagination .page-item.active .page-link {
+  background-color: #7eacb5 !important;
+  border-color: #7eacb5 !important;
+  color: white !important;
+}
+
+/* Style for page hover and focus states */
+.pagination .page-link:hover,
+.pagination .page-link:focus {
+  background-color: #7eacb5 !important;
+  border-color: #7eacb5 !important;
+  color: white !important;
+}
+
+/* Pagination normal state */
+.pagination .page-link {
+  color: #7eacb5 !important;
+}
+
+/* Styles for filter dropdown */
+.dropdown-item.active {
+  background-color: transparent !important;
+  color: white !important;
+}
+
+/* Hover/focus */
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: #f8f9fa;
+  color: white !important;
+}
+

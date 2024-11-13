@@ -5,6 +5,7 @@ import os
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
+from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
@@ -13,8 +14,9 @@ import inflect
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
+from django.db.models import Case, When, Value, IntegerField
 
-from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets
+from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets, Rating
 from .forms import CreateUserForm
 from .decorators import unauthenticated_user
 
@@ -71,6 +73,8 @@ def registerPage(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
+from django.db.models import Count
+
 class RecipeSearch(View):
     def get(self, request):
         query = request.GET.get('term', '').strip()
@@ -100,45 +104,62 @@ class RecipeSearch(View):
         # Apply whitelist filter (include only recipes containing all specified whitelist ingredients)
         if whitelist:
             for ingredient in whitelist:
-                # Try to find ingredients matching the name
-                whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-                if not whitelisted_ingredients.exists():
-                    # Try singular form
-                    singular_ingredient = p.singular_noun(ingredient)
-                    if singular_ingredient:
-                        whitelisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient)
-                if whitelisted_ingredients.exists():
-                    recipe_results = recipe_results.filter(
-                        recipeingredient__ingredient__in=whitelisted_ingredients
-                    )
-                else:
-                    # Skip ingredients that are not found
-                    continue
+                try:
+                    whitelisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
+                    if whitelisted_ingredients.exists():
+                        recipe_results = recipe_results.filter(recipeingredient__ingredient__in=whitelisted_ingredients)
+                    else:
+                        # Try singular form
+                        singular_ingredient = p.singular_noun(ingredient)
+                        if singular_ingredient:
+                            whitelisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
+                            if whitelisted_ingredients.exists():
+                                recipe_results = recipe_results.filter(recipeingredient__ingredient__in=whitelisted_ingredients)
+                            else:
+                                # If any ingredient in the whitelist is not found, no recipes can match
+                                return JsonResponse({
+                                    'recipes': [],
+                                })
+                        else:
+                            # If any ingredient in the whitelist is not found, no recipes can match
+                            return JsonResponse({
+                                'recipes': [],
+                            })
+                except Ingredient.DoesNotExist:
+                    # If any ingredient in the whitelist is not found, no recipes can match
+                    return JsonResponse({'recipes': []})
 
         # Apply blacklist filter
-        if blacklist:
-            for ingredient in blacklist:
-                blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-                if not blacklisted_ingredients.exists():
+        for ingredient in blacklist:
+            try:
+                blacklisted_ingredients = Ingredient.objects.filter(name__icontains=ingredient).distinct()
+                if blacklisted_ingredients.exists():
+                    recipe_results = recipe_results.exclude(recipeingredient__ingredient__in=blacklisted_ingredients)
+                else:
                     # Try singular form
                     singular_ingredient = p.singular_noun(ingredient)
                     if singular_ingredient:
-                        blacklisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient)
-                if blacklisted_ingredients.exists():
-                    recipe_results = recipe_results.exclude(
-                        recipeingredient__ingredient__in=blacklisted_ingredients
-                    )
+                        blacklisted_ingredients = Ingredient.objects.filter(name__icontains=singular_ingredient).distinct()
+                        if blacklisted_ingredients.exists():
+                            recipe_results = recipe_results.exclude(recipeingredient__ingredient__in=blacklisted_ingredients)
+                        else:
+                            continue
+                    else:
+                        continue
+            except Ingredient.DoesNotExist:
+                continue
 
-        # Remove duplicates and paginate the results
-        recipe_results = recipe_results.distinct()
+        # Annotate the queryset with the count of ingredients
+        recipe_results = recipe_results.annotate(ingredient_count=Count('recipeingredient'))
+
+        # Paginate the results
         recipe_list = list(
-            recipe_results.values('title', 'id')[offset:offset + limit]
+            recipe_results.values('title', 'id', 'ingredient_count')[offset:offset + limit]
         )
 
         return JsonResponse({
             'recipes': recipe_list,
         })
-
 class RedirectToDetailView(View):
     def post(self, request):
         # Collect data from POST request
@@ -191,23 +212,38 @@ class RecipeDetailView(View):
         # Set favorite status for authenticated users
         is_favorited = self._is_favorited_by_user(request.user, recipe)
 
-        # Check if the instructions contain numbered steps
-        if re.search(r'\d+\.\s*', recipe.instructions):
-            # Split instructions using a regular expression to capture numbered steps
-            instructions_list = re.split(r'(?<=\d\.)\s*', recipe.instructions.strip())
-        else:
-            # Split by period and space
-            instructions_list = re.split(r'\.\s+', recipe.instructions.strip())
-            # Add a new period to the end of each instruction
-            instructions_list = [instruction + '.' for instruction in instructions_list if instruction]
+        # Remove numbered steps from instructions
+        instructions = re.sub(r'\d+\.\s*', '', recipe.instructions.strip())
+
+        # Split instructions by periods
+        instructions_list = re.split(r'\.\s+', instructions)
+
+        # add a period to the end of each instruction if it doesn't already have one
+        instructions_list = [instruction + '.' if not instruction.endswith('.') else instruction for instruction in instructions_list]
 
         # Clean up the instructions list
         instructions_list = [instruction.strip() for instruction in instructions_list if instruction]
+        
+        # Initialize user_rating and user_review to None
+        user_rating = None
+        user_review = None
+        
+        if request.user.is_authenticated:
+            try:
+                # Try to get the user's rating for the recipe
+                rating = Rating.objects.get(user=request.user, recipe=recipe)
+                user_rating = rating.value
+                user_review = rating.review 
+            except Rating.DoesNotExist:
+                user_rating = None
+                user_review = None
 
         context = {
             'recipe': recipe,
             'is_favorited': is_favorited,
             'instructions_list': instructions_list,
+            'user_rating': user_rating,
+            'user_review': user_review,
         }
         return render(request, 'cookapp/recipe_detail.html', context)
 
@@ -216,6 +252,45 @@ class RecipeDetailView(View):
             return FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists()
         return False
 
+    @method_decorator(login_required)
+    def post(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
+        try:
+            rating_value = int(request.POST.get('rating', 0))
+            review_text = request.POST.get('review', '').strip()
+            if rating_value < 1 or rating_value > 5:
+                return JsonResponse({'status': 'error', 'message': 'Invalid rating value'}, status=400)
+            
+            # Get or create the rating
+            rating, created = Rating.objects.get_or_create(
+                user=request.user, 
+                recipe=recipe, 
+                defaults={'value': rating_value, 'review': review_text}
+            )
+            # Update the rating value
+            rating.value = rating_value
+            rating.review = review_text
+            rating.save()
+            
+            # Update the average rating for the recipe
+            recipe.update_average_rating()
+            
+            # Return a success message
+            message = 'Rating submitted successfully!' if created else 'Rating updated successfully!'
+            return JsonResponse({'status': 'success', 'message': message, 'average_rating': recipe.average_rating})
+        except Exception as e:
+            print("\n\n!!!! There was an error saving the rating:", e)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        
+class ReviewsView(View):
+    def get(self, request):
+        reviews = Rating.objects.filter(review__isnull=False).select_related('recipe', 'user')
+        rating = Rating.objects.filter(review__isnull=False).select_related('recipe', 'user')
+        context = {
+            'reviews': reviews,
+        }
+        return render(request, 'cookapp/reviews.html', context)
+    
 class MealPlanView(View):
     def get(self, request):
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
