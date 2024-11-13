@@ -376,3 +376,81 @@ class SimpleRecipeDetailView(View):
         }
         return render(request, 'cookapp/simple_recipe_detail.html', context)
 
+class RecipeListView(ListView):
+    model = Recipe
+    template_name = 'cookapp/recipe_list.html'
+    context_object_name = 'recipes'
+    paginate_by = 12
+
+    # Query for recipes depending on filter dropdown
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort = self.request.GET.get('sort', 'name')  # Default to 'name' for A-Z sorting
+
+        if sort == 'name_desc':
+            queryset = queryset.order_by('-title')
+        elif sort == 'rating':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('-rating_case', '-average_rating', 'title')  # First by non-zero ratings, then by rating
+        elif sort == 'rating_asc':
+            queryset = queryset.annotate(
+                rating_case=Case(
+                    When(average_rating=0, then=Value(None)),
+                    default='average_rating',
+                    output_field=IntegerField(),
+                )
+            ).order_by('rating_case', 'average_rating', 'title')  # First by non-zero ratings, then by rating
+        else:
+            queryset = queryset.order_by('title')
+
+        return queryset
+
+def create_recipe(request):
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipe = form.save(commit=False)
+            
+            # If the recipe doesn't have an API ID, generate one
+            if not recipe.api_id:
+                recipe.api_id = str(uuid.uuid4())
+                
+            recipe.save()
+
+            return redirect('add_ingredients', recipe_id=recipe.id)
+    else:
+        form = RecipeForm()
+
+    return render(request, 'cookapp/create_recipe.html', {'form': form})
+
+
+# Define the formset for RecipeIngredient in the views
+RecipeIngredientFormSet = modelformset_factory(
+    RecipeIngredient,
+    form=RecipeIngredientForm,
+    extra=5,  # Allows up to 5 ingredients to be added
+)
+
+def add_ingredients(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+
+    if request.method == 'POST':
+        formset = RecipeIngredientFormSet(request.POST, queryset=RecipeIngredient.objects.none())
+        if formset.is_valid():
+            # Save the valid forms with data
+            for form in formset:
+                if form.cleaned_data:
+                    recipe_ingredient = form.save(commit=False)
+                    recipe_ingredient.recipe = recipe
+                    recipe_ingredient.save()
+            # Redirect after saving
+            return redirect('index')
+    else:
+        formset = RecipeIngredientFormSet(queryset=RecipeIngredient.objects.none())
+
+    return render(request, 'cookapp/add_ingredients.html', {'formset': formset, 'recipe': recipe})

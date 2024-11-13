@@ -15,15 +15,11 @@ class RecipeIngredientForm(forms.ModelForm):
     class Meta:
         model = RecipeIngredient
         fields = ['ingredient', 'quantity']  # Replace with actual fields in the RecipeIngredient model
-
 class RecipeForm(forms.ModelForm):
-    # Explicitly define calories here again
-    calories = forms.IntegerField(label='Calories', required=True)  # Ensure it is required if necessary
-
+    calories = forms.IntegerField(label='Calories', required=True)
     protein = forms.IntegerField(label='Protein')
     carbs = forms.IntegerField(label='Carbohydrates')
     fat = forms.IntegerField(label='Fat')
-    
     tags = forms.CharField(label='Tags', help_text='Enter tags separated by commas')
 
     class Meta:
@@ -39,9 +35,8 @@ class RecipeForm(forms.ModelForm):
         return []
 
     def clean_macros(self):
-        # Collect macros from individual fields, including calories
+        # Exclude calories from macros
         return {
-            'calories': self.cleaned_data.get('calories', 0),
             'protein': self.cleaned_data.get('protein', 0),
             'carbs': self.cleaned_data.get('carbs', 0),
             'fat': self.cleaned_data.get('fat', 0),
