@@ -346,47 +346,33 @@ class RecipeListView(ListView):
 
         return queryset
 
-def create_recipe(request):
-    if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES)
-        if form.is_valid():
-            recipe = form.save(commit=False)
-            
-            # If the recipe doesn't have an API ID, generate one
-            if not recipe.api_id:
-                recipe.api_id = str(uuid.uuid4())
-                
-            recipe.save()
 
-            return redirect('add_ingredients', recipe_id=recipe.id)
-    else:
-        form = RecipeForm()
+class RedirectToDetailView(View):
+    def post(self, request):
+        # Collect data from POST request
+        data = json.loads(request.body)
+        search_term = data.get('term', 'No input')
+        whitelist = data.get('whitelist', ['No input'])
+        blacklist = data.get('blacklist', ['No input'])
 
-    return render(request, 'cookapp/create_recipe.html', {'form': form})
+        # Redirect to the detail view with the arguments
+        redirect_url = f'/simple-recipe-detail/?term={search_term}&whitelist={"&whitelist=".join(whitelist)}&blacklist={"&blacklist=".join(blacklist)}'
+        return JsonResponse({'redirect_url': redirect_url})
 
 
-# Define the formset for RecipeIngredient in the views
-RecipeIngredientFormSet = modelformset_factory(
-    RecipeIngredient,
-    form=RecipeIngredientForm,
-    extra=5,  # Allows up to 5 ingredients to be added
-)
+        
+class SimpleRecipeDetailView(View):
+    def get(self, request):
+        # Retrieve arguments from GET parameters or set default values
+        search_term = request.GET.get('term', 'No input')
+        whitelist = request.GET.getlist('whitelist', ['No input'])
+        blacklist = request.GET.getlist('blacklist', ['No input'])
 
-def add_ingredients(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
+        # Pass arguments to the context
+        context = {
+            'search_term': search_term,
+            'whitelist': whitelist,
+            'blacklist': blacklist,
+        }
+        return render(request, 'cookapp/simple_recipe_detail.html', context)
 
-    if request.method == 'POST':
-        formset = RecipeIngredientFormSet(request.POST, queryset=RecipeIngredient.objects.none())
-        if formset.is_valid():
-            # Save the valid forms with data
-            for form in formset:
-                if form.cleaned_data:
-                    recipe_ingredient = form.save(commit=False)
-                    recipe_ingredient.recipe = recipe
-                    recipe_ingredient.save()
-            # Redirect after saving
-            return redirect('index')
-    else:
-        formset = RecipeIngredientFormSet(queryset=RecipeIngredient.objects.none())
-
-    return render(request, 'cookapp/add_ingredients.html', {'formset': formset, 'recipe': recipe})

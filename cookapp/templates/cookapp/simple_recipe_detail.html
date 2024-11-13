@@ -1,0 +1,50 @@
+{% extends "cookapp/base.html" %}
+{% load static %}
+{% block content %}
+<link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+
+<main class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h2 class="mb-4 text-center">AI Recipe Details</h2>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Search Term</h4>
+          <p class="card-text">
+            {{ search_term|default:"No input provided" }}
+          </p>
+          <hr />
+          <h4 class="card-title">Included Ingredients (Whitelist)</h4>
+          {% if whitelist %}
+            <ul class="list-group mb-3">
+              {% for ingredient in whitelist %}
+                <li class="list-group-item">{{ ingredient }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No ingredients included.</p>
+          {% endif %}
+          <hr />
+          <h4 class="card-title">Excluded Ingredients (Blacklist)</h4>
+          {% if blacklist %}
+            <ul class="list-group mb-3">
+              {% for ingredient in blacklist %}
+                <li class="list-group-item">{{ ingredient }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No ingredients excluded.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <a href="{% url 'index' %}" class="btn btn-primary">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+[33mcommit 20a396d21a4df530efff79581dfc7a292ad4a664[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Merge: 9d97861 6ba2a31
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Sun Nov 10 21:44:15 2024 +0000
+
+    Merge branch 'main' of https://github.com/UCCS-CS4300-5300/Group1-fall2024
+
+[33mcommit 9d97861dd984bef856e7ed240d966220a5c980dc[m
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Sun Nov 10 21:35:48 2024 +0000
+
+    simplified, no AI button is working
+
+[33mcommit 6ba2a31678bf7d75b149ce486cec3716cd725009[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: root <kxmster@gmail.com>
+Date:   Sun Nov 10 20:28:03 2024 +0000
+
+    recipe search fixes
+
+[33mcommit 923e73e25b2d48901968aa36d7cf6a71a8d69de9[m
+Author: Tandon Jenkins <tjenkin5@uccs.edu>
+Date:   Sat Nov 9 21:33:33 2024 -0700
+
+    recipes and stuff
+
+[33mcommit bbad54b510ae58ccb8df374ccd740005cce816b8[m
+Author: Tandon Jenkins <tjenkin5@uccs.edu>
+Date:   Sat Nov 9 11:27:52 2024 -0700
+
+    added ingredient count back
+
+[33mcommit 6e8e5e139f5bad5004d2887f863e2af62fdf17ca[m
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Thu Nov 7 00:31:17 2024 +0000
+
+    I fixed the issue where the recipes can 't be searched.
+
+[33mcommit e9ffc39b9895091e375bd99a9a6cb55f48597f95[m[33m ([m[1;32mdatabase_rework[m[33m)[m
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Tue Oct 29 03:37:06 2024 +0000
+
+    I updated the command resource doc so everyone can update the database
+
+[33mcommit 6e03f172681dd81d395ba46ff983999eed8e76e5[m
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Tue Oct 29 03:27:24 2024 +0000
+
+    my slightly more advanced recipe models are now compatible with everything there is in this world.
+
+[33mcommit cdd2455182a249a2bc030a1760247e14a769109f[m
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Tue Oct 29 02:54:42 2024 +0000
+
+    My work here is done, time to climb the mountain of safe merging.
+
+[33mcommit e3ca290321d82c811d16a9773483063eb3788218[m
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Tue Oct 29 02:40:36 2024 +0000
+
+    updated views so the site doesn't ppoop after slight changes to models
+
+[33mcommit 9e7311fb9887bff0f6735ef61d6d7e0e6962b9f1[m
+Author: Gunnar Anderson <gunnar0022@gmail.com>
+Date:   Tue Oct 29 02:19:09 2024 +0000
+
+    i think i got the gpt stuff working
+
+[33mcommit 4a4f742f9f2c6c2788e6cd93a9092206cace812c[m[33m ([m[1;31morigin/User_Adds_Recipe[m[33m)[m
+Author: Ron Lustig <ronlustig111@gmail.com>
+Date:   Sun Nov 3 01:37:19 2024 +0000
+
+    Add PDF download feature
+
+[33mcommit 471508d066e52cf76e154fd92370a93a17b94048[m[33m ([m[1;33mtag: [m[1;33msprint2[m[33m)[m
+Author: Tandon Jenkins <tjenkin5@uccs.edu>
+Date:   Tue Oct 29 10:49:17 2024 -0600
+
+    revised dividers
+    - added more logic to blacklist
+
+[33mcommit c6d2cfafe23350189f3fc4bd2b1c8bfac9dcbba3[m
+Author: Tandon Jenkins <tjenkin5@uccs.edu>
+Date:   Mon Oct 28 20:31:35 2024 -0600
+
+    css grooming + reformatting of recipe finder
+
+[33mcommit cea09dc384e5b298097e34a87a24abbf772aec23[m
+Author: Kaylee <122187582+kaylee-barcroft@users.noreply.github.com>
+Date:   Tue Oct 29 00:13:39 2024 +0000
+
+    reorganizing (allergen fix)
