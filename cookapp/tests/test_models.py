@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .models import Ingredient, Recipe, UserPreference
+from cookapp.models import Ingredient, Recipe, UserPreference
 
 class IngredientModelTest(TestCase):
     def setUp(self):

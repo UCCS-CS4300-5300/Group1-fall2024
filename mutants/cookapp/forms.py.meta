@@ -1,0 +1,27 @@
+{
+    "exit_code_by_key": {
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_tags__mutmut_1": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_tags__mutmut_2": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_tags__mutmut_3": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_tags__mutmut_4": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_1": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_2": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_3": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_4": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_5": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_6": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_7": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_8": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1clean_macros__mutmut_9": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1save__mutmut_1": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1save__mutmut_2": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1save__mutmut_3": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1save__mutmut_4": null,
+        "cookapp.forms.x\u01c1RecipeForm\u01c1save__mutmut_5": null
+    },
+    "hash_by_function_name": {
+        "clean_tags": "a10cf3b645b15b4d6c5a790f4d093c56",
+        "clean_macros": "86538bfb55476d5b9a5e8857f51d68ca",
+        "save": "15ffb273454e16ab0c7e248645561d87"
+    }
+}
