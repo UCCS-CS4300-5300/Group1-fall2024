@@ -344,4 +344,3 @@ class RecipeListIntegrationTests(TestCase):
         # Test page navigation
         response = self.client.get(f'{self.recipe_list_url}?page=2')
         self.assertEqual(response.status_code, 200)
-
