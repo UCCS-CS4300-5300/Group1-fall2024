@@ -2,11 +2,60 @@
 {% load static %}
 
 {% block content %}
-<h1>Create Recipe</h1>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}  <!-- Renders all form fields, including calories -->
-    <button type="submit">Create Recipe</button>
-</form>
+<div class="container container mt-5">
+    <h1 class="create-recipe-title text-center mb-4">Create Recipe</h1>
+    <form method="POST" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="create-recipe-card card shadow-sm no-hover">
+                    <div class="create-recipe-card-body card-body">
+                        <div class="form-group">
+                            {{ form.non_field_errors }}
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    {{ form.title.label_tag }} {{ form.title }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    {{ form.instructions.label_tag }} {{ form.instructions }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    {{ form.image.label_tag }} {{ form.image }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.calories.label_tag }} {{ form.calories }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.protein.label_tag }} {{ form.protein }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.carbs.label_tag }} {{ form.carbs }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.fat.label_tag }} {{ form.fat }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    {{ form.tags.label_tag }} {{ form.tags }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn-primary-recipe btn-lg">Create Recipe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

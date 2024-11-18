@@ -1,18 +1,21 @@
 import json
 import re
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 from django.contrib import messages
 import inflect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.views import View
 from django.db.models import Q, Count
 from django.db.models import Case, When, Value, IntegerField
-
+from pkg_resources import require
 from .models import Ingredient, Recipe, UserPreference, FavoriteRecipe, Diets, Rating, RecipeIngredient
 from .forms import CreateUserForm, RecipeForm, RecipeIngredientForm
 from .decorators import unauthenticated_user
@@ -266,15 +269,36 @@ class RecipeDetailView(View):
         except Exception as e:
             print("\n\n!!!! There was an error saving the rating:", e)
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-        
+
 class ReviewsView(View):
     def get(self, request):
         reviews = Rating.objects.filter(review__isnull=False).select_related('recipe', 'user')
-        rating = Rating.objects.filter(review__isnull=False).select_related('recipe', 'user')
         context = {
             'reviews': reviews,
         }
         return render(request, 'cookapp/reviews.html', context)
+
+class UserReviewsView(LoginRequiredMixin, View):
+    def get(self, request):
+        reviews = Rating.objects.filter(user=request.user).select_related('recipe')
+        context = {
+            'reviews': reviews,
+        }
+        return render(request, 'cookapp/reviews.html', context)
+
+@require_POST
+def delete_review(request, rating_id):
+    try:
+        rating = get_object_or_404(Rating, id=rating_id)
+        recipe_id = rating.recipe.id  # Get the recipe ID before deleting the rating
+        rating.delete()
+        messages.success(request, 'Review deleted successfully')
+        return redirect('recipe_detail', id=recipe_id)
+    except Exception as e:
+        messages.error(request, f'Error deleting review: {e}')
+        return redirect('recipe_detail', id=recipe_id)
+    
+
     
 class MealPlanView(View):
     def get(self, request):

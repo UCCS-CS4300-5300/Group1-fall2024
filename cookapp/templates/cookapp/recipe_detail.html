@@ -17,6 +17,26 @@
     {% endif %}
 </div>
 
+{% if messages %}
+<div class="messages">
+  {% for message in messages %}
+  <div
+    class="alert alert-{{ message.tags }} alert-dismissible fade show"
+    role="alert"
+  >
+    {{ message }}
+    <button
+      type="button"
+      class="close"
+      data-dismiss="alert"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
 <div class="container mt-5">
     <!-- Recipe Title Section -->
     <div class="recipe-header text-center py-3 position-relative" style="background-color: #f7f7f7; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -118,12 +138,23 @@
                 <button type="submit" class="btn-primary-recipe mt-3">Submit</button>
             </form>
             <!-- Show all Reviews -->
-             <h2 class="font-weight-bold mb-2 text-left" style="color: #333;">All Reviews</h2>
-            {% for rating in recipe.ratings.all %}
-                <p class="font-weight-bold text-left" style="color: #333;">{{ rating.user }} rated this recipe {{ rating.value }} stars</p>
-                <p class="text-left">{{ rating.review }}</p>
-                <hr style="border-top: dotted 1px; border-color: gray" />
-            {% endfor %}
+            <h2 class="font-weight-bold mb-2 text-left" style="color: #333;">All Reviews</h2>
+            {% if recipe.ratings.count > 0 %}
+                {% for rating in recipe.ratings.all %}
+                    <div class="review-item mb-4 p-3" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <p class="font-weight-bold text-left" style="color: #333;">{{ rating.user }} rated this recipe {{ rating.value }} stars</p>
+                        <p class="text-left">{{ rating.review }}</p>
+                        <form action="{% url 'delete_review' rating_id=rating.id %}" method="post" class="delete-review-form text-right">
+                            {% csrf_token %}
+                            <input type="hidden" name="_method" value="delete">
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                        <hr style="border-top: dotted 1px; border-color: gray" />
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-left">No reviews yet. Be the first to review this recipe!</p>
+            {% endif %}
 
             <div id="rating-success" style="display: none;">
                 <i class="fa fa-check-circle" style="color: #2ecc71; margin-left: 10px;"></i>

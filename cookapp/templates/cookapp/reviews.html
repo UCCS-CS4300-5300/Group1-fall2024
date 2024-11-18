@@ -4,24 +4,28 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="display-4 font-weight-bold text-center" style="color: #333;">Reviews</h1>
-    <hr class="my-4" style="border-color: #333;">
+    <hr style="border-top: dotted 1px; border-color: gray" />
     <div class="reviews-list mt-4">
-        {% for review in reviews %}
-            <div class="review-item mb-4 p-3" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <h3 class="font-weight-bold" style="color: #333;">
-                    <a href="{% url 'recipe_detail' review.recipe.id %}" class="recipe-link;" style=" color: black;">
-                        {{ review.recipe.title }}
-                    </a>
-                </h3>
-                <p class="text-muted">by {{ review.user.username }}</p>
-                <div class="rating">
-                    {% for i in "12345" %}
-                        <span class="fa fa-star no-hover-star {% if i|add:'0' <= review.value %}checked{% endif %}"></span>
-                    {% endfor %}
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="review-item mb-4 p-3" style="background-color: #fdfefe; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <h3 class="font-weight-bold" style="color: #333;">
+                        <a href="{% url 'recipe_detail' review.recipe.id %}" class="recipe-link;" style=" color: black;">
+                            {{ review.recipe.title }}
+                        </a>
+                    </h3>
+                    <p class="text-muted">by {{ review.user.username }}</p>
+                    <div class="rating">
+                        {% for i in "12345" %}
+                            <span class="fa fa-star no-hover-star {% if i|add:'0' <= review.value %}checked{% endif %}"></span>
+                        {% endfor %}
+                    </div>
+                    <p class="mt-2">{{ review.review }}</p>
                 </div>
-                <p class="mt-2">{{ review.review }}</p>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No reviews available.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

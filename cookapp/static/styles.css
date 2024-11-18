@@ -845,7 +845,8 @@ footer .navbar-text {
   flex: 1;
 }
 
-.btn-primary-recipe {
+.btn-primary-recipe,
+ .btn-primary-recipe a{
   background-color: var(--color-primary-peach);
   border: none;
   padding: 10px;
@@ -853,10 +854,14 @@ footer .navbar-text {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
+  text-decoration: none;
 }
 
-.btn-primary-recipe:hover {
+.btn-primary-recipe:hover,
+ .btn-primary-recipe a {
   background-color: var(--color-dark);
+  color: var(--color-white);
+  text-decoration: none;
 }
 
 .btn-primary-favorite {
@@ -953,7 +958,9 @@ footer .navbar-text {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  outline: none;
 }
+
 
 .remove-recipe {
   background: none;
@@ -1124,3 +1131,23 @@ footer .navbar-text {
   color: white !important;
 }
 
+/* Custom styles for the create recipe form */
+.create-recipe-card {
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.create-recipe-card-body {
+  padding: 2rem;
+}
+
+.create-recipe-card-shadow-sm {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Disable hover effect for create recipe card */
+.create-recipe-card.no-hover:hover {
+  transform: none;
+  box-shadow: none;
+}
