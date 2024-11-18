@@ -145,4 +145,51 @@ class RecipeSearchUnitTests(TestCase):
         # Check that no recipes are returned
         self.assertEqual(filtered_recipes.count(), 0)
 
-        
+
+class AllergenFunctionTests(TestCase):
+    def setUp(self):
+        # Create ingredients
+        self.peanut = Ingredient.objects.create(name="Peanut")
+        self.flour = Ingredient.objects.create(name="Flour")
+        self.sugar = Ingredient.objects.create(name="Sugar")
+
+        # Create dietary restriction
+        self.allergy = Diets.objects.create(name="Nut Allergy")
+        self.allergy.blacklist.add(self.peanut)
+
+        # Create a recipe
+        self.recipe = Recipe.objects.create(
+            title="Peanut Butter Cookies",
+            api_id="12345",
+            instructions="Mix ingredients and bake.",
+        )
+
+        # Link ingredients to recipe
+        RecipeIngredient.objects.create(recipe=self.recipe, ingredient=self.peanut, quantity="100g")
+        RecipeIngredient.objects.create(recipe=self.recipe, ingredient=self.flour, quantity="200g")
+        RecipeIngredient.objects.create(recipe=self.recipe, ingredient=self.sugar, quantity="150g")
+
+        # Create user and preferences
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.user_preference = UserPreference.objects.create(user=self.user)
+        self.user_preference.blacklist.add(self.peanut)
+
+    def test_recipe_ingredients_respects_blacklist(self):
+        """Test that a recipe is correctly identified as containing blacklisted ingredients."""
+        recipe_ingredients = RecipeIngredient.objects.filter(recipe=self.recipe)
+        ingredient_ids = [ri.ingredient.id for ri in recipe_ingredients]
+        blacklist_ids = self.user_preference.blacklist.values_list('id', flat=True)
+
+        contains_blacklisted = any(ingredient in blacklist_ids for ingredient in ingredient_ids)
+        self.assertTrue(contains_blacklisted)
+
+    def test_recipe_without_blacklisted_ingredients(self):
+        """Test that a recipe without blacklisted ingredients passes the filter."""
+        self.user_preference.blacklist.clear()  # Clear blacklist to simulate no restriction
+        blacklist_ids = self.user_preference.blacklist.values_list('id', flat=True)
+
+        recipe_ingredients = RecipeIngredient.objects.filter(recipe=self.recipe)
+        ingredient_ids = [ri.ingredient.id for ri in recipe_ingredients]
+
+        contains_blacklisted = any(ingredient in blacklist_ids for ingredient in ingredient_ids)
+        self.assertFalse(contains_blacklisted)
