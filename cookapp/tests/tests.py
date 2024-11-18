@@ -429,3 +429,42 @@ class RatingModelTest(TestCase):
     def test_update_average_rating(self):
         self.recipe.update_average_rating()
         self.assertEqual(self.recipe.average_rating, 5.0)
+
+class FavoriteRecipeTests(TestCase):
+    def setUp(self):
+        # Create a test user and log them in
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
+
+        # Create a test recipe using the correct fields
+        self.recipe = Recipe.objects.create(
+            title='Test Recipe', 
+            api_id='test-api-id',
+            instructions='Test description',
+            calories=200, 
+            macros={},  
+            tags=[],  
+        )
+
+    def test_toggle_favorite_add(self):
+        # Send POST request to toggle favorite for the recipe
+        response = self.client.post(reverse('toggle_favorite', args=[self.recipe.id]))
+
+        # Check if the response is a redirect to the recipe detail page
+        self.assertRedirects(response, reverse('recipe_detail', args=[self.recipe.id]))
+
+        # Verify the favorite is added
+        self.assertTrue(FavoriteRecipe.objects.filter(user=self.user, recipe=self.recipe).exists())
+
+    def test_toggle_favorite_remove(self):
+        # First, create a favorite entry for the test
+        FavoriteRecipe.objects.create(user=self.user, recipe=self.recipe)
+
+        # Send POST request to toggle favorite for the recipe
+        response = self.client.post(reverse('toggle_favorite', args=[self.recipe.id]))
+
+        # Check if the response is a redirect to the recipe detail page
+        self.assertRedirects(response, reverse('recipe_detail', args=[self.recipe.id]))
+
+        # Verify the favorite is removed
+        self.assertFalse(FavoriteRecipe.objects.filter(user=self.user, recipe=self.recipe).exists())
