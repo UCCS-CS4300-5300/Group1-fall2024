@@ -35,7 +35,9 @@ urlpatterns = [
     
  
     # User reviews
-    path('reviews/', views.ReviewsView.as_view(), name='reviews'),
+    path('reviews/', views.UserReviewsView.as_view(), name='reviews'),
+    path('delete_review/<int:rating_id>/', views.delete_review, name='delete_review'),
+
 
 
     # Simplified AI recipe generator

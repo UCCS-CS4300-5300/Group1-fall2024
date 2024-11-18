@@ -4,7 +4,8 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center">Your Favorite Recipes</h2>
+    <h2 class="display-4 font-weight-bold text-center">Your Favorite Recipes</h2>
+    <hr style="border-top: dotted 1px; border-color: gray" />
     <ul class="list-group mt-4 list-unstyled">
         {% for favorite in favorite_recipes %}
             <li class="list-group-item mb-3 text-center" style="font-size: 1.25rem;">

@@ -217,9 +217,7 @@
         // Search button click
         $('#search-button').on('click', function() {
             var query = $('#search-input').val();
-            if (query.length >= 3) {
-                fetchRecipes(query);
-            }
+            fetchRecipes(query);
         });
 
         // Clear search input
@@ -234,45 +232,54 @@
 
         // Ensure Enter key in search input only triggers search
         $('#search-input').on('keypress', function(e) {
-            if (e.keyCode === 13) {  // Enter key
+            if (e.keyCode === 13) {
                 e.preventDefault();
                 var query = $(this).val();
-                if (query.length >= 3) {
-                    fetchRecipes(query);
-                }
+                fetchRecipes(query);
             }
         });
 
         // Drag & Drop functionality
-        $(document).on('dragstart', '.draggable', function(e) {
-            e.originalEvent.dataTransfer.setData('text/plain', $(this).data('recipe-id'));
+        $(document).on('dragstart', '.draggable', function (e) {
+            console.log('Drag started:', $(this).data('recipe-id'));
+            const recipeId = $(this).data('recipe-id');
+            const recipeHTML = $(this).prop('outerHTML');
+            e.originalEvent.dataTransfer.setData('recipeId', recipeId);
+            e.originalEvent.dataTransfer.setData('recipeHTML', recipeHTML);
         });
 
-        $('.dropzone').on('dragover', function(e) {
+        $('.dropzone').on('dragover', function (e) {
             e.preventDefault();
         });
 
-        $('.dropzone').on('drop', function(e) {
+        $('.dropzone').on('drop', function (e) {
             e.preventDefault();
-            var recipeId = e.originalEvent.dataTransfer.getData('text/plain');
-            var droppedRecipe = $(`li[data-recipe-id="${recipeId}"]`).html(); // Get recipe HTML
+            const recipeHTML = e.originalEvent.dataTransfer.getData('recipeHTML');
+            const recipeId = e.originalEvent.dataTransfer.getData('recipeId');
 
-            // Append dropped recipe to the cell with a remove button
-            $(this).html(`<div class="card meal-card d-flex align-items-center"><span>${droppedRecipe}</span><button class="remove-recipe ml-2"><i class="fa fa-times" aria-hidden="true"></i></button></div>`);
+
+            // Append recipe content to the drop zone
+            $(this).html(`
+                <div class="card meal-card d-flex align-items-center">
+                    ${recipeHTML}
+                    <button class="remove-recipe ml-2">
+                        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                    </button>
+                </div>
+            `);
         });
 
-        // Remove recipe from cell
-        $(document).on('click', '.remove-recipe', function() {
+        $(document).on('click', '.remove-recipe', function () {
             $(this).closest('.meal-card').remove();
         });
 
-        // Save to local storage
+
         $('#save-meal-plan').on('click', function() {
             let mealPlan = {};
             $('.dropzone').each(function() {
-                let day = $(this).data('day');
-                let meal = $(this).data('meal');
-                let content = $(this).html();
+                const day = $(this).data('day');
+                const meal = $(this).data('meal');
+                const content = $(this).html();
                 if (!mealPlan[day]) mealPlan[day] = {};
                 mealPlan[day][meal] = content;
             });
@@ -285,8 +292,8 @@
         if (savedMealPlan) {
             savedMealPlan = JSON.parse(savedMealPlan);
             $('.dropzone').each(function() {
-                let day = $(this).data('day');
-                let meal = $(this).data('meal');
+                const day = $(this).data('day');
+                const meal = $(this).data('meal');
                 if (savedMealPlan[day] && savedMealPlan[day][meal]) {
                     $(this).html(savedMealPlan[day][meal]);
                 }
