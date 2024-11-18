@@ -1,7 +1,9 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from cookapp.models import Ingredient, Recipe, UserPreference, Diets, RecipeIngredient, Rating
+from django.db.models import Count
+
+from cookapp.models import *
 
 class UserTestCase(TestCase):
     def setUp(self):
@@ -190,6 +192,155 @@ class AllergenFunctionTests(TestCase):
         contains_blacklisted = any(ingredient in blacklist_ids for ingredient in ingredient_ids)
         self.assertFalse(contains_blacklisted)
 
+
+class RecipeListUnitTests(TestCase):
+
+    def setUp(self):
+        # Create test recipes
+        self.recipe1 = Recipe.objects.create(
+            title="Banana Bread",
+            api_id="123",
+            instructions="Mix and bake",
+            calories=350,
+            macros={"protein": 5, "carbs": 55, "fat": 12},
+            tags=["baking", "dessert"]
+        )
+        
+        self.recipe2 = Recipe.objects.create(
+            title="Apple Pie",
+            api_id="456",
+            instructions="Make pie crust, fill with apples",
+            calories=400,
+            macros={"protein": 3, "carbs": 65, "fat": 15},
+            tags=["baking", "dessert"]
+        )
+
+    def test_recipe_creation(self):
+        """Test that recipes are created correctly"""
+        self.assertEqual(self.recipe1.title, "Banana Bread")
+        self.assertEqual(self.recipe2.title, "Apple Pie")
+        self.assertEqual(Recipe.objects.count(), 2)
+
+    def test_recipe_str_method(self):
+        """Test the string representation of Recipe model"""
+        self.assertEqual(str(self.recipe1), "Banana Bread")
+        self.assertEqual(str(self.recipe2), "Apple Pie")
+
+    def test_default_ordering(self):
+        """Test that recipes are ordered alphabetically by default"""
+        recipes = Recipe.objects.all()
+        self.assertEqual(recipes[0].title, "Apple Pie")
+        self.assertEqual(recipes[1].title, "Banana Bread")
+
+    def test_average_rating_calculation(self):
+        """Test the average rating calculation method"""
+        # Create a user for ratings
+        user = User.objects.create_user(username='testuser', password='12345')
+        
+        # Create ratings for recipe1
+        Rating.objects.create(recipe=self.recipe1, user=user, value=4)
+        Rating.objects.create(recipe=self.recipe1, user=User.objects.create_user(username='testuser2', password='12345'), value=5)
+        
+        self.recipe1.update_average_rating()
+        self.assertEqual(self.recipe1.average_rating, 4.5)
+
+    def test_average_rating_no_ratings(self):
+        """Test average rating calculation with no ratings"""
+        self.recipe1.update_average_rating()
+        self.assertEqual(self.recipe1.average_rating, 0.0)
+
+class RecipeListIntegrationTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.recipe_list_url = reverse('recipes')
+        
+        # Create test recipes with different ratings
+        self.recipe1 = Recipe.objects.create(
+            title="Banana Bread",
+            api_id="123",
+            instructions="Mix and bake",
+            average_rating=4.5
+        )
+        
+        self.recipe2 = Recipe.objects.create(
+            title="Apple Pie",
+            api_id="456",
+            instructions="Make pie crust",
+            average_rating=3.8
+        )
+        
+        self.recipe3 = Recipe.objects.create(
+            title="Carrot Cake",
+            api_id="789",
+            instructions="Mix ingredients",
+            average_rating=4.2
+        )
+
+    def test_recipe_list_view_loads(self):
+        """Test that the recipe list view loads successfully"""
+        response = self.client.get(self.recipe_list_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cookapp/recipe_list.html')
+        self.assertContains(response, "All Recipes")
+
+    def test_recipe_list_contains_all_recipes(self):
+        """Test that all recipes are displayed in the list"""
+        response = self.client.get(self.recipe_list_url)
+        self.assertContains(response, "Banana Bread")
+        self.assertContains(response, "Apple Pie")
+        self.assertContains(response, "Carrot Cake")
+
+    def test_recipe_list_sorting_name_asc(self):
+        """Test alphabetical sorting (A-Z)"""
+        response = self.client.get(f'{self.recipe_list_url}?sort=name')
+        recipes = response.context['recipes']
+        self.assertEqual(recipes[0].title, "Apple Pie")
+        self.assertEqual(recipes[1].title, "Banana Bread")
+        self.assertEqual(recipes[2].title, "Carrot Cake")
+
+    def test_recipe_list_sorting_name_desc(self):
+        """Test alphabetical sorting (Z-A)"""
+        response = self.client.get(f'{self.recipe_list_url}?sort=name_desc')
+        recipes = response.context['recipes']
+        self.assertEqual(recipes[0].title, "Carrot Cake")
+        self.assertEqual(recipes[1].title, "Banana Bread")
+        self.assertEqual(recipes[2].title, "Apple Pie")
+
+    def test_recipe_list_sorting_rating(self):
+        """Test rating sorting (High to Low)"""
+        response = self.client.get(f'{self.recipe_list_url}?sort=rating')
+        recipes = response.context['recipes']
+        self.assertEqual(recipes[0].title, "Banana Bread")  # 4.5
+        self.assertEqual(recipes[1].title, "Carrot Cake")   # 4.2
+        self.assertEqual(recipes[2].title, "Apple Pie")     # 3.8
+
+    def test_recipe_list_sorting_rating_asc(self):
+        """Test rating sorting (Low to High)"""
+        response = self.client.get(f'{self.recipe_list_url}?sort=rating_asc')
+        recipes = response.context['recipes']
+        self.assertEqual(recipes[0].title, "Apple Pie")     # 3.8
+        self.assertEqual(recipes[1].title, "Carrot Cake")   # 4.2
+        self.assertEqual(recipes[2].title, "Banana Bread")  # 4.5
+
+    def test_recipe_list_pagination(self):
+        """Test that pagination works correctly"""
+        # Create more recipes to trigger pagination
+        for i in range(10):
+            Recipe.objects.create(
+                title=f"Test Recipe {i}",
+                api_id=f"test{i}",
+                instructions="Test instructions",
+                average_rating=3.0
+            )
+
+        # Test first page
+        response = self.client.get(self.recipe_list_url)
+        self.assertTrue('is_paginated' in response.context)
+        self.assertTrue(response.context['is_paginated'])
+        
+        # Test page navigation
+        response = self.client.get(f'{self.recipe_list_url}?page=2')
+        self.assertEqual(response.status_code, 200)
 
 class IngredientModelTest(TestCase):
     def setUp(self):
