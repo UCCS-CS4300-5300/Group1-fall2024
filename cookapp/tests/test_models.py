@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from cookapp.models import Ingredient, Recipe, UserPreference
+from cookapp.models import Ingredient, Recipe, UserPreference, RecipeIngredient
 
 class IngredientModelTest(TestCase):
     def setUp(self):
@@ -20,6 +20,7 @@ class IngredientModelTest(TestCase):
         self.assertEqual(ingredients[0].name, "Apple", "First ingredient should be 'Apple' due to ordering")
         self.assertEqual(ingredients[1].name, "Tomato", "Second ingredient should be 'Tomato' due to ordering")
 
+
 class RecipeModelTest(TestCase):
     def setUp(self):
         # Create Ingredient instances for testing
@@ -36,20 +37,34 @@ class RecipeModelTest(TestCase):
             tags=["quick", "easy"]
         )
         
-        # Add ingredients to the recipe
-        self.recipe.ingredients.add(self.ingredient1, self.ingredient2)
+        # Create RecipeIngredient instances to associate ingredients with the recipe
+        self.recipe_ingredient1 = RecipeIngredient.objects.create(
+            recipe=self.recipe,
+            ingredient=self.ingredient1,
+            quantity="2 cups"
+        )
+        self.recipe_ingredient2 = RecipeIngredient.objects.create(
+            recipe=self.recipe,
+            ingredient=self.ingredient2,
+            quantity="1 cup"
+        )
 
     def test_recipe_creation(self):
         # Test the creation of the Recipe instance
-        self.assertEqual(self.recipe.title, "Tomato Cheese Salad", "Recipe title should be 'Tomato Cheese Salad'")
-        self.assertEqual(self.recipe.api_id, "12345", "Recipe API ID should be '12345'")
-        self.assertEqual(self.recipe.instructions, "Mix tomatoes and cheese.", "Recipe instructions should be 'Mix tomatoes and cheese.'")
-        self.assertEqual(self.recipe.calories, 200, "Recipe calories should be 200")
-        self.assertEqual(self.recipe.macros, {"protein": 10, "carbs": 15, "fat": 10}, "Recipe macros should be {'protein': 10, 'carbs': 15, 'fat': 10}")
-        self.assertEqual(self.recipe.tags, ["quick", "easy"], "Recipe tags should be ['quick', 'easy']")
-        self.assertEqual(str(self.recipe), "Tomato Cheese Salad", "String representation of the recipe should be 'Tomato Cheese Salad'")
-        self.assertIn(self.ingredient1, self.recipe.ingredients.all(), "Ingredient 'Tomato' should be in the recipe ingredients")
-        self.assertIn(self.ingredient2, self.recipe.ingredients.all(), "Ingredient 'Cheese' should be in the recipe ingredients")
+        self.assertEqual(self.recipe.title, "Tomato Cheese Salad")
+        self.assertEqual(self.recipe.api_id, "12345")
+        self.assertEqual(self.recipe.instructions, "Mix tomatoes and cheese.")
+        self.assertEqual(self.recipe.calories, 200)
+        self.assertEqual(self.recipe.macros, {"protein": 10, "carbs": 15, "fat": 10})
+        self.assertEqual(self.recipe.tags, ["quick", "easy"])
+        self.assertEqual(str(self.recipe), "Tomato Cheese Salad")
+        
+        # Test that the RecipeIngredient instances are associated correctly
+        recipe_ingredients = RecipeIngredient.objects.filter(recipe=self.recipe)
+        self.assertEqual(recipe_ingredients.count(), 2)
+        ingredients = [ri.ingredient for ri in recipe_ingredients]
+        self.assertIn(self.ingredient1, ingredients)
+        self.assertIn(self.ingredient2, ingredients)
 
     def test_recipe_ordering(self):
         # Test the ordering of Recipe instances
@@ -57,6 +72,48 @@ class RecipeModelTest(TestCase):
         recipes = Recipe.objects.all()
         self.assertEqual(recipes[0].title, "Apple Pie", "First recipe should be 'Apple Pie' due to ordering")
         self.assertEqual(recipes[1].title, "Tomato Cheese Salad", "Second recipe should be 'Tomato Cheese Salad' due to ordering")
+
+
+class RecipeIngredientModelTest(TestCase):
+    def setUp(self):
+        # Create Ingredient and Recipe instances for testing
+        self.ingredient = Ingredient.objects.create(name="Sugar")
+        self.recipe = Recipe.objects.create(
+            title="Sugar Syrup",
+            api_id="54321",
+            instructions="Mix sugar with water.",
+            calories=100,
+            macros={"carbs": 25},
+            tags=["sweet", "easy"]
+        )
+        
+        # Create a RecipeIngredient instance
+        self.recipe_ingredient = RecipeIngredient.objects.create(
+            recipe=self.recipe,
+            ingredient=self.ingredient,
+            quantity="1 cup"
+        )
+
+    def test_recipe_ingredient_creation(self):
+        # Test the creation of the RecipeIngredient instance
+        self.assertEqual(self.recipe_ingredient.recipe, self.recipe)
+        self.assertEqual(self.recipe_ingredient.ingredient, self.ingredient)
+        self.assertEqual(self.recipe_ingredient.quantity, "1 cup")
+        expected_str = f"1 cup of {self.ingredient.name} in {self.recipe.title}"
+        self.assertEqual(str(self.recipe_ingredient), expected_str)
+
+    def test_unique_together_constraint(self):
+        # Test that the unique_together constraint works
+        with self.assertRaises(Exception):
+            RecipeIngredient.objects.create(
+                recipe=self.recipe,
+                ingredient=self.ingredient,
+                quantity="2 cups"
+            )
+
+
+
+
 
 class UserPreferenceModelTest(TestCase):
     def setUp(self):
