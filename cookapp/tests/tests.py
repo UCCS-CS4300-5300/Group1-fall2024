@@ -25,7 +25,6 @@ class IndexTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'cookapp/index.html')
 
-# Integration tests for Blacklist
 class RecipeSearchIntegrationTests(TestCase):
     def setUp(self):
         # Create some ingredients
@@ -61,6 +60,7 @@ class RecipeSearchIntegrationTests(TestCase):
         # Create a user
         self.user = User.objects.create_user(username='testuser', password='testpass')
 
+    # Blacklist Tests
     def test_blacklisted_ingredients_exclusion(self):
         # Simulate a GET request to the search view with a blacklist
         self.client.login(username='testuser', password='testpass')
@@ -81,7 +81,50 @@ class RecipeSearchIntegrationTests(TestCase):
         recipes = response.json()['recipes']
         self.assertEqual(len(recipes), 0)  # No recipes should be returned
 
-# Unit tests for Blacklist
+    def test_blacklisted_ingredients_only(self):
+        # Simulate a GET request to the search view with only a blacklist
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(reverse('recipe_search'), {'term': 'soup', 'blacklist': '["Onion"]'})
+
+        # Check that recipes containing "Onion" are excluded
+        recipes = response.json()['recipes']
+        self.assertEqual(len(recipes), 1)  # Only Tomato Soup should be returned
+        self.assertEqual(recipes[0]['title'], 'Tomato Soup')  # Tomato Soup should be in the results
+        self.assertNotIn('Onion Soup', [recipe['title'] for recipe in recipes])  # Onion Soup should be excluded
+
+    # Whitelist Tests
+    def test_whitelisted_ingredients_inclusion(self):
+        # Simulate a GET request to the search view with a whitelist
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(reverse('recipe_search'), {'term': 'soup', 'whitelist': '["Tomato"]'})
+
+        # Check that only Tomato Soup is included
+        recipes = response.json()['recipes']
+        self.assertEqual(len(recipes), 1)  # Only Tomato Soup should be returned
+        self.assertEqual(recipes[0]['title'], 'Tomato Soup')  # Tomato Soup should be in the results
+        self.assertNotIn('Onion Soup', [recipe['title'] for recipe in recipes])  # Onion Soup should not be included
+
+    def test_whitelisted_ingredients_no_results(self):
+        # Simulate a GET request to the search view with a whitelist that excludes all recipes
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(reverse('recipe_search'), {'term': 'soup', 'whitelist': '["Garlic"]'})
+
+        # Check that no recipes are returned, as none contain Garlic
+        recipes = response.json()['recipes']
+        self.assertEqual(len(recipes), 0)  # No recipes should be returned
+
+    def test_whitelisted_ingredients_only(self):
+        # Simulate a GET request to the search view with only a whitelist
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(reverse('recipe_search'), {'term': 'soup', 'whitelist': '["Tomato"]'})
+
+        # Check that only recipes containing "Tomato" are returned
+        recipes = response.json()['recipes']
+        self.assertEqual(len(recipes), 1)  # Only Tomato Soup should be returned
+        self.assertEqual(recipes[0]['title'], 'Tomato Soup')  # Tomato Soup should be in the results
+        self.assertNotIn('Onion Soup', [recipe['title'] for recipe in recipes])  # Onion Soup should not be included
+
+
 class RecipeSearchUnitTests(TestCase):
     def setUp(self):
         # Create a user
@@ -105,6 +148,7 @@ class RecipeSearchUnitTests(TestCase):
         # Create user preference
         self.user_pref = UserPreference.objects.create(user=self.user)
 
+    # Blacklist Tests
     def test_add_to_blacklist(self):
         # Add ingredient to blacklist
         self.user_pref.blacklist.add(self.ingredient1)
@@ -143,6 +187,48 @@ class RecipeSearchUnitTests(TestCase):
 
         # Check that no recipes are returned
         self.assertEqual(filtered_recipes.count(), 0)
+
+    # Whitelist Tests
+    def test_add_to_whitelist(self):
+        # Add ingredient to whitelist
+        self.user_pref.whitelist.add(self.ingredient1)
+        self.assertIn(self.ingredient1, self.user_pref.whitelist.all())
+
+    def test_remove_from_whitelist(self):
+        # Add and remove an ingredient from the whitelist
+        self.user_pref.whitelist.add(self.ingredient1)
+        self.user_pref.whitelist.remove(self.ingredient1)
+        self.assertNotIn(self.ingredient1, self.user_pref.whitelist.all())
+
+    def test_multiple_ingredients_in_whitelist(self):
+        # Add multiple ingredients to the whitelist
+        self.user_pref.whitelist.add(self.ingredient1, self.ingredient2)
+        self.assertIn(self.ingredient1, self.user_pref.whitelist.all())
+        self.assertIn(self.ingredient2, self.user_pref.whitelist.all())
+
+    def test_whitelist_filtering(self):
+        # Test filtering recipes based on whitelist
+        whitelist = ['Tomato']
+
+        # Simulate whitelist filtering logic
+        filtered_recipes = Recipe.objects.filter(recipeingredient__ingredient__name__in=whitelist)
+
+        # Check that only recipes containing the ingredients in the whitelist are returned
+        self.assertIn(self.recipe1, filtered_recipes)
+        self.assertNotIn(self.recipe2, filtered_recipes)  # Onion Soup should be excluded
+        self.assertNotIn(self.recipe3, filtered_recipes)  # Garlic Bread should be excluded
+
+    def test_whitelist_with_no_results(self):
+        # Test with whitelist that excludes all recipes
+        whitelist = ['Carrot']  # Assuming 'Carrot' is not an ingredient in any recipe
+
+        # Simulate whitelist filtering logic
+        filtered_recipes = Recipe.objects.filter(recipeingredient__ingredient__name__in=whitelist)
+
+        # Check that no recipes are returned since no recipe contains 'Carrot'
+        self.assertEqual(filtered_recipes.count(), 0)
+
+
 
 class AllergenFunctionTests(TestCase):
     def setUp(self):
