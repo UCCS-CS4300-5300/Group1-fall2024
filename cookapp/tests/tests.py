@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.db.models import Count
-
+import uuid
 from cookapp.models import *
 
 class UserTestCase(TestCase):
@@ -468,3 +468,30 @@ class FavoriteRecipeTests(TestCase):
 
         # Verify the favorite is removed
         self.assertFalse(FavoriteRecipe.objects.filter(user=self.user, recipe=self.recipe).exists())
+
+class CreateRecipeTests(TestCase):
+    def test_create_recipe(self):
+        # Adjust form data to match the RecipeForm requirements
+        form_data = {
+            'title': 'Test Recipe',
+            'description': 'This is a test recipe.',
+            'instructions': 'Mix ingredients and cook.',  # Required field
+            'image': 'http://example.com/image.jpg',      # Optional, but include to ensure it works
+            'calories': 200,                              # Required field
+            'protein': 10,                                # Required field
+            'carbs': 30,                                  # Required field
+            'fat': 5,                                     # Required field
+            'tags': 'easy, dinner',                       # Required field
+        }
+        
+        # Send POST request to create a recipe
+        response = self.client.post(reverse('create_recipe'), form_data)
+
+        # Check if the response redirects to the add_ingredients view
+        self.assertEqual(response.status_code, 302)
+
+        # Check if the recipe was created
+        recipe = Recipe.objects.first()
+        self.assertIsNotNone(recipe)
+        self.assertEqual(recipe.title, 'Test Recipe')
+        self.assertIsNotNone(recipe.api_id)
