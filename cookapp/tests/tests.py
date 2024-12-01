@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.db.models import Count
 import uuid
-from cookapp.models import *
+from cookapp.models import Ingredient, Recipe, UserPreference, RecipeIngredient, FavoriteRecipe
 
 class UserTestCase(TestCase):
     def setUp(self):
