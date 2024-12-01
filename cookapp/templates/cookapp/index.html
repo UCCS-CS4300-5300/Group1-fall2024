@@ -263,7 +263,7 @@
     // Parse the diet blacklists safely
     let dietBlacklists = {};
     try {
-      dietBlacklists = JSON.parse("{{ diet_blacklists|safe }}");
+      dietBlacklists = JSON.parse('{{ diet_blacklists|safe }}');
     } catch (e) {
       console.error("Error parsing diet blacklists:", e);
     }
