@@ -247,28 +247,36 @@ class RecipeDetailView(View):
             rating_value = int(request.POST.get('rating', 0))
             review_text = request.POST.get('review', '').strip()
             if rating_value < 1 or rating_value > 5:
-                return JsonResponse({'status': 'error', 'message': 'Invalid rating value'}, status=400)
-            
+                return JsonResponse(
+                    {'status': 'error', 'message': 'Invalid rating value'},
+                    status=400)
+
             # Get or create the rating
             rating, created = Rating.objects.get_or_create(
-                user=request.user, 
-                recipe=recipe, 
+                user=request.user,
+                recipe=recipe,
                 defaults={'value': rating_value, 'review': review_text}
             )
             # Update the rating value
             rating.value = rating_value
             rating.review = review_text
             rating.save()
-            
+
             # Update the average rating for the recipe
             recipe.update_average_rating()
-            
+
             # Return a success message
             message = 'Rating submitted successfully!' if created else 'Rating updated successfully!'
-            return JsonResponse({'status': 'success', 'message': message, 'average_rating': recipe.average_rating})
+            return JsonResponse(
+                {'status': 'success',
+                 'message': message,
+                 'average_rating': recipe.average_rating})
         except Exception as e:
             print("\n\n!!!! There was an error saving the rating:", e)
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            return JsonResponse(
+                {'status': 'error', 'message': str(e)},
+                status=500)
+
 
 class ReviewsView(View):
     def get(self, request):
@@ -278,6 +286,7 @@ class ReviewsView(View):
         }
         return render(request, 'cookapp/reviews.html', context)
 
+
 class UserReviewsView(LoginRequiredMixin, View):
     def get(self, request):
         reviews = Rating.objects.filter(user=request.user).select_related('recipe')
@@ -286,23 +295,25 @@ class UserReviewsView(LoginRequiredMixin, View):
         }
         return render(request, 'cookapp/reviews.html', context)
 
+
 @require_POST
 def delete_review(request, rating_id):
     try:
         rating = get_object_or_404(Rating, id=rating_id)
-        recipe_id = rating.recipe.id  # Get the recipe ID before deleting the rating
+        # Get the recipe ID before deleting the rating
+        recipe_id = rating.recipe.id
         rating.delete()
         messages.success(request, 'Review deleted successfully')
         return redirect('recipe_detail', id=recipe_id)
     except Exception as e:
         messages.error(request, f'Error deleting review: {e}')
         return redirect('recipe_detail', id=recipe_id)
-    
 
-    
+
 class MealPlanView(View):
     def get(self, request):
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday",
+                "Friday", "Saturday", "Sunday"]
         meals = ["Breakfast", "Lunch", "Snack", "Dinner"]
         context = {
             'days': days,
@@ -310,16 +321,20 @@ class MealPlanView(View):
         }
         return render(request, 'cookapp/mealPlanner.html', context)
 
+
 def toggle_favorite(request, recipe_id):
     if request.method == 'POST':
         recipe = get_object_or_404(Recipe, id=recipe_id)
         # Check if the user already has this recipe as a favorite
-        favorite, created = FavoriteRecipe.objects.get_or_create(user=request.user, recipe=recipe)
-        if not created:  # If it was not created, it means it already exists, so remove it
+        favorite, created = FavoriteRecipe.objects.get_or_create(
+            user=request.user, recipe=recipe)
+        # If it was not created, it means it already exists, so remove it
+        if not created:
             favorite.delete()  # Remove from favorites
         # If created, it means it was added, so no action is needed.
 
     return redirect('recipe_detail', id=recipe_id)
+
 
 @login_required
 def favorites(request):
@@ -327,14 +342,13 @@ def favorites(request):
     View to display the user's favorite recipes.
     """
     # Get the favorite recipes for the logged-in user
-    favorite_recipes = FavoriteRecipe.objects.filter(user=request.user).select_related('recipe')
+    favorite_recipes = FavoriteRecipe.objects.filter(
+        user=request.user).select_related('recipe')
     context = {
         'favorite_recipes': favorite_recipes,
     }
     return render(request, 'cookapp/favorites.html', context)
 
-from django.db.models import Avg
-from django.views.generic import ListView
 
 class RecipeListView(ListView):
     model = Recipe
@@ -345,7 +359,8 @@ class RecipeListView(ListView):
     # Query for recipes depending on filter dropdown
     def get_queryset(self):
         queryset = super().get_queryset()
-        sort = self.request.GET.get('sort', 'name')  # Default to 'name' for A-Z sorting
+        # Default to 'name' for A-Z sorting
+        sort = self.request.GET.get('sort', 'name')
 
         if sort == 'name_desc':
             queryset = queryset.order_by('-title')
@@ -356,7 +371,8 @@ class RecipeListView(ListView):
                     default='average_rating',
                     output_field=IntegerField(),
                 )
-            ).order_by('-rating_case', '-average_rating', 'title')  # First by non-zero ratings, then by rating
+                # First by non-zero ratings, then by rating
+            ).order_by('-rating_case', '-average_rating', 'title')
         elif sort == 'rating_asc':
             queryset = queryset.annotate(
                 rating_case=Case(
@@ -364,7 +380,8 @@ class RecipeListView(ListView):
                     default='average_rating',
                     output_field=IntegerField(),
                 )
-            ).order_by('rating_case', 'average_rating', 'title')  # First by non-zero ratings, then by rating
+                # First by non-zero ratings, then by rating
+            ).order_by('rating_case', 'average_rating', 'title')
         else:
             queryset = queryset.order_by('title')
 
@@ -380,11 +397,12 @@ class RedirectToDetailView(View):
         blacklist = data.get('blacklist', ['No input'])
 
         # Redirect to the detail view with the arguments
-        redirect_url = f'/simple-recipe-detail/?term={search_term}&whitelist={"&whitelist=".join(whitelist)}&blacklist={"&blacklist=".join(blacklist)}'
+        redirect_url = f'''/simple-recipe-detail/?term={search_term}
+                            &whitelist={"&whitelist=".join(whitelist)}
+                            &blacklist={"&blacklist=".join(blacklist)}'''
         return JsonResponse({'redirect_url': redirect_url})
 
 
-        
 class SimpleRecipeDetailView(View):
     def get(self, request):
         # Retrieve arguments from GET parameters or set default values
@@ -400,50 +418,16 @@ class SimpleRecipeDetailView(View):
         }
         return render(request, 'cookapp/simple_recipe_detail.html', context)
 
-class RecipeListView(ListView):
-    model = Recipe
-    template_name = 'cookapp/recipe_list.html'
-    context_object_name = 'recipes'
-    paginate_by = 12
-
-    # Query for recipes depending on filter dropdown
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        sort = self.request.GET.get('sort', 'name')  # Default to 'name' for A-Z sorting
-
-        if sort == 'name_desc':
-            queryset = queryset.order_by('-title')
-        elif sort == 'rating':
-            queryset = queryset.annotate(
-                rating_case=Case(
-                    When(average_rating=0, then=Value(None)),
-                    default='average_rating',
-                    output_field=IntegerField(),
-                )
-            ).order_by('-rating_case', '-average_rating', 'title')  # First by non-zero ratings, then by rating
-        elif sort == 'rating_asc':
-            queryset = queryset.annotate(
-                rating_case=Case(
-                    When(average_rating=0, then=Value(None)),
-                    default='average_rating',
-                    output_field=IntegerField(),
-                )
-            ).order_by('rating_case', 'average_rating', 'title')  # First by non-zero ratings, then by rating
-        else:
-            queryset = queryset.order_by('title')
-
-        return queryset
 
 def create_recipe(request):
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
             recipe = form.save(commit=False)
-            
             # If the recipe doesn't have an API ID, generate one
             if not recipe.api_id:
                 recipe.api_id = str(uuid.uuid4())
-                
+
             recipe.save()
 
             return redirect('add_ingredients', recipe_id=recipe.id)
@@ -460,21 +444,24 @@ RecipeIngredientFormSet = modelformset_factory(
     extra=5,  # Allows up to 5 ingredients to be added
 )
 
+
 def add_ingredients(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
 
     if request.method == 'POST':
-        formset = RecipeIngredientFormSet(request.POST, queryset=RecipeIngredient.objects.none())
+        formset = RecipeIngredientFormSet(
+            request.POST,
+            queryset=RecipeIngredient.objects.none())
         if formset.is_valid():
-            # Save the valid forms with data
-            for form in formset:
+            for form in formset:  # Save the valid forms with data
                 if form.cleaned_data:
                     recipe_ingredient = form.save(commit=False)
                     recipe_ingredient.recipe = recipe
                     recipe_ingredient.save()
-            # Redirect after saving
-            return redirect('index')
+            return redirect('index')  # Redirect after saving
     else:
         formset = RecipeIngredientFormSet(queryset=RecipeIngredient.objects.none())
 
-    return render(request, 'cookapp/add_ingredients.html', {'formset': formset, 'recipe': recipe})
+    return render(request,
+                  'cookapp/add_ingredients.html',
+                  {'formset': formset, 'recipe': recipe})
