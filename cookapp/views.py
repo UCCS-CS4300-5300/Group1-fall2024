@@ -212,7 +212,7 @@ class RecipeDetailView(View):
         recipe = get_object_or_404(Recipe, id=id)
 
         # Set favorite status for authenticated users
-        is_favorited = self._is_favorited_by_user(request.user, recipe)
+        is_favorited = self._is_favorite_by_user(request.user, recipe)
 
         # Remove numbered steps from instructions
         instructions = re.sub(r'\d+\.\s*', '', recipe.instructions.strip())
@@ -248,7 +248,7 @@ class RecipeDetailView(View):
 
         context = {
             'recipe': recipe,
-            'is_favorited': is_favorited,
+            'is_favorite': is_favorited,
             'instructions_list': instructions_list,
             'user_rating': user_rating,
             'user_review': user_review,
@@ -439,11 +439,29 @@ class SimpleRecipeDetailView(View):
         whitelist = request.GET.getlist('whitelist', ['No input'])
         blacklist = request.GET.getlist('blacklist', ['No input'])
 
-        # Pass arguments to the context
+        # Fetch recipes based on search term, whitelist, and blacklist
+        recipes = Recipe.objects.all()
+        if search_term:
+            recipes = recipes.filter(
+                Q(title__icontains=search_term) |
+                Q(tags__icontains=search_term)
+            )
+
+        for ingredient in whitelist:
+            recipes = recipes.filter(
+                recipe_ingredient__ingredient__name__icontains=ingredient
+            )
+        for ingredient in blacklist:
+            recipes = recipes.exclude(
+                recipe_ingredient__ingredient__name__icontains=ingredient
+            )
+
+        # Pass arguments and recipes to the context
         context = {
             'search_term': search_term,
             'whitelist': whitelist,
             'blacklist': blacklist,
+            'recipes': recipes,
         }
         return render(request, 'cookapp/simple_recipe_detail.html', context)
 
