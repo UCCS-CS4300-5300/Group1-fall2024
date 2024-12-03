@@ -97,89 +97,68 @@ class RecipeSearch(View):
             blacklist = []
             whitelist = []
 
-        # Initialize the inflect engine
         p = inflect.engine()
 
-        # Initialize the query
+        recipe_results = Recipe.objects.all()
         if query:
-            recipe_results = Recipe.objects.filter(
+            recipe_results = recipe_results.filter(
                 Q(title__icontains=query) | Q(tags__icontains=query)
             )
-        else:
-            recipe_results = Recipe.objects.all()
 
-        # Apply whitelist filter
-        # (include only recipes containing all specified whitelist ingredients)
-        if whitelist:
-            for ingredient in whitelist:
-                try:
-                    whitelisted_ingredients = Ingredient.objects.filter(
-                        name__icontains=ingredient).distinct()
-                    if whitelisted_ingredients.exists():
-                        recipe_results = recipe_results.filter(
-                            recipeingredient__ingredient__in=whitelisted_ingredients)
-                    else:
-                        # Try singular form
-                        singular_ingredient = p.singular_noun(ingredient)
-                        if singular_ingredient:
-                            whitelisted_ingredients = Ingredient.objects.filter(
-                                name__icontains=singular_ingredient).distinct()
-                            if whitelisted_ingredients.exists():
-                                recipe_results = recipe_results.filter(
-                                    recipeingredient__ingredient__in=whitelisted_ingredients)
-                            else:
-                                # If any ingredient in the whitelist is not found, no recipes can match
-                                return JsonResponse({
-                                    'recipes': [],
-                                })
-                        else:
-                            # If any ingredient in the whitelist is not found, no recipes can match
-                            return JsonResponse({
-                                'recipes': [],
-                            })
-                except Ingredient.DoesNotExist:
-                    # If any ingredient in the whitelist isn't found, no recipes match
-                    return JsonResponse({'recipes': []})
+        recipe_results = self.apply_whitelist_filter(
+            recipe_results, whitelist, p)
+        recipe_results = self.apply_blacklist_filter(
+            recipe_results, blacklist, p)
 
-        # Apply blacklist filter
-        for ingredient in blacklist:
-            try:
-                blacklisted_ingredients = Ingredient.objects.filter(
-                    name__icontains=ingredient).distinct()
-                if blacklisted_ingredients.exists():
-                    recipe_results = recipe_results.exclude(
-                        recipe_ingredient__ingredient__in=blacklisted_ingredients
-                    )
-                else:
-                    # Try singular form
-                    singular_ingredient = p.singular_noun(ingredient)
-                    if singular_ingredient:
-                        blacklisted_ingredients = Ingredient.objects.filter(
-                            name__icontains=singular_ingredient).distinct()
-                        if blacklisted_ingredients.exists():
-                            recipe_results = recipe_results.exclude(
-                                recipe_ingredient__ingredient__in=blacklisted_ingredients
-                            )
-                        else:
-                            continue
-                    else:
-                        continue
-            except Ingredient.DoesNotExist:
-                continue
-
-        # Annotate the queryset with the count of ingredients
         recipe_results = recipe_results.annotate(
-            ingredient_count=Count('recipeingredient'))
-
-        # Paginate the results
-        recipe_list = list(
-            recipe_results.values(
-                'title', 'id', 'ingredient_count')[offset:offset + limit]
+            ingredient_count=Count('recipeingredient')
         )
 
-        return JsonResponse({
-            'recipes': recipe_list,
-        })
+        recipe_list = list(
+            recipe_results.values(
+                'title', 'id', 'ingredient_count'
+            )[offset:offset + limit]
+        )
+
+        return JsonResponse({'recipes': recipe_list})
+
+    def apply_whitelist_filter(self, queryset, whitelist, inflect_engine):
+        for ingredient in whitelist:
+            queryset = self.filter_by_ingredient(
+                queryset, ingredient, inflect_engine, include=True)
+            if queryset is None:
+                return Recipe.objects.none()
+        return queryset
+
+    def apply_blacklist_filter(self, queryset, blacklist, inflect_engine):
+        for ingredient in blacklist:
+            queryset = self.filter_by_ingredient(
+                queryset, ingredient, inflect_engine, include=False)
+        return queryset
+
+    def filter_by_ingredient(self, queryset,
+                             ingredient, inflect_engine, include=True):
+        try:
+            ingredients = Ingredient.objects.filter(
+                name__icontains=ingredient).distinct()
+            if not ingredients.exists():
+                singular_ingredient = inflect_engine.singular_noun(ingredient)
+                if singular_ingredient:
+                    ingredients = Ingredient.objects.filter(
+                        name__icontains=singular_ingredient).distinct()
+            if ingredients.exists():
+                if include:
+                    return queryset.filter(
+                        recipeingredient__ingredient__in=ingredients)
+                else:
+                    return queryset.exclude(
+                        recipeingredient__ingredient__in=ingredients)
+            elif include:
+                return None
+        except Ingredient.DoesNotExist:
+            if include:
+                return None
+        return queryset
 
 
 @method_decorator(login_required, name='dispatch')
