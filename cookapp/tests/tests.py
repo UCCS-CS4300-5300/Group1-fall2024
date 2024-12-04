@@ -104,7 +104,7 @@ class RecipeSearchIntegrationTests(TestCase):
         )  # Onion Soup should be excluded
 
     def test_blacklisted_ingredients_no_results(self):
-        # Simulate a GET request to the search view with a blacklist that excludes all recipes
+        # Simulate GET request for view with blacklist excluding all recipes
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(
             reverse('recipe_search'),
@@ -125,7 +125,7 @@ class RecipeSearchIntegrationTests(TestCase):
 
         # Check that recipes containing "Onion" are excluded
         recipes = response.json()['recipes']
-        self.assertEqual(len(recipes), 1)  # Only Tomato Soup should be returned
+        self.assertEqual(len(recipes), 1)  # Return Tomato Soup
         self.assertEqual(
             recipes[0]['title'], 'Tomato Soup'
         )  # Tomato Soup should be in the results
@@ -144,7 +144,7 @@ class RecipeSearchIntegrationTests(TestCase):
 
         # Check that only Tomato Soup is included
         recipes = response.json()['recipes']
-        self.assertEqual(len(recipes), 1)  # Only Tomato Soup should be returned
+        self.assertEqual(len(recipes), 1)  # Return Tomato Soup
         self.assertEqual(
             recipes[0]['title'], 'Tomato Soup'
         )  # Tomato Soup should be in the results
@@ -153,7 +153,7 @@ class RecipeSearchIntegrationTests(TestCase):
         )  # Onion Soup should not be included
 
     def test_whitelisted_ingredients_no_results(self):
-        # Simulate a GET request to the search view with a whitelist that excludes all recipes
+        # Simulate GET request for view with whitelist excluding all recipes
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(
             reverse('recipe_search'),
@@ -174,7 +174,7 @@ class RecipeSearchIntegrationTests(TestCase):
 
         # Check that only recipes containing "Tomato" are returned
         recipes = response.json()['recipes']
-        self.assertEqual(len(recipes), 1)  # Only Tomato Soup should be returned
+        self.assertEqual(len(recipes), 1)  # Return Tomato Soup
         self.assertEqual(
             recipes[0]['title'], 'Tomato Soup'
         )  # Tomato Soup should be in the results
@@ -304,7 +304,7 @@ class RecipeSearchUnitTests(TestCase):
             recipeingredient__ingredient__name__in=whitelist
         )
 
-        # Check that only recipes containing the ingredients in the whitelist are returned
+        # Check only recipes containing ingredients in whitelist are returned
         self.assertIn(self.recipe1, filtered_recipes)
         self.assertNotIn(
             self.recipe2, filtered_recipes
@@ -315,7 +315,7 @@ class RecipeSearchUnitTests(TestCase):
 
     def test_whitelist_with_no_results(self):
         # Test with whitelist that excludes all recipes
-        whitelist = ['Carrot']  # Assuming 'Carrot' is not an ingredient in any recipe
+        whitelist = ['Carrot']  # Assuming 'Carrot' is not in any recipe
 
         # Simulate whitelist filtering logic
         filtered_recipes = Recipe.objects.filter(
@@ -370,10 +370,15 @@ class AllergenFunctionTests(TestCase):
         self.user_preference.blacklist.add(self.peanut)
 
     def test_recipe_ingredients_respects_blacklist(self):
-        """Test that a recipe is correctly identified as containing blacklisted ingredients."""
-        recipe_ingredients = RecipeIngredient.objects.filter(recipe=self.recipe)
+        """Test that recipe contains blacklisted ingredients"""
+        recipe_ingredients = RecipeIngredient.objects.filter(
+            recipe=self.recipe
+        )
         ingredient_ids = [ri.ingredient.id for ri in recipe_ingredients]
-        blacklist_ids = self.user_preference.blacklist.values_list('id', flat=True)
+        blacklist_ids = self.user_preference.blacklist.values_list(
+            'id',
+            flat=True
+        )
 
         contains_blacklisted = any(
             ingredient in blacklist_ids for ingredient in ingredient_ids
@@ -381,11 +386,15 @@ class AllergenFunctionTests(TestCase):
         self.assertTrue(contains_blacklisted)
 
     def test_recipe_without_blacklisted_ingredients(self):
-        """Test that a recipe without blacklisted ingredients passes the filter."""
-        self.user_preference.blacklist.clear()  # Clear blacklist to simulate no restriction
-        blacklist_ids = self.user_preference.blacklist.values_list('id', flat=True)
+        """Test that recipe without blacklisted ingredients passes filter."""
+        self.user_preference.blacklist.clear()  # Clear blacklist
+        blacklist_ids = self.user_preference.blacklist.values_list(
+            'id', flat=True
+        )
 
-        recipe_ingredients = RecipeIngredient.objects.filter(recipe=self.recipe)
+        recipe_ingredients = RecipeIngredient.objects.filter(
+            recipe=self.recipe
+        )
         ingredient_ids = [ri.ingredient.id for ri in recipe_ingredients]
 
         contains_blacklisted = any(
@@ -441,7 +450,10 @@ class RecipeListUnitTests(TestCase):
         Rating.objects.create(recipe=self.recipe1, user=user, value=4)
         Rating.objects.create(
             recipe=self.recipe1,
-            user=User.objects.create_user(username='testuser2', password='12345'),
+            user=User.objects.create_user(
+                username='testuser2',
+                password='12345'
+            ),
             value=5,
         )
 
@@ -563,7 +575,7 @@ class IngredientModelTest(TestCase):
     def test_ingredient_ordering(self):
         ingredient2 = Ingredient.objects.create(name="Apple")
         ingredients = Ingredient.objects.all()
-        self.assertEqual(ingredients[0].name, "Apple")
+        self.assertEqual(ingredients[0].name, ingredient2.name)
         self.assertEqual(ingredients[1].name, "Tomato")
 
 
@@ -597,7 +609,10 @@ class RecipeModelTest(TestCase):
         self.assertEqual(self.recipe.api_id, "12345")
         self.assertEqual(self.recipe.instructions, "Mix tomatoes and cheese.")
         self.assertEqual(self.recipe.calories, 200)
-        self.assertEqual(self.recipe.macros, {"protein": 10, "carbs": 15, "fat": 10})
+        self.assertEqual(
+            self.recipe.macros,
+            {"protein": 10, "carbs": 15, "fat": 10}
+        )
         self.assertEqual(self.recipe.tags, ["quick", "easy"])
         self.assertEqual(str(self.recipe), "Tomato Cheese Salad")
         self.assertIn(
@@ -612,13 +627,16 @@ class RecipeModelTest(TestCase):
     def test_recipe_ordering(self):
         recipe2 = Recipe.objects.create(title="Apple Pie", api_id="67890")
         recipes = Recipe.objects.all()
-        self.assertEqual(recipes[0].title, "Apple Pie")
+        self.assertEqual(recipes[0].title, recipe2.title)
         self.assertEqual(recipes[1].title, "Tomato Cheese Salad")
 
 
 class UserPreferenceModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.user = User.objects.create_user(
+            username="testuser",
+            password="testpass"
+        )
         self.ingredient1 = Ingredient.objects.create(name="Tomato")
         self.ingredient2 = Ingredient.objects.create(name="Cheese")
         self.user_preference = UserPreference.objects.create(user=self.user)
@@ -634,7 +652,10 @@ class UserPreferenceModelTest(TestCase):
 
 class RatingModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.user = User.objects.create_user(
+            username="testuser",
+            password="testpass"
+        )
         self.recipe = Recipe.objects.create(
             title="Tomato Cheese Salad",
             api_id="12345",
@@ -696,7 +717,10 @@ class FavoriteRecipeTests(TestCase):
 
         # Verify the favorite is added
         self.assertTrue(
-            FavoriteRecipe.objects.filter(user=self.user, recipe=self.recipe).exists()
+            FavoriteRecipe.objects.filter(
+                user=self.user,
+                recipe=self.recipe
+            ).exists()
         )
 
     def test_toggle_favorite_remove(self):
@@ -716,7 +740,10 @@ class FavoriteRecipeTests(TestCase):
 
         # Verify the favorite is removed
         self.assertFalse(
-            FavoriteRecipe.objects.filter(user=self.user, recipe=self.recipe).exists()
+            FavoriteRecipe.objects.filter(
+                user=self.user,
+                recipe=self.recipe
+            ).exists()
         )
 
 
