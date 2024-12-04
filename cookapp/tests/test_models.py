@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from cookapp.models import Ingredient, Recipe, UserPreference, RecipeIngredient
+from cookapp.models import Ingredient, Recipe, UserPreference, RecipeIngredient, FavoriteRecipe
 
 class IngredientModelTest(TestCase):
     def setUp(self):
@@ -111,10 +111,6 @@ class RecipeIngredientModelTest(TestCase):
                 quantity="2 cups"
             )
 
-
-
-
-
 class UserPreferenceModelTest(TestCase):
     def setUp(self):
         # Create a User instance for testing
@@ -137,3 +133,34 @@ class UserPreferenceModelTest(TestCase):
         self.assertIn(self.ingredient1, self.user_preference.whitelist.all(), "Ingredient 'Tomato' should be in the whitelist")
         self.assertIn(self.ingredient2, self.user_preference.blacklist.all(), "Ingredient 'Cheese' should be in the blacklist")
         self.assertEqual(str(self.user_preference), "testuser's preferences", "String representation of the user preference should be 'testuser's preferences'")
+
+class FavoriteRecipeModelTest(TestCase):
+    def setUp(self):
+        # Create User and Recipe instances for testing
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.recipe = Recipe.objects.create(
+            title="Tomato Cheese Salad",
+            api_id="12345",
+            instructions="Mix tomatoes and cheese.",
+            calories=200,
+            macros={"protein": 10, "carbs": 15, "fat": 10},
+            tags=["quick", "easy"]
+        )
+
+    def test_favorite_recipe_creation(self):
+        # Test that a FavoriteRecipe instance can be created
+        favorite = FavoriteRecipe.objects.create(user=self.user, recipe=self.recipe)
+        self.assertEqual(favorite.user, self.user, "User should be correctly associated with the favorite")
+        self.assertEqual(favorite.recipe, self.recipe, "Recipe should be correctly associated with the favorite")
+        
+        # Use the default string representation
+        self.assertEqual(str(favorite), f"FavoriteRecipe object ({favorite.id})", "String representation should match the default")
+        
+    def test_unique_together_constraint(self):
+        # Test that the unique_together constraint works
+        FavoriteRecipe.objects.create(user=self.user, recipe=self.recipe)
+        
+        # Try to create the same favorite again, should raise IntegrityError
+        with self.assertRaises(Exception):
+            FavoriteRecipe.objects.create(user=self.user, recipe=self.recipe)
+
