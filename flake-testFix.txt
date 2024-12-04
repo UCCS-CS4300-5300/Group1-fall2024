@@ -1,0 +1,209 @@
+./cookapp/admin.py:7:1: E302 expected 2 blank lines, found 1
+./cookapp/admin.py:12:1: E305 expected 2 blank lines after class or function definition, found 1
+./cookapp/admin.py:21:28: W292 no newline at end of file
+./cookapp/decorators.py:4:1: E302 expected 2 blank lines, found 1
+./cookapp/decorators.py:10:1: W293 blank line contains whitespace
+./cookapp/decorators.py:13:1: E302 expected 2 blank lines, found 1
+./cookapp/decorators.py:24:80: E501 line too long (80 > 79 characters)
+./cookapp/decorators.py:26:21: W292 no newline at end of file
+./cookapp/forms.py:4:1: F401 '.models.Ingredient' imported but unused
+./cookapp/forms.py:5:1: F401 'django.forms.modelformset_factory' imported but unused
+./cookapp/forms.py:8:1: E302 expected 2 blank lines, found 1
+./cookapp/forms.py:17:80: E501 line too long (103 > 79 characters)
+./cookapp/forms.py:18:1: E302 expected 2 blank lines, found 0
+./cookapp/forms.py:23:80: E501 line too long (84 > 79 characters)
+./cookapp/forms.py:27:80: E501 line too long (98 > 79 characters)
+./cookapp/forms.py:49:1: W293 blank line contains whitespace
+./cookapp/management/commands/clear_database.py:4:1: E302 expected 2 blank lines, found 1
+./cookapp/management/commands/clear_database.py:5:80: E501 line too long (97 > 79 characters)
+./cookapp/management/commands/clear_database.py:11:80: E501 line too long (83 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:11:1: E302 expected 2 blank lines, found 1
+./cookapp/management/commands/fetch_meals.py:12:80: E501 line too long (92 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:40:80: E501 line too long (81 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:60:80: E501 line too long (94 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:64:80: E501 line too long (86 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:69:80: E501 line too long (113 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:79:80: E501 line too long (86 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:87:80: E501 line too long (95 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:89:80: E501 line too long (83 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:111:80: E501 line too long (106 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:122:80: E501 line too long (117 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:137:80: E501 line too long (89 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:153:80: E501 line too long (110 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:157:80: E501 line too long (87 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:163:80: E501 line too long (104 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:209:80: E501 line too long (93 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:212:80: E501 line too long (80 > 79 characters)
+./cookapp/management/commands/fetch_meals.py:215:80: E501 line too long (85 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:6:1: E302 expected 2 blank lines, found 1
+./cookapp/management/commands/generate_recipe.py:8:80: E501 line too long (103 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:10:80: E501 line too long (109 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:11:80: E501 line too long (93 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:14:80: E501 line too long (112 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:23:80: E501 line too long (120 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:24:71: W291 trailing whitespace
+./cookapp/management/commands/generate_recipe.py:25:80: E501 line too long (118 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:26:80: E501 line too long (80 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:26:81: W291 trailing whitespace
+./cookapp/management/commands/generate_recipe.py:27:80: E501 line too long (105 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:52:80: E501 line too long (115 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:56:1: E302 expected 2 blank lines, found 1
+./cookapp/management/commands/generate_recipe.py:78:1: E302 expected 2 blank lines, found 1
+./cookapp/management/commands/generate_recipe.py:85:80: E501 line too long (87 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:86:80: E501 line too long (84 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:88:80: E501 line too long (84 > 79 characters)
+./cookapp/management/commands/generate_recipe.py:116:1: E305 expected 2 blank lines after class or function definition, found 1
+./cookapp/management/commands/test_openai.py:14:1: E402 module level import not at top of file
+./cookapp/management/commands/test_openai.py:47:80: E501 line too long (89 > 79 characters)
+./cookapp/management/commands/test_openai.py:73:80: E501 line too long (82 > 79 characters)
+./cookapp/management/commands/test_openai.py:76:80: E501 line too long (84 > 79 characters)
+./cookapp/management/commands/test_openai.py:106:80: E501 line too long (83 > 79 characters)
+./cookapp/management/commands/test_openai.py:117:80: E501 line too long (81 > 79 characters)
+./cookapp/management/commands/test_openai.py:138:80: E501 line too long (91 > 79 characters)
+./cookapp/management/commands/test_openai.py:154:80: E501 line too long (135 > 79 characters)
+./cookapp/migrations/0001_initial.py:20:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0001_initial.py:31:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0001_initial.py:32:80: E501 line too long (110 > 79 characters)
+./cookapp/migrations/0001_initial.py:33:80: E501 line too long (121 > 79 characters)
+./cookapp/migrations/0001_initial.py:34:80: E501 line too long (110 > 79 characters)
+./cookapp/migrations/0001_initial.py:40:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0001_initial.py:47:80: E501 line too long (81 > 79 characters)
+./cookapp/migrations/0002_recipe_image.py:16:80: E501 line too long (87 > 79 characters)
+./cookapp/migrations/0004_diets.py:16:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0004_diets.py:18:80: E501 line too long (110 > 79 characters)
+./cookapp/migrations/0004_favoriterecipe.py:19:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0004_favoriterecipe.py:20:80: E501 line too long (112 > 79 characters)
+./cookapp/migrations/0004_favoriterecipe.py:21:80: E501 line too long (118 > 79 characters)
+./cookapp/migrations/0004_remove_recipe_ingredients_recipeingredient.py:21:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0004_remove_recipe_ingredients_recipeingredient.py:22:80: E501 line too long (86 > 79 characters)
+./cookapp/migrations/0004_remove_recipe_ingredients_recipeingredient.py:23:80: E501 line too long (120 > 79 characters)
+./cookapp/migrations/0004_remove_recipe_ingredients_recipeingredient.py:24:80: E501 line too long (112 > 79 characters)
+./cookapp/migrations/0006_remove_recipe_ingredients_and_more.py:21:80: E501 line too long (109 > 79 characters)
+./cookapp/migrations/0006_remove_recipe_ingredients_and_more.py:26:80: E501 line too long (109 > 79 characters)
+./cookapp/migrations/0006_remove_recipe_ingredients_and_more.py:31:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0006_remove_recipe_ingredients_and_more.py:32:80: E501 line too long (86 > 79 characters)
+./cookapp/migrations/0006_remove_recipe_ingredients_and_more.py:33:80: E501 line too long (120 > 79 characters)
+./cookapp/migrations/0006_remove_recipe_ingredients_and_more.py:34:80: E501 line too long (112 > 79 characters)
+./cookapp/migrations/0008_rating.py:19:80: E501 line too long (117 > 79 characters)
+./cookapp/migrations/0008_rating.py:21:80: E501 line too long (136 > 79 characters)
+./cookapp/migrations/0008_rating.py:22:80: E501 line too long (118 > 79 characters)
+./cookapp/models.py:5:1: E302 expected 2 blank lines, found 1
+./cookapp/models.py:11:80: E501 line too long (116 > 79 characters)
+./cookapp/models.py:30:80: E501 line too long (145 > 79 characters)
+./cookapp/models.py:33:80: E501 line too long (81 > 79 characters)
+./cookapp/models.py:47:80: E501 line too long (80 > 79 characters)
+./cookapp/models.py:51:80: E501 line too long (112 > 79 characters)
+./cookapp/models.py:54:80: E501 line too long (85 > 79 characters)
+./cookapp/models.py:60:80: E501 line too long (83 > 79 characters)
+./cookapp/models.py:65:80: E501 line too long (91 > 79 characters)
+./cookapp/models.py:77:1: E302 expected 2 blank lines, found 1
+./cookapp/models.py:79:80: E501 line too long (80 > 79 characters)
+./cookapp/models.py:91:80: E501 line too long (82 > 79 characters)
+./cookapp/models.py:97:1: E302 expected 2 blank lines, found 1
+./cookapp/models.py:103:80: E501 line too long (110 > 79 characters)
+./cookapp/models.py:104:80: E501 line too long (110 > 79 characters)
+./cookapp/models.py:107:80: E501 line too long (93 > 79 characters)
+./cookapp/models.py:108:80: E501 line too long (93 > 79 characters)
+./cookapp/models.py:113:21: W291 trailing whitespace
+./cookapp/models.py:114:1: E302 expected 2 blank lines, found 1
+./cookapp/models.py:121:1: E302 expected 2 blank lines, found 1
+./cookapp/models.py:123:80: E501 line too long (88 > 79 characters)
+./cookapp/models.py:126:5: E301 expected 1 blank line, found 0
+./cookapp/models.py:128:5: E301 expected 1 blank line, found 0
+./cookapp/models.py:129:80: E501 line too long (80 > 79 characters)
+./cookapp/models.py:129:81: W292 no newline at end of file
+./cookapp/tests/test_models.py:3:80: E501 line too long (95 > 79 characters)
+./cookapp/tests/test_models.py:5:1: E302 expected 2 blank lines, found 1
+./cookapp/tests/test_models.py:8:80: E501 line too long (102 > 79 characters)
+./cookapp/tests/test_models.py:12:80: E501 line too long (94 > 79 characters)
+./cookapp/tests/test_models.py:13:80: E501 line too long (136 > 79 characters)
+./cookapp/tests/test_models.py:14:80: E501 line too long (118 > 79 characters)
+./cookapp/tests/test_models.py:18:9: F841 local variable 'ingredient2' is assigned to but never used
+./cookapp/tests/test_models.py:20:80: E501 line too long (108 > 79 characters)
+./cookapp/tests/test_models.py:21:80: E501 line too long (111 > 79 characters)
+./cookapp/tests/test_models.py:29:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:39:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:40:80: E501 line too long (84 > 79 characters)
+./cookapp/tests/test_models.py:58:80: E501 line too long (85 > 79 characters)
+./cookapp/tests/test_models.py:61:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:63:80: E501 line too long (80 > 79 characters)
+./cookapp/tests/test_models.py:71:9: F841 local variable 'recipe2' is assigned to but never used
+./cookapp/tests/test_models.py:73:80: E501 line too long (109 > 79 characters)
+./cookapp/tests/test_models.py:74:80: E501 line too long (130 > 79 characters)
+./cookapp/tests/test_models.py:89:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:102:80: E501 line too long (80 > 79 characters)
+./cookapp/tests/test_models.py:114:1: E302 expected 2 blank lines, found 1
+./cookapp/tests/test_models.py:117:80: E501 line too long (86 > 79 characters)
+./cookapp/tests/test_models.py:118:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:122:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:125:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:132:80: E501 line too long (128 > 79 characters)
+./cookapp/tests/test_models.py:133:80: E501 line too long (127 > 79 characters)
+./cookapp/tests/test_models.py:134:80: E501 line too long (127 > 79 characters)
+./cookapp/tests/test_models.py:135:80: E501 line too long (160 > 79 characters)
+./cookapp/tests/test_models.py:137:1: E302 expected 2 blank lines, found 1
+./cookapp/tests/test_models.py:140:80: E501 line too long (86 > 79 characters)
+./cookapp/tests/test_models.py:152:80: E501 line too long (84 > 79 characters)
+./cookapp/tests/test_models.py:153:80: E501 line too long (107 > 79 characters)
+./cookapp/tests/test_models.py:154:80: E501 line too long (113 > 79 characters)
+./cookapp/tests/test_models.py:155:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:157:80: E501 line too long (131 > 79 characters)
+./cookapp/tests/test_models.py:158:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:162:1: W293 blank line contains whitespace
+./cookapp/tests/test_models.py:166:1: W391 blank line at end of file
+./cookapp/tests/tests.py:107:80: E501 line too long (94 > 79 characters)
+./cookapp/tests/tests.py:128:80: E501 line too long (80 > 79 characters)
+./cookapp/tests/tests.py:147:80: E501 line too long (80 > 79 characters)
+./cookapp/tests/tests.py:156:80: E501 line too long (94 > 79 characters)
+./cookapp/tests/tests.py:177:80: E501 line too long (80 > 79 characters)
+./cookapp/tests/tests.py:307:80: E501 line too long (90 > 79 characters)
+./cookapp/tests/tests.py:318:80: E501 line too long (86 > 79 characters)
+./cookapp/tests/tests.py:373:80: E501 line too long (95 > 79 characters)
+./cookapp/tests/tests.py:374:80: E501 line too long (80 > 79 characters)
+./cookapp/tests/tests.py:376:80: E501 line too long (83 > 79 characters)
+./cookapp/tests/tests.py:384:80: E501 line too long (83 > 79 characters)
+./cookapp/tests/tests.py:385:80: E501 line too long (92 > 79 characters)
+./cookapp/tests/tests.py:386:80: E501 line too long (83 > 79 characters)
+./cookapp/tests/tests.py:388:80: E501 line too long (80 > 79 characters)
+./cookapp/tests/tests.py:444:80: E501 line too long (82 > 79 characters)
+./cookapp/tests/tests.py:564:9: F841 local variable 'ingredient2' is assigned to but never used
+./cookapp/tests/tests.py:600:80: E501 line too long (85 > 79 characters)
+./cookapp/tests/tests.py:613:9: F841 local variable 'recipe2' is assigned to but never used
+./cookapp/tests/tests.py:621:80: E501 line too long (86 > 79 characters)
+./cookapp/tests/tests.py:637:80: E501 line too long (86 > 79 characters)
+./cookapp/tests/tests.py:699:80: E501 line too long (86 > 79 characters)
+./cookapp/tests/tests.py:719:80: E501 line too long (86 > 79 characters)
+./cookapp/urls.py:6:1: F811 redefinition of unused 'path' from line 3
+./cookapp/urls.py:6:1: F811 redefinition of unused 'include' from line 3
+./cookapp/urls.py:7:1: F811 redefinition of unused 'views' from line 4
+./cookapp/urls.py:8:80: E501 line too long (87 > 79 characters)
+./cookapp/urls.py:13:1: W293 blank line contains whitespace
+./cookapp/urls.py:19:1: W293 blank line contains whitespace
+./cookapp/urls.py:21:80: E501 line too long (85 > 79 characters)
+./cookapp/urls.py:24:80: E501 line too long (88 > 79 characters)
+./cookapp/urls.py:25:80: E501 line too long (85 > 79 characters)
+./cookapp/urls.py:26:1: W293 blank line contains whitespace
+./cookapp/urls.py:29:1: W293 blank line contains whitespace
+./cookapp/urls.py:35:1: W293 blank line contains whitespace
+./cookapp/urls.py:36:1: W293 blank line contains whitespace
+./cookapp/urls.py:39:80: E501 line too long (86 > 79 characters)
+./cookapp/urls.py:44:80: E501 line too long (97 > 79 characters)
+./cookapp/urls.py:45:80: E501 line too long (91 > 79 characters)
+./cookapp/urls.py:46:80: E501 line too long (85 > 79 characters)
+./cookapp/urls.py:48:80: E501 line too long (99 > 79 characters)
+./cookapp/urls.py:52:80: E501 line too long (92 > 79 characters)
+./cookapp/urls.py:53:1: W293 blank line contains whitespace
+./needtocook/settings.py:14:1: F401 'os' imported but unused
+./needtocook/settings.py:24:80: E501 line too long (81 > 79 characters)
+./needtocook/settings.py:29:80: E501 line too long (171 > 79 characters)
+./needtocook/settings.py:29:99: E231 missing whitespace after ','
+./needtocook/settings.py:29:152: E231 missing whitespace after ','
+./needtocook/settings.py:103:80: E501 line too long (91 > 79 characters)
+./needtocook/settings.py:106:80: E501 line too long (81 > 79 characters)
+./needtocook/settings.py:109:80: E501 line too long (82 > 79 characters)
+./needtocook/settings.py:112:80: E501 line too long (83 > 79 characters)
+./needtocook/settings.py:142:1: E265 block comment should start with '# '
+./needtocook/settings.py:142:69: W291 trailing whitespace
+./needtocook/urls.py:1:1: F401 'django.contrib.admin' imported but unused
+./needtocook/urls.py:12:80: E501 line too long (122 > 79 characters)
+./needtocook/urls.py:15:79: W292 no newline at end of file
