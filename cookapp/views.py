@@ -110,10 +110,12 @@ class RecipeSearch(View):
         recipe_results = self.apply_blacklist_filter(
             recipe_results, blacklist, p)
 
+        
         recipe_results = recipe_results.annotate(
             ingredient_count=Count('recipeingredient')
-        )
+        ).order_by('title')
 
+        # Paginate the results
         recipe_list = list(
             recipe_results.values(
                 'title', 'id', 'ingredient_count'
@@ -159,6 +161,7 @@ class RecipeSearch(View):
             if include:
                 return None
         return queryset
+
 
 
 @method_decorator(login_required, name='dispatch')

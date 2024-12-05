@@ -236,9 +236,11 @@
             </div>
 
             <!-- Results List -->
-            <ul id="search-results-list" class="list-group w-100">
-              <!-- Search results will be displayed here -->
-            </ul>
+            <div id="search-results-container" class="list-group w-100">
+              <ul id="search-results-list" class="list-group">
+                  <!-- Search results will be displayed here -->
+              </ul>
+            </div>
 
             <ul id="find-results-list" class="list-group w-100 mb-3">
               <!-- Results from Find Recipes will be displayed here -->
@@ -641,15 +643,15 @@
 
     // Infinite scroll handler
     $("#search-results-container").on("scroll", function () {
-      if (isSearchMode && !isLoading && hasMoreResults) {
-        const scrollHeight = $(this)[0].scrollHeight;
-        const scrollTop = $(this).scrollTop();
-        const containerHeight = $(this).height();
+          if (isSearchMode && !isLoading && hasMoreResults) {
+            const scrollHeight = $(this)[0].scrollHeight;
+            const scrollTop = $(this).scrollTop();
+            const containerHeight = $(this).height();
 
-        if (scrollHeight - (scrollTop + containerHeight) < 50) {
-          fetchRecipes(currentSearchQuery, false, true);
-        }
-      }
+            if (scrollHeight - (scrollTop + containerHeight) < 50) {
+              fetchRecipes(currentSearchQuery, false, true);
+            }
+          }
     });
 
     // Initialize
