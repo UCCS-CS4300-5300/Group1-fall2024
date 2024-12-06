@@ -491,7 +491,7 @@ def create_recipe(request):
 RecipeIngredientFormSet = modelformset_factory(
     RecipeIngredient,
     form=RecipeIngredientForm,
-    extra=5,  # Allows up to 5 ingredients to be added
+    extra=1,  # Allows up to 5 ingredients to be added
 )
 
 

@@ -3,17 +3,50 @@
 
 {% block content %}
 <div class="container mt-5">
-<form method="POST">
-    {% csrf_token %}
-    {{ formset.management_form }}
-    
-    {% for form in formset %}
-        <div class="form-row">
-            {{ form.as_p }}  <!-- This renders the form's fields (ingredient and quantity) -->
+    <h1 class="text-center">Add Ingredients</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <div id="ingredient-container">
+            {% for form in formset %}
+                <div class="form-row ingredient-row">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
-    
-    <button type="submit">Add Ingredients</button>
-</form>
+
+        <button type="button" id="add-more-button" class="btn btn-secondary mt-3">More</button>
+        <button type="submit" class="btn btn-primary mt-3">Add Ingredients</button>
+    </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addMoreButton = document.getElementById('add-more-button');
+        const container = document.getElementById('ingredient-container');
+        const totalForms = document.querySelector('#id_form-TOTAL_FORMS');
+
+        addMoreButton.addEventListener('click', function () {
+            const currentFormCount = parseInt(totalForms.value);
+            const formClone = container.firstElementChild.cloneNode(true);
+
+            // Update the cloned form's input attributes
+            formClone.querySelectorAll('input, select, textarea').forEach((input) => {
+                if (input.name) {
+                    input.name = input.name.replace(/form-\d+/, `form-${currentFormCount}`);
+                }
+                if (input.id) {
+                    input.id = input.id.replace(/form-\d+/, `form-${currentFormCount}`);
+                }
+                if (input.type !== 'hidden') {
+                    input.value = ''; // Clear non-hidden input values
+                }
+            });
+
+            container.appendChild(formClone);
+            totalForms.value = currentFormCount + 1; // Increment the total form count
+        });
+    });
+</script>
 {% endblock %}
