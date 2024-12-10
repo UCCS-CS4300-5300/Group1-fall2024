@@ -251,7 +251,7 @@ class RecipeDetailView(View):
 
         context = {
             'recipe': recipe,
-            'is_favorite': is_favorited,
+            'is_favorited': is_favorited,
             'instructions_list': instructions_list,
             'user_rating': user_rating,
             'user_review': user_review,
